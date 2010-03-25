@@ -29,17 +29,37 @@ void* malloc(int cant_bytes){
 
 void* obtenerDirDisponible(header* tabla,int cant_bytes){
 
-void* d = devolverDondeEntre(tabla,cant_bytes);
+	void* d = devolverDondeEntre(tabla,cant_bytes);
+	void* pagina_libre, d_aux;
+	d_aux = d;
+	int cant_paginas = cant_bytes % 4096 == 0? cant_bytes/4096 : (cant_bytes/4096) + 1;
 
-if(¬presente(d)) pidoPaginas(d,cant_bytes);
-
-return d;
+	if(¬estaPresente(d)){
+		while(cant_paginas > 0){
+			pagina_libre = pidoPagina();
+			remapear(pagina_libre,d_aux);
+			cant_paginas--;
+			d_aux += 4096;
+		}
+	}
+	return d;
 }
 
 
-pidoPaginas(void* d,int cant_bytes){
+void* pidoPagina(){
 
+	byte* bitmap_dir;
+	bitmap_dir = DIRECCION_BITMAP;
+	byte libre;
+	unsigned int cant_paginas = 0;
 
+	while(*bitmap_dir == 0xFF){
+		bitmap_dir++;
+		cant_paginas = cant_paginas + 8;
+	}
+
+	libre = *bitmap_dir;
+	
 
 
 
