@@ -4,7 +4,7 @@
 
 
 void llenarBitmap(){
-byte* bitmap = DIRECCION_BITMAP;
+	byte* bitmap = DIRECCION_BITMAP;
 	for(int i = 0; i < 32;i++)
 	{
 		*bitmap = 0xFF;
@@ -17,7 +17,7 @@ byte* bitmap = DIRECCION_BITMAP;
 	}	
 }
 
-void* malloc(int cant_bytes){
+void* malloc(unsigned int cant_bytes){
 
 	id_tarea id_actual = obtenerIdActual();
 	
@@ -27,44 +27,103 @@ void* malloc(int cant_bytes){
 }
 
 
-void* obtenerDirDisponible(header* tabla,int cant_bytes){
+void* obtenerDirDisponible(header* tabla,unsigned int cant_bytes){
 
 	void* d = devolverDondeEntre(tabla,cant_bytes);
 	void* pagina_libre, d_aux;
-	d_aux = d;
-	int cant_paginas = cant_bytes % 4096 == 0? cant_bytes/4096 : (cant_bytes/4096) + 1;
-
-	if(¬estaPresente(d)){
-		while(cant_paginas > 0){
+	d_aux = d & 0xFFFFF000; //lo llevo al inicio de la pagina
+	int cant_paginas = (cant_bytes-1)/4096 + 1;  //devuelve la cantidad de paginas que se usaran
+	
+	while(cant_paginas > 0){
+		if(¬estaPresente(d_aux,cant_bytes)){
 			pagina_libre = pidoPagina();
 			remapear(pagina_libre,d_aux);
-			cant_paginas--;
-			d_aux += 4096;
 		}
+		cant_paginas--;
+		d_aux += 4096;
 	}
 	return d;
 }
 
 
-void* pidoPagina(){
+void* pidoPagina()
+{
 
 	byte* bitmap_dir;
 	bitmap_dir = DIRECCION_BITMAP;
 	byte libre;
-	unsigned int cant_paginas = 0;
+	unsigned int contador_paginas = 0;
 
 	while(*bitmap_dir == 0xFF){
 		bitmap_dir++;
-		cant_paginas = cant_paginas + 8;
+		contador_paginas = contador_paginas + 8;
 	}
 
 	libre = *bitmap_dir;
+	 
+	int i;
+	for(i = 0;i<8;i++) {
+		if (libre & 0x80 != 0)
+		{
+			var = contador_paginas + i;
+			*bitmap_dir = *bitmap_dir || (0x01 << (7-i)); //Se actualiza el BIT correspondiente a la pagina obtenida
+			return var*4*1024;
+		}
+		libre << 1;
+		}
+	return 0;
+}
+
+
+
+
+void* devolverDondeEntre(header* tabla,unsigned int cant_bytes){
+	int tam,ocupado,fin,tam_acumulados;
+	tam_acumulados = 0;
+	header* posible = 0;
 	
+	do{
+		tam = *tabla & 0x1FFFFFFF; //regresa el tamaño en el header
+		ocupado = *tabla & 0x80000000; //  0 = libre;
+		fin = *tabla & 0xE0000000; //0x0 = fin;
+
+		if (ocupado == 0 && tam >= cant_bytes) 
+		{
+			posible = tabla;
+			tam_posible = tam_acumulados;	
+		}
+		if (tam == cant_bytes) {
+			*tabla || 0x8000000;
+			return DIRECCION_BASE_MALLOC + tam_acumulados;
+		}
+
+		tam_acumulados = tam_acumulados + tam;
+		tabla = tabla + 1;
+
+	
+	}while(fin != 0);
+	
+	
+	if(tam > cant_bytes){
+		*tabla = 0xE0000000 + cant_bytes;
+		*(tabla+1) = tam - cant_bytes;
+		return DIRECCION_BASE_MALLOC + tam_acumulados;
+	}
+
+	if(posible != 0) {
+	while(tabla != posible) ...
+	
+	
+	}
 
 
+
+		
+	}
 
 
 }
+
 
 
 
