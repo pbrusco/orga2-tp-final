@@ -60,19 +60,19 @@ gdt_entry gdt[GDT_COUNT] = {
 
 		/* Descriptor de task 0*/
 	(gdt_entry){ 
-		(unsigned short) 0x0067, 
-		(unsigned short) 0x0000,
-		(unsigned char) 0x00, 
-		(unsigned char) 0x9, 
-		(unsigned char) 0, 
-		(unsigned char) 0, 
-		(unsigned char) 1, 
-		(unsigned char) 0x0,
-		(unsigned char) 0,  
-		(unsigned char) 0,  
-		(unsigned char) 0,  
-		(unsigned char) 1, 
-		(unsigned char) 0x00 
+		(unsigned short) 0x0067, 	//limit 0:15 	(16 bits)
+		(unsigned short) 0x0000,	//base 0:15		(16 bits)
+		(unsigned char) 0x00, 		//base 23:16	(7 bits)
+		(unsigned char) 0x9, 		//type 			(4 bits)
+		(unsigned char) 0, 			//system		(1 bit)
+		(unsigned char) 0, 			//dpl			(2 bits)
+		(unsigned char) 1, 			//present		(1 bit)
+		(unsigned char) 0x0,		//limit_16_19	(4 bit)
+		(unsigned char) 0,  		//avaible		(1 bit)
+		(unsigned char) 0,  		//l				(1 bit)
+		(unsigned char) 0,  		//d/b			(1 bit)
+		(unsigned char) 1, 			//granularity	(1 bit)
+		(unsigned char) 0x00 		//base_31_24	(16 bits)
 	}
 
 };
