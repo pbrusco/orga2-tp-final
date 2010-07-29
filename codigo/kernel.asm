@@ -23,8 +23,9 @@ start:
 	; cargo en el registro LGDT la direccion base de la GDT que armamos en gts.asm
 	lgdt[GDT_DESC]			
 
-
+	;#########################################################################################
 	; seteo el bit PE del registro de control CR0 para luego poder habilitar el modo protegido
+	;#########################################################################################
 	mov eax, cr0			
 	or eax, 1
 	mov cr0, eax
@@ -47,6 +48,19 @@ modo_protegido:
 
 	call contarMemoria
 	call iniciar_paginacion_kernel
+	
+	;####################################################################################	
+	;cargo en el registro CR3 la direccion del Directorio de Tablas de Paginas del kernel
+	;####################################################################################
+	mov eax, DIRINIT	
+	mov cr3, eax
+
+	; seteo el bit PG del registro de control CR0 para luego poder habilitar paginacion
+	mov eax, cr0				
+	or  eax, 0x80000000			
+	mov cr0, eax
+
+
 	
 	jmp $
 

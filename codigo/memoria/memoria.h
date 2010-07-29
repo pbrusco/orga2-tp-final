@@ -8,7 +8,4 @@ dword memoria_total;
 void contarMemoria();
 
 
-
-
-
 #endif
