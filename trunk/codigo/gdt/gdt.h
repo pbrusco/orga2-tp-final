@@ -61,4 +61,12 @@ extern gdt_desc GDT_DESC;
 gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
 
 
+
+
+//funciones para modificar/manipular la GDT 
+
+short int buscarLugarVacio();
+
+
+
 #endif //__GDT_H__

@@ -4,6 +4,7 @@ global start
 extern GDT_DESC
 extern contarMemoria
 extern iniciar_paginacion_kernel
+extern llenarBitmap
 ;extern IDT_DESC
 ;extern idtFill
 ;extern tsss
@@ -59,6 +60,9 @@ modo_protegido:
 	mov eax, cr0				
 	or  eax, 0x80000000			
 	mov cr0, eax
+
+
+;	call llenarBitmap
 
 
 	
