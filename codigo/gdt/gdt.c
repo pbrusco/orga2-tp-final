@@ -69,3 +69,23 @@ gdt_entry gdt[GDT_COUNT] = {
 gdt_desc GDT_DESC = {sizeof(gdt)-1, (unsigned int)&gdt};
 
 
+
+
+
+//funciones para modificar la GDT
+
+//devuelve una posicion de la gdt que este vacia
+short int buscarLugarVacio(){
+	int i = 1;
+	unsigned long long *aux = (unsigned long long *) gdt;
+	
+	while(i < GDT_COUNT){
+		if ( *aux == 0 ) return i;
+		aux++;
+		i++;
+	}
+	return 0;
+}
+
+
+
