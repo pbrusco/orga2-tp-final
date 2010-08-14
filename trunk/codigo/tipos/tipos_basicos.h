@@ -10,7 +10,7 @@
 
 #define MB 0x100000
 #define KB 0x400
-#define TAM_PAG 4*KB
+#define TAM_PAG 0x1000
 
 
 typedef unsigned char byte;

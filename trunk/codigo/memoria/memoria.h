@@ -11,7 +11,8 @@ byte *dir_init_bitmap;//debajo de las tablas de paginas del kernel
 void contarMemoria();
 
 void llenarBitmap();
-
+dword* pidoPagina();
+void liberoPagina(dword *);
 
 
 

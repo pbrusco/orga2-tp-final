@@ -5,6 +5,7 @@ extern GDT_DESC
 extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
+
 ;extern IDT_DESC
 ;extern idtFill
 ;extern tsss
@@ -62,8 +63,8 @@ modo_protegido:
 	mov cr0, eax
 
 
-;	call llenarBitmap
-
+	call llenarBitmap
+	
 
 	
 	jmp $
@@ -72,5 +73,7 @@ modo_protegido:
 	%include "macros/a20.asm"
 
 
+
+;ESTO DE ABAJO NO SE HACE AHORA, PERO LO DEJO COMO RECORDATORIO POR SI LO NECESITAMOS USAR
 ;  rellenamos con 0's hasta la posicion donde inicia el directorio de paginas del kernel (0x8000)
 ;	TIMES DIRINIT - KORG - ($ - $$) db 0x00
