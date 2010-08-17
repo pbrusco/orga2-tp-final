@@ -66,6 +66,7 @@ gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
 //funciones para modificar/manipular la GDT 
 
 short int buscarLugarVacio();
+void borrar_gdt_entry(word i);
 
 
 

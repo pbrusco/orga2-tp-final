@@ -3,6 +3,15 @@
 
 extern dword memoria_total;
 
+
+/*
+Funciona tanto para entradas de directorio de tablas como para entradas de tabla de paginas.
+Caso Directorio de Tablas de Paginas:
+"entry*" es la direccion fisica(#) de la entrada del directorio y dir es la direccion fisica de la tabla de pagina.
+
+Caso Tabla de Paginas:
+"entry*" es la direccion virtual y dir es la direccion fisica a la que apunta realmente
+*/
 void mapear_entrada(dword *entry, dword dir, word atributos){
 
 	*entry = (dir & 0xFFFFF000) | (atributos & 0x00000FFF);

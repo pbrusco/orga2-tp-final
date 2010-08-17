@@ -15,6 +15,8 @@ void contarMemoria(){
 	}
 	
 	memoria_total = ((dword) dir) / (1*MB);
+	
+	paginas_libres = ( (memoria_total * MB) - (2*MB) ) / TAM_PAG ;
 
 }
 
@@ -27,29 +29,26 @@ void llenarBitmap(){
 
 	//calculo donde arranca el bitmap, justo debajo de las tablas de paginas
 	dir_init_bitmap = (byte *) MB + (offset_tablas * TAM_PAG);
-
-	//empiezo a rellenar el bitmap
-	int i = 0;
 	
-	int paginas_ocupadas = ((DIR_KERNEL_END) / TAM_PAG)/8;
-	int paginas_libres = (((memoria_total * MB) / TAM_PAG)/8) - paginas_ocupadas;
+	//calculo donde termina el bitmap (ultima dir valida del bitmap)
+	dir_end_bitmap =  (byte *)   (((dword) dir_init_bitmap) + ((((memoria_total * MB) / TAM_PAG)/8) - 1));
 
+	int pag_ocupadas = ((DIR_KERNEL_END) / TAM_PAG)/8;
 	
 	byte* bitmap = dir_init_bitmap;
 	
 	
-	while(i < paginas_ocupadas)
+	while(0 < pag_ocupadas)
 	{
 		*bitmap = 0xFF;
 		bitmap++;
-		i++;
+		pag_ocupadas--;
 	}
-	i = 0;
-	while(i < paginas_libres)
+
+	while(bitmap <= dir_end_bitmap)
 	{
 		*bitmap = 0x00;
 		bitmap++;
-		i++;
 	}
 }
 
@@ -61,21 +60,28 @@ dword* pidoPagina() {
 	dword contador_paginas = 512;//desde los 2 MB en adelante
 	dword var = 0;
 
-	while(*bitmap_dir == 0xFF){
+	while(bitmap_dir <= dir_end_bitmap && *bitmap_dir == 0xFF){
 		bitmap_dir++;
 		contador_paginas = contador_paginas + 8;
 	}
 
-	libre = *bitmap_dir;
-	 
-	int i;
-	for(i = 0;i<8;i++) {
-		if ((libre & 1) == 0) {
-			var = contador_paginas + i;
-			*bitmap_dir = *bitmap_dir | (1 << i); //Se actualiza el BIT correspondiente a la pagina obtenida
-			return (dword *) (var*4*1024);
+	if(bitmap_dir <= dir_end_bitmap) {
+
+		libre = *bitmap_dir;
+		 
+		int i;
+		for(i = 0;i<8;i++) {
+			if ((libre & 1) == 0) {
+				var = contador_paginas + i;
+				*bitmap_dir = *bitmap_dir | (1 << i); //Se actualiza el BIT correspondiente a la pagina obtenida
+				
+				//actualizo la cant de paginas libres
+				paginas_libres--;
+				
+				return (dword *) (var*4*1024);
+			}
+			libre = libre >> 1;
 		}
-		libre = libre >> 1;
 	}
 	
 	return 0;
@@ -102,5 +108,8 @@ void liberoPagina(dword* pagina){
 	}
 
 	*bitmap_dir = *bitmap_dir & (mascara ^ 0xFF); // el operador ^ es el XOR, con FF invierto todos los bits
+	
+	//actualizo la cant de paginas libres
+	paginas_libres++;
 }
 
