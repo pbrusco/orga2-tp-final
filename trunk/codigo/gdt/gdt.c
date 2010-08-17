@@ -87,5 +87,7 @@ short int buscarLugarVacio(){
 	return 0;
 }
 
-
+void borrar_gdt_entry(word i){
+	gdt[i] = make_descriptor(0,0,0,0);
+}
 
