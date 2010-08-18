@@ -113,3 +113,28 @@ void liberoPagina(dword* pagina){
 	paginas_libres++;
 }
 
+
+
+
+/**********************/
+/*  MEMORIA AVANZADA  */
+/**********************/
+
+
+
+void crear_heap(Heap* heap_dir, dword cant_bytes){
+	dword primer_entrada = 0x7FFFFFF & cant_bytes;
+	
+	*heap_dir = (Heap){
+					(dword) primer_entrada,
+					(Entry_Heap *) (heap_dir + sizeof(Heap)),
+					(Entry_Heap *) (heap_dir + sizeof(Heap))
+				};
+}
+
+void* pedir_memoria(dword cant_bytes){
+
+	return 0;
+}
+
+void liberar_memoria(void* dir){}
