@@ -8,12 +8,12 @@ void contarMemoria(){
 
 	*dir = dato;
 	
-	while(*dir == dato){
+	while( ((dword) dir < (32*MB)) && *dir == dato){
 		*dir = 0;
-		dir += TAM_PAG;
+		dir += 1024;
 		*dir = dato;
 	}
-	
+	//no se le suma 2 MB porque la direccion ya apunta al total de la memoria (en bytes)
 	memoria_total = ((dword) dir) / (1*MB);
 	
 	paginas_libres = ( (memoria_total * MB) - (2*MB) ) / TAM_PAG ;
@@ -28,7 +28,7 @@ void llenarBitmap(){
 	unsigned long long offset_tablas = (memoria_total / 4) + 1;
 
 	//calculo donde arranca el bitmap, justo debajo de las tablas de paginas
-	dir_init_bitmap = (byte *) MB + (offset_tablas * TAM_PAG);
+	dir_init_bitmap = (byte *) DIR_DIRECTORIO + (offset_tablas * TAM_PAG);
 	
 	//calculo donde termina el bitmap (ultima dir valida del bitmap)
 	dir_end_bitmap =  (byte *)   (((dword) dir_init_bitmap) + ((((memoria_total * MB) / TAM_PAG)/8) - 1));
@@ -224,6 +224,7 @@ Entry_Heap* devolverDondeEntre(Heap* heap_dir, dword cant_bytes){
 	
 	return posible;
 }
+
 
 
 void liberar_memoria(Heap* heap_dir, void* dir){}

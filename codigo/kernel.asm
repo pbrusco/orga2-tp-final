@@ -23,7 +23,7 @@ start:
 	call check_A20
 
 	; cargo en el registro LGDT la direccion base de la GDT que armamos en gts.asm
-	lgdt[GDT_DESC]			
+	lgdt[GDT_DESC]	
 
 	;#########################################################################################
 	; seteo el bit PE del registro de control CR0 para luego poder habilitar el modo protegido
@@ -48,6 +48,7 @@ modo_protegido:
 	mov gs, ax
 	mov ss, ax
 
+
 	call contarMemoria
 	call iniciar_paginacion_kernel
 	
@@ -65,7 +66,6 @@ modo_protegido:
 
 	call llenarBitmap
 	
-
 	
 	jmp $
 

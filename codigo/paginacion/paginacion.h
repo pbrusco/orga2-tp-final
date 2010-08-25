@@ -31,7 +31,7 @@ entrada de tabla de pagina:
 */
 
 
-#define DIR_DIRECTORIO 0x100000 //1MB
+
 
 #define PRESENT 	1 << 0
 #define READ 		0 << 1
