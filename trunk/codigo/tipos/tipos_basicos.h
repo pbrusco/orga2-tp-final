@@ -12,6 +12,8 @@
 #define KB 0x400
 #define TAM_PAG 0x1000
 
+#define DIR_DIRECTORIO 0x100000
+
 
 typedef unsigned char byte;
 typedef unsigned short word;
