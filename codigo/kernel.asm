@@ -10,7 +10,7 @@ extern llenarBitmap
 ;extern idtFill
 ;extern tsss
 
-%define KORG 0x1200								; posicion de inicio de kernel
+%define KORG 0x1200							; posicion de inicio de kernel
 %define DIRINIT 0x100000						; posicion de inicio del directorio de paginas
 
 start:
@@ -22,8 +22,9 @@ start:
 	call enable_A20
 	call check_A20
 
+
 	; cargo en el registro LGDT la direccion base de la GDT que armamos en gts.asm
-	lgdt[GDT_DESC]	
+	lgdt[GDT_DESC]
 
 	;#########################################################################################
 	; seteo el bit PE del registro de control CR0 para luego poder habilitar el modo protegido
