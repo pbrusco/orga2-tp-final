@@ -1,7 +1,7 @@
 #ifndef __TSS_H__
 #define __TSS_H__
 
-#include "tipos_basicos.h"
+#include "../tipos/tipos_basicos.h"
 
 // Task State Segment - Definicion de las TSSs.
 
@@ -48,7 +48,14 @@ typedef struct str_tss {
 } __attribute__((__packed__, aligned (8))) tss;
 
 
-// Arreglo de TSSs, asi tenemos todo mas ordenado
-tss tsss[CANT_TAREAS];
+//OJO FUNCIONA MAL APARENTEMENTE!
+void crear_TSS(tss *entry, dword CR3, dword EIP, dword EFLAGS);
+
+
+word dame_TSS_vacia();//si devuelve algo mas grande o igual que CANT_TAREAS => no hay ninguno vacio!
+void vaciar_TSS(byte n);
+
+void probar();
+
 
 #endif //__TSS_H__ 

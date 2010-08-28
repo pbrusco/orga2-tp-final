@@ -11,12 +11,12 @@
 
 
 typedef struct BCP_Entry_s{
-	word pid = NULL;
-	byte estado = MUERTO;
-	dword* entrada_directorio = NULL;
-	BCP_Entry* sig = NULL;
-	BCP_Entry* ant = NULL;
-	byte reservado = 0;
+	word pid;
+	byte estado;
+	dword* entrada_directorio;
+	BCP_Entry *sig;
+	BCP_Entry *ant;
+	byte reservado;
 } __attribute__((__packed__, aligned (8))) BCP_Entry;
 
 BCP_Entry BCP[CANT_TAREAS];
