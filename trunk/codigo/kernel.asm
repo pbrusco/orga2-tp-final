@@ -7,6 +7,7 @@ extern iniciar_paginacion_kernel
 extern llenarBitmap
 
 
+
 ;extern IDT_DESC
 ;extern idtFill
 ;extern tsss
@@ -18,6 +19,7 @@ start:
 
 	; deshabilito interrupciones
 	cli					
+
 
 	; habilito el Gate A20 y checkeo que este habilitado
 	call enable_A20
@@ -50,6 +52,12 @@ modo_protegido:
 	mov gs, ax
 	mov ss, ax
 
+	xchg bx, bx
+
+	mov ebp, 0x1FFFFF
+	mov esp, 0x1FFFFF
+
+
 
 	call contarMemoria
 	call iniciar_paginacion_kernel
@@ -68,9 +76,6 @@ modo_protegido:
 
 	call llenarBitmap
 	
-	
-
-	xchg bx, bx
 	
 	jmp $
 

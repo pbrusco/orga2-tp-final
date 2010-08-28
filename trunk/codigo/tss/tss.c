@@ -8,11 +8,11 @@ tss TSS[CANT_TAREAS];
 
 
 
-//CUIDADO CON ESTA FUNCION! ES UNA PORQUERIA! SE CUELGA SIN SENTIDO APARENTE
+//WIII ARREGLE EL PROBLEMA!!! ERA UN PROBLEMA CON LA PILA!!!
 void crear_TSS(tss *entry, dword CR3, dword EIP, dword EFLAGS){
 	entry->cr3 = CR3;
-	entry->eip = EIP;
 	entry->eflags = EFLAGS;
+	entry->eip = EIP;
 }
 
 
@@ -29,7 +29,7 @@ word dame_TSS_vacia(){
 	
 		if(TSS[i].cr3 == 0){
 			res = i;
-			i = CANT_TAREAS;		
+			i = CANT_TAREAS;
 		}
 		i++;	
 	}

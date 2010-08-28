@@ -3,7 +3,7 @@
 #include "../tss/tss.h"
 
 extern tss TSS;
-
+/*
 //llena el BPC[0] con los datos del kernel, y inicializa variables globales
 void iniciar_BCP(){
 
@@ -36,5 +36,5 @@ void crear_entrada(dword id, byte estado, dword* entrada_directorio, BCP_Entry* 
 
 
 
-void eliminar_entrada(dword pid);
-void cambiar_estado(dword pid, byte estado_nuevo);
+void eliminar_entrada(dword pid){}
+void cambiar_estado(dword pid, byte estado_nuevo){}*/
