@@ -6,6 +6,7 @@ extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
 
+
 ;extern IDT_DESC
 ;extern idtFill
 ;extern tsss
@@ -67,6 +68,9 @@ modo_protegido:
 
 	call llenarBitmap
 	
+	
+
+	xchg bx, bx
 	
 	jmp $
 
