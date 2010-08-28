@@ -13,7 +13,7 @@
 typedef struct BCP_Entry_s{
 	word pid;
 	byte estado;
-	dword* entrada_directorio;
+	dword *entrada_directorio;
 	BCP_Entry *sig;
 	BCP_Entry *ant;
 	byte reservado;

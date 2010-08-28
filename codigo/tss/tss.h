@@ -55,7 +55,6 @@ void crear_TSS(tss *entry, dword CR3, dword EIP, dword EFLAGS);
 word dame_TSS_vacia();//si devuelve algo mas grande o igual que CANT_TAREAS => no hay ninguno vacio!
 void vaciar_TSS(byte n);
 
-void probar();
 
 
 #endif //__TSS_H__ 
