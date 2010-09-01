@@ -34,12 +34,12 @@ entrada de tabla de pagina:
 
 
 #define PRESENT 	1 << 0
-#define READ 		0 << 1
+#define READ_PAGINACION	0 << 1
 #define WRITE 		1 << 1
 #define SUPERVISOR	0 << 2
 #define USUARIO		1 << 2
 
-void mapear_directorio(dword *dir_entry, dword dir_table, word atributos);
+void mapear_entrada(dword *entry, dword index, word atributos);
 
 void iniciar_paginacion_kernel();
 

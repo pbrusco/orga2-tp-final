@@ -9,10 +9,13 @@ tss TSS[CANT_TAREAS];
 
 
 //WIII ARREGLE EL PROBLEMA!!! ERA UN PROBLEMA CON LA PILA!!!
-void crear_TSS(tss *entry, dword CR3, dword EIP, dword EFLAGS){
+void crear_TSS(word entrada, dword CR3, dword EIP, dword EFLAGS){
+	
+	tss* entry = &TSS[entrada];
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
+	entry->ptl = 0xFE0;
 }
 
 

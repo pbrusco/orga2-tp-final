@@ -24,6 +24,19 @@ dword* pidoPagina();
 void liberoPagina(dword *);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* MEMORIA AVANZADA (es un artilugio mucho muy complejo) */
 
 typedef dword Entry_Heap;

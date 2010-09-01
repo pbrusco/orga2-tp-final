@@ -77,11 +77,9 @@ gdt_desc GDT_DESC = {sizeof(gdt)-1, (unsigned int)&gdt};
 //devuelve una posicion de la gdt que este vacia
 short int buscarLugarVacio(){
 	int i = 1;
-	unsigned long long *aux = (unsigned long long *) gdt;
-	
+
 	while(i < GDT_COUNT){
-		if ( *aux == 0 ) return i;
-		aux++;
+		if ( gdt[i].limite1 == 0 ) return i;
 		i++;
 	}
 	return 0;
