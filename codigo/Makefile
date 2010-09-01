@@ -5,12 +5,12 @@ KERNEL_OBJ=kernel.o
 KERNEL_BIN=kernel.bin
 
 
-OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o #interrupciones/idt.o interrupciones/isr.o tareas/tss.o teclado/teclado.o
+OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o tareas/tareas.o #interrupciones/idt.o interrupciones/isr.o tareas/tss.o teclado/teclado.o
 DISK_IMG=almacenamiento/diskette.img
 
 
-CFLAGS=-m32 -g -ggdb -Wall -Werror -O0 \
-  -fno-zero-initialized-in-bss -fno-stack-protector -ffreestanding
+CFLAGS=-m32 -g -ggdb -Wall -O0 \
+  -fno-zero-initialized-in-bss -fno-stack-protector -ffreestanding #-Werror
 
 OBJDUMP=objdump
 OBJCOPY=objcopy

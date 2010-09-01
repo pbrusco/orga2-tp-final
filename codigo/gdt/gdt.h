@@ -25,7 +25,7 @@
 #define WRITE           1 << 1
 #define CODIGO          0xA
 #define CONFORMING      1 << 2
-#define READ            1 << 1
+#define READ_GDT        1 << 1
 #define ACCESED         1 << 0
 
 //Valors del campo SISTEMA del Segmento Descriptor de GDT 

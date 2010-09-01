@@ -8,7 +8,7 @@ void contarMemoria(){
 
 	*dir = dato;
 	
-	while(*dir == dato){
+	while(( (dword) dir < (32*MB)) &&  *dir == dato){
 		*dir = 0;
 		dir += 1024;
 		*dir = dato;

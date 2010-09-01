@@ -6,6 +6,7 @@ extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
 
+extern cargar_tarea
 
 
 ;extern IDT_DESC
@@ -52,8 +53,7 @@ modo_protegido:
 	mov gs, ax
 	mov ss, ax
 
-	xchg bx, bx
-
+	;pongo la pila en los 2MB
 	mov ebp, 0x1FFFFF
 	mov esp, 0x1FFFFF
 
@@ -76,7 +76,11 @@ modo_protegido:
 
 	call llenarBitmap
 	
-	
+	mov eax, 16
+	push eax
+	call cargar_tarea
+	pop eax
+
 	jmp $
 
 ; incluimos en el kernel el codigo de los siguientes archivos
