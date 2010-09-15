@@ -24,4 +24,22 @@ typedef unsigned int dword;
 typedef unsigned long long qword;
 
 
+
+
+
+//definicion de estados posibles para las tareas en la BCP
+#define MUERTO 0
+#define CORRIENDO 1
+#define ACTIVO 2
+#define DORMIDO 3
+#define KERNEL -1
+
+
+
+
+
+
+
+
+
 #endif

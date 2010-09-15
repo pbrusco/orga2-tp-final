@@ -75,7 +75,7 @@ gdt_desc GDT_DESC = {sizeof(gdt)-1, (unsigned int)&gdt};
 //funciones para modificar la GDT
 
 //devuelve una posicion de la gdt que este vacia
-short int buscarLugarVacio(){
+short int buscar_entradaGDT_vacia(){
 	int i = 1;
 
 	while(i < GDT_COUNT){

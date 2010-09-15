@@ -48,13 +48,9 @@ typedef struct str_tss {
 } __attribute__((__packed__, aligned (8))) tss;
 
 
-//OJO FUNCIONA MAL APARENTEMENTE!
+/* Funciones */
 void crear_TSS(word entrada, dword CR3, dword EIP, dword EFLAGS);
-
-
-word dame_TSS_vacia();//si devuelve algo mas grande o igual que CANT_TAREAS => no hay ninguno vacio!
+word buscar_TSS_vacia();//si devuelve algo mas grande o igual que CANT_TAREAS => no hay ninguno vacio!
 void vaciar_TSS(byte n);
-
-
 
 #endif //__TSS_H__ 
