@@ -76,10 +76,11 @@ modo_protegido:
 
 	call llenarBitmap
 	
-	mov eax, 16
-	push eax
-	call cargar_tarea
-	pop eax
+	;####################################################################################	
+	;cargo TSS y BCP del kernel
+	;####################################################################################
+	;call cargar_init()
+	
 
 	jmp $
 

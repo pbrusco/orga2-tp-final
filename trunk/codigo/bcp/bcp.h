@@ -4,12 +4,6 @@
 #include "../tipos/tipos_basicos.h"
 
 
-//definicion de estados posibles
-#define MUERTO 1
-#define ACTIVO 2
-#define DORMIDO 3
-
-
 typedef struct BCP_Entry_s{
 	word pid;
 	byte estado;
@@ -26,14 +20,22 @@ BCP_Entry* tarea_actual;
 word cant_tareas_en_sistema;
 
 
-//funciones
+/* Funciones */
 
-void iniciar_BCP(); //llena el BPC[0] con los datos del kernel, y inicializa variables globales
+//llena el BPC[0] con los datos del kernel, y inicializa variables globales
+void iniciar_BCP(); 
 
-void crear_entrada(dword pid, byte estado, dword* entrada_directorio, BCP_Entry* ant, BCP_Entry* sig);
-void eliminar_entrada(dword pid);
+// busca entrada libre en el BCP (libre <=> estado == muerto)
+word buscar_entradaBCP_vacia();
+
+// llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
+void crear_entrada(word entrada, dword pid, byte estado, dword* entrada_directorio);
+
+// cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
 void cambiar_estado(dword pid, byte estado_nuevo);
 
+// devuelve el pid de la proxima tarea en la cola
+word proxima_tarea();
 
 
 #endif 
