@@ -19,7 +19,7 @@ gdt_entry gdt[GDT_COUNT] = {
 
 	/* Descriptor de segmento nulo*/	
 	(gdt_entry){(unsigned long long) 0},
-	
+
 	
 	/* Descriptor de segmento de codigo KERNEL*/
 	(gdt_entry){ 
