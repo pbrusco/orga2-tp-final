@@ -11,7 +11,8 @@ typedef struct BCP_Entry_s{
 	struct BCP_Entry_s *sig;
 	struct BCP_Entry_s *ant;
 	byte reservado;
-} __attribute__((__packed__, aligned (8))) BCP_Entry;
+} __attribute__((__packed__, aligned (8))) BCP_Entry; 
+
 
 BCP_Entry BCP[CANT_TAREAS];
 

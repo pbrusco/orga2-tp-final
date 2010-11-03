@@ -11,13 +11,24 @@ void iniciar_BCP(){
 	cant_tareas_en_sistema = 1;
 	
 	
-	BCP[0].pid = 5;//entrada TSS en la GDT del kernel
+	BCP[0].pid = buscar_entradaGDT_vacia();//entrada TSS en la GDT donde estara el kernel
 	BCP[0].estado = KERNEL;
 	BCP[0].entrada_directorio = DIR_DIRECTORIO;
-	BCP[0].ant = NULL;
-	BCP[0].sig = NULL;
+	BCP[0].ant = &BCP[0];
+	BCP[0].sig = &BCP[0];
 
 }
+
+void iniciar_tss_kernel(){
+    word tssVacia = buscar_TSS_vacia();
+    
+    gdt[BCP[0].pid] = make_descriptor(&tss[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO , TSS_GRANULARIDAD |  AVAILABLE)
+    
+    
+    
+    
+}
+
 
 
 void crear_entrada(word entrada, dword id, byte estado, dword* ent_directorio){

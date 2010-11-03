@@ -18,7 +18,9 @@
 #define SISTEMA  		0 << 4
 #define GRANULARIDAD    1 << 7
 #define DB              1 << 6
-
+#define AVAILABLE       1 << 0
+#define L_32            0 << 1
+#define L_64            1 << 1
 //Valores del campo GENERAL del Segmento Descriptor de GDT
 #define DATOS           0x2
 #define EXPAND_DOWN     1 << 2
@@ -28,15 +30,25 @@
 #define READ_GDT        1 << 1
 #define ACCESED         1 << 0
 
-//Valors del campo SISTEMA del Segmento Descriptor de GDT 
+//Valores del campo SISTEMA del Segmento Descriptor de GDT 
 #define LDT             2
 #define TASK_GATE       5
-#define TSS_AVAILABLE   9
+
 #define TSS_BUSY        0xB
 #define CALL_GATE       0xC
 #define INT_GATE        0xE
 #define TRAP_GATE       0xF
 
+//Valores de los campos ATRIBUTOS Descriptor de GDT de TSS
+#define TSS_AVAILABLE       9
+#define TSS_0_OBLIGATORIO  0 << 4
+#define TSS_GRANULARIDAD    100b << 1
+
+
+
+
+//otras constantes
+#define TAM_TSS         0x67
 
 //Tipo Registro de GDT 
 typedef struct gdt_desc {

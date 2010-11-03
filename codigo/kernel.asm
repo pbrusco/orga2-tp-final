@@ -77,12 +77,30 @@ modo_protegido:
 	call llenarBitmap
 	
 	;####################################################################################	
-	;cargo TSS y BCP del kernel
-	;####################################################################################
-	;call cargar_init()
+	call iniciar_BCP();
+	call iniciar_tss_kernel(); crea descriptor de tss en la gdt y la entrada corresp en la tss
 	
+	; Cargo el registro de tareas (TR)
+	mov ax, 0x20		
+	ltr ax
 
-	jmp $
+
+    ; inicializo los descriptores de la IDT
+	call idtFill
+
+    ; remapeamos las interrupciones del vector de interrupciones 
+	%include "macros/rutina_de_remapeo_pic.asm"
+	
+    ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
+	lidt[IDT_DESC]
+
+    ; Habilito las interrupciones
+	sti
+
+    jmp $
+
+
+
 
 ; incluimos en el kernel el codigo de los siguientes archivos
 	%include "macros/a20.asm"
