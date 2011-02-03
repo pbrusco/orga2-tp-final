@@ -18,7 +18,7 @@
 #define SISTEMA  		0 << 4
 #define GRANULARIDAD    1 << 7
 #define DB              1 << 6
-#define AVAILABLE       1 << 0
+#define AVAILABLE       1 << 4
 #define L_32            0 << 1
 #define L_64            1 << 1
 //Valores del campo GENERAL del Segmento Descriptor de GDT
@@ -40,9 +40,9 @@
 #define TRAP_GATE       0xF
 
 //Valores de los campos ATRIBUTOS Descriptor de GDT de TSS
-#define TSS_AVAILABLE       9
+#define TSS_AVAILABLE       1001 << 0
 #define TSS_0_OBLIGATORIO  0 << 4
-#define TSS_GRANULARIDAD    100b << 1
+#define TSS_GRANULARIDAD    1 << 7
 
 
 

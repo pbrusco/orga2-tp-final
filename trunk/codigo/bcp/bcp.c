@@ -2,7 +2,8 @@
 #include "../gdt/gdt.h"
 #include "../tss/tss.h"
 
-extern tss TSS;
+extern tss TSS[];
+extern gdt_entry gdt[];
 
 void iniciar_BCP(){
 
@@ -13,7 +14,7 @@ void iniciar_BCP(){
 	
 	BCP[0].pid = buscar_entradaGDT_vacia();//entrada TSS en la GDT donde estara el kernel
 	BCP[0].estado = KERNEL;
-	BCP[0].entrada_directorio = DIR_DIRECTORIO;
+	BCP[0].entrada_directorio = (dword *) DIR_DIRECTORIO;
 	BCP[0].ant = &BCP[0];
 	BCP[0].sig = &BCP[0];
 
@@ -22,11 +23,7 @@ void iniciar_BCP(){
 void iniciar_tss_kernel(){
     word tssVacia = buscar_TSS_vacia();
     
-    gdt[BCP[0].pid] = make_descriptor(&tss[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO , TSS_GRANULARIDAD |  AVAILABLE)
-    
-    
-    
-    
+    gdt[BCP[0].pid] = make_descriptor((dword) &(TSS[tssVacia]), TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 }
 
 

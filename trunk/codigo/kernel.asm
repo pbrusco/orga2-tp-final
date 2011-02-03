@@ -9,9 +9,10 @@ extern llenarBitmap
 extern cargar_tarea
 
 
-;extern IDT_DESC
-;extern idtFill
-;extern tsss
+extern IDT_DESC
+extern idtFill
+extern iniciar_BCP
+extern iniciar_tss_kernel
 
 %define KORG 0x1200							; posicion de inicio de kernel
 %define DIRINIT 0x100000						; posicion de inicio del directorio de paginas
@@ -58,7 +59,6 @@ modo_protegido:
 	mov esp, 0x1FFFFF
 
 
-
 	call contarMemoria
 	call iniciar_paginacion_kernel
 	
@@ -76,23 +76,34 @@ modo_protegido:
 
 	call llenarBitmap
 	
-	;####################################################################################	
-	call iniciar_BCP();
-	call iniciar_tss_kernel(); crea descriptor de tss en la gdt y la entrada corresp en la tss
+
 	
+
+	;####################################################################################	
+	call iniciar_BCP;
+	call iniciar_tss_kernel; crea descriptor de tss en la gdt y la entrada corresp en la tss
+	
+
 	; Cargo el registro de tareas (TR)
-	mov ax, 0x20		
+	mov ax, 0x28		
 	ltr ax
+
 
 
     ; inicializo los descriptores de la IDT
 	call idtFill
 
+
+
     ; remapeamos las interrupciones del vector de interrupciones 
 	%include "macros/rutina_de_remapeo_pic.asm"
 	
+
+
     ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
 	lidt[IDT_DESC]
+
+
 
     ; Habilito las interrupciones
 	sti
