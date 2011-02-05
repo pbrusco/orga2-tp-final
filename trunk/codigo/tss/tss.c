@@ -1,4 +1,4 @@
-//#include "../tipos/tipos_basicos.h" 
+
 #include "tss.h"
 #include "../gdt/gdt.h"
 
@@ -6,9 +6,7 @@
 tss TSS[CANT_TAREAS];
 
 
-void crear_TSS(word entrada, dword CR3, dword EIP, dword EFLAGS){
-	
-	tss* entry = &TSS[entrada];
+void crear_TSS(tss* entry, dword CR3, dword EIP, dword EFLAGS){
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
@@ -17,7 +15,7 @@ void crear_TSS(word entrada, dword CR3, dword EIP, dword EFLAGS){
 
 
 
-word buscar_TSS_vacia(){
+tss* buscar_TSS_vacia(){
 	//voy a tomar como TSS vacia aquella cuyo cr3 sea igual a 0
 
 	//recordar que devuelve algo igual o mayor que CANT_TAREAS si no hay ningun lugar disponible
@@ -31,7 +29,11 @@ word buscar_TSS_vacia(){
 		}
 		i++;	
 	}
-	return res;
+	
+	if(res == CANT_TAREAS)
+		return NULL;
+	else
+		return &TSS[res];
 }
 
 

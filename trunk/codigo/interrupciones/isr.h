@@ -25,11 +25,5 @@ void _isr13();
 void _isr20();
 void _isr21();
 
-/* **************************************************************
- * Funciones Auxiliares
- * ************************************************************** */ 
-
-//Funcion para dibujar el reloj
-void next_clock(void); 
 
 #endif // __ISR_H__

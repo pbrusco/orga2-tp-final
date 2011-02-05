@@ -81,147 +81,130 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 	_isr0:
 		cli
 		mov edx, msgisr0
-		IMPRIMIR_TEXTO edx, msgisr0_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr0_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 		
 	_isr1:
 		cli
 		mov edx, msgisr1
-		IMPRIMIR_TEXTO edx, msgisr1_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr1_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr2:
 		cli
 		mov edx, msgisr2
-		IMPRIMIR_TEXTO edx, msgisr2_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr2_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr3:
 		cli
 		mov edx, msgisr3
-		IMPRIMIR_TEXTO edx, msgisr3_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr3_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr4:
 		cli
 		mov edx, msgisr4
-		IMPRIMIR_TEXTO edx, msgisr4_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr4_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr5:
 		cli
 		mov edx, msgisr5
-		IMPRIMIR_TEXTO edx, msgisr5_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr5_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr6:
 		cli
 		mov edx, msgisr6
-		IMPRIMIR_TEXTO edx, msgisr6_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr6_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr7:
 		cli
 		mov edx, msgisr7
-		IMPRIMIR_TEXTO edx, msgisr7_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr7_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr8:
 		cli
 		mov edx, msgisr8
-		IMPRIMIR_TEXTO edx, msgisr8_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr8_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr9:
 		cli
 		mov edx, msgisr9
-		IMPRIMIR_TEXTO edx, msgisr9_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr9_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isrA:
 		cli
 		mov edx, msgisrA
-		IMPRIMIR_TEXTO edx, msgisrA_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrA_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isrB:
 		cli
 		mov edx, msgisrB
-		IMPRIMIR_TEXTO edx, msgisrB_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrB_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isrC:
 		cli
 		mov edx, msgisrC
-		IMPRIMIR_TEXTO edx, msgisrC_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrC_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isrD:
 		cli
 		mov edx, msgisrD
-		IMPRIMIR_TEXTO edx, msgisrD_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrD_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	
 	_isrE:
 		cli
 		mov edx, msgisrE
-		IMPRIMIR_TEXTO edx, msgisrE_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrE_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isrF:
 		cli
 		mov edx, msgisrF
-		IMPRIMIR_TEXTO edx, msgisrF_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisrF_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr10:
 		cli
 		mov edx, msgisr10
-		IMPRIMIR_TEXTO edx, msgisr10_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr10_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr11:
 		cli
 		mov edx, msgisr11
-		IMPRIMIR_TEXTO edx, msgisr11_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr11_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr12:
 		cli
 		mov edx, msgisr12
-		IMPRIMIR_TEXTO edx, msgisr12_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr12_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 	_isr13:
 		cli
 		mov edx, msgisr13
-		IMPRIMIR_TEXTO edx, msgisr13_len, 0x0C, 0, 0, 0x13000
+		IMPRIMIR_TEXTO edx, msgisr13_len, 0x0C, 0, 0, 0xb8000
 		jmp $
 	
 ; rutina de atencion de interrupcion del timertick y cambio de tarea
 
 	_isr20: 
 		cli				;deshabilito las interrupciones
-		call next_clock			;llamo a la rutina que dibuja el reloj
-		mov al, 0x20			;aviso al pic que se atendio la interrupcion
-		out 0x20, al
-	
-		
-		cmp dword [isrnumero], 1
-		je tareatraductor
-		cmp dword [isrnumero], 3
-		je tareatraductor		;si isrnumero vale 1 o 3, voy a ejecutar la tarea del traductor
-	
-	tareapintor:
-						;habilito las interrupciones antes que se guarde el contexto de la tarea del traductor
-		jmp 0x28:0			;ejecuto la tarea del pintor
-		sti
-		iret				;cuando vuelvo a ejecutar la tarea del traductor, vuelvo a ejecutar desde la linea donde se interrumpio la tarea
-	
-	tareatraductor:
-						;habilito las interrupciones antes que se guarde el contexto de la tarea del pintor
-		jmp 0x30:0			;ejecuto la tarea del traductor
+		mov al, 0x20
+		out 0x20, al			;aviso al pic que se atendio la interrupcion
 		sti
 		iret				;;cuando vuelvo a ejecutar la tarea del pintor, vuelvo a ejecutar desde la linea donde se interrumpio la tarea
 		
@@ -235,7 +218,7 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		jg salir
 		push edx							;guardo edx
 		mov edx, msgisr21					
-		IMPRIMIR_TEXTO edx, msgisr21_len, 0x0C, 0, 0, 0x13000		;escribo por pantalla el mensaje de interrupcion
+		IMPRIMIR_TEXTO edx, msgisr21_len, 0x0C, 0, 0, 0xb8000		;escribo por pantalla el mensaje de interrupcion
 		pop edx	
 		inc byte [cont]
 		jmp sigo
@@ -248,29 +231,6 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		iret								;vuelvo de la interrupcion
 
 
-; Funcion para dibujar el reloj.
-; void next_clock(void)
-	next_clock:
-		pushad
-		inc DWORD [isrnumero]
-		mov ebx, [isrnumero]
-		cmp ebx, 0x4
-		jl .ok
-			mov DWORD [isrnumero], 0x0
-			mov ebx, 0
-		.ok:
-			add ebx, isrmessage1
-			mov edx, isrmessage
-			IMPRIMIR_TEXTO edx, 6, 0x0A, 23, 1, 0x13000
-			IMPRIMIR_TEXTO ebx, 1, 0x0A, 23, 8, 0x13000
-		popad
-		ret
-			
-	isrmessage: db 'Reloj:'
-	isrnumero: dd 0x00000000
-	isrmessage1: db '|'
-	isrmessage2: db '/'
-	isrmessage3: db '-'
-	isrmessage4: db '\'
 	cont: db 1
+	tarea: db 0
 

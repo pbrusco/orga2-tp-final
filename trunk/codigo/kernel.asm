@@ -6,7 +6,7 @@ extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
 
-extern cargar_tarea
+extern cargarTarea
 
 
 extern IDT_DESC
@@ -14,8 +14,10 @@ extern idtFill
 extern iniciar_BCP
 extern iniciar_tss_kernel
 
-%define KORG 0x1200							; posicion de inicio de kernel
-%define DIRINIT 0x100000						; posicion de inicio del directorio de paginas
+%define KORG 0x1200				; posicion de inicio de kernel
+%define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
+%define INICIO_TAREAS 0x4000			; posicion de inicio de las tareas estaticas
+%define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
 
 start:
 
@@ -107,10 +109,34 @@ modo_protegido:
 
     ; Habilito las interrupciones
 	sti
+	
+	;xchg bx, bx
+	call cargarTarea
 
-    jmp $
-
-
+	mov ah, 2
+	next_clock:
+		mov ebx, [isrnumero]
+		cmp ebx, 0x4
+		jl .ok
+			mov DWORD [isrnumero], 0x0
+			jmp next_clock
+		.ok:
+			add ebx, isrmessage1
+			mov al, [ebx]
+			mov [0xb8042], ax
+			inc DWORD [isrnumero]
+			mov ecx, 0
+		.ciclo:
+			inc ecx
+			cmp ecx, 1000000
+			jl .ciclo
+			jmp next_clock
+			
+	isrnumero: dd 0x00000000
+	isrmessage1: db '|'
+	isrmessage2: db '/'
+	isrmessage3: db '-'
+	isrmessage4: db '\'
 
 
 ; incluimos en el kernel el codigo de los siguientes archivos
@@ -118,6 +144,14 @@ modo_protegido:
 
 
 
-;ESTO DE ABAJO NO SE HACE AHORA, PERO LO DEJO COMO RECORDATORIO POR SI LO NECESITAMOS USAR
-;  rellenamos con 0's hasta la posicion donde inicia el directorio de paginas del kernel (0x8000)
-;	TIMES DIRINIT - KORG - ($ - $$) db 0x00
+
+;  rellenamos con 0's hasta la posicion donde inicia el bloque de tareas estaticas (0x4000)
+	TIMES INICIO_TAREAS - KORG - ($ - $$) db 0x00
+
+
+	incbin "relojabajo.tsk"
+;	incbin "relojarriba.tsk"
+
+; por ahora relleno con 0's hasta donde habría tareas (10 tareas por ahora) suponiendo que cada una ocupa 4kb
+	TIMES FIN_TAREAS - KORG - ($ - $$) db 0x00
+

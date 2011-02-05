@@ -49,8 +49,8 @@ typedef struct str_tss {
 
 
 /* Funciones */
-void crear_TSS(word entrada, dword CR3, dword EIP, dword EFLAGS);
-word buscar_TSS_vacia();//si devuelve algo mas grande o igual que CANT_TAREAS => no hay ninguno vacio!
+void crear_TSS(tss* entrada, dword CR3, dword EIP, dword EFLAGS);
+tss* buscar_TSS_vacia();
 void vaciar_TSS(byte n);
 
 #endif //__TSS_H__ 
