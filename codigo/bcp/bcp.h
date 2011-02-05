@@ -23,7 +23,7 @@ word cant_tareas_en_sistema;
 
 /* Funciones */
 
-//llena el BPC[0] con los datos del kernel, y inicializa variables globales
+// llena el BPC[0] con los datos del kernel, y inicializa variables globales
 void iniciar_BCP(); 
 
 // busca entrada libre en el BCP (libre <=> estado == muerto)
@@ -38,5 +38,12 @@ void cambiar_estado(dword pid, byte estado_nuevo);
 // devuelve el pid de la proxima tarea en la cola
 word proxima_tarea();
 
+// provoca el switch de tareas
+
+/*
+ESTO DE ABAJO SON PRUEBAS PARA VER SI CARGA UNA TAREA Y SWITCHEA BIEN
+*/
+
+void cargarTarea();
 
 #endif 
