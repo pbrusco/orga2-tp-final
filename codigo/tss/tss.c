@@ -6,11 +6,18 @@
 tss TSS[CANT_TAREAS];
 
 
-void crear_TSS(tss* entry, dword CR3, dword EIP, dword EFLAGS){
+void crear_TSS(tss* entry, dword CR3, dword EIP, dword EFLAGS, dword pila){
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
-	entry->ptl = 0xFE0;
+	entry->cs = 0x8;
+	entry->ss = 0x10;
+	entry->ds = 0x10;
+	entry->fs = 0x10;
+	entry->gs = 0x10;
+	entry->es = 0x10;
+	entry->esp = pila;
+	entry->ebp = pila;
 }
 
 

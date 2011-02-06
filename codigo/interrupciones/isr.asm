@@ -208,6 +208,30 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		sti
 		iret				;;cuando vuelvo a ejecutar la tarea del pintor, vuelvo a ejecutar desde la linea donde se interrumpio la tarea
 		
+		
+;#################  PRUEBA CABEZA  ######################################		
+		cli				;deshabilito las interrupciones
+		mov al, 0x20			;aviso al pic que se atendio la interrupcion
+		out 0x20, al
+	
+		
+		cmp dword [tarea], 0
+		je relojito
+	
+		mov byte [tarea], 0
+		sti
+		iret				;cuando vuelvo a ejecutar la tarea del traductor, vuelvo a ejecutar desde la linea donde se interrumpio la tarea
+	
+	relojito:
+		xchg bx, bx
+		mov byte [tarea], 1
+		jmp 0x30:0			;ejecuto la tarea del relojito
+		sti
+		iret				;;cuando vuelvo a ejecutar la tarea del pintor, vuelvo a ejecutar desde la linea donde se interrumpio la tarea
+		
+		
+;#######################################################################
+		
 
 ; rutina de atencion de interrupcion del teclado
 ; al igual que las del procesador, se muestra un mensaje por pantalla avisando que interrupcion se produjo, y continua la ejecucion
