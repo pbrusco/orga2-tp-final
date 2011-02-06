@@ -9,6 +9,7 @@ extern llenarBitmap
 extern cargarTarea
 
 
+
 extern IDT_DESC
 extern idtFill
 extern iniciar_BCP
@@ -63,6 +64,7 @@ modo_protegido:
 
 	call contarMemoria
 	call iniciar_paginacion_kernel
+
 	
 	;####################################################################################	
 	;cargo en el registro CR3 la direccion del Directorio de Tablas de Paginas del kernel
@@ -110,33 +112,38 @@ modo_protegido:
     ; Habilito las interrupciones
 	sti
 	
-	;xchg bx, bx
+		
 	call cargarTarea
+	
+	xchg bx, bx
+	jmp 0x30:0
+	
 
 	mov ah, 2
-	next_clock:
-		mov ebx, [isrnumero]
+	next_clock1:
+		mov ebx, [isrnumero1]
 		cmp ebx, 0x4
 		jl .ok
-			mov DWORD [isrnumero], 0x0
-			jmp next_clock
+			mov DWORD [isrnumero1], 0x0
+			jmp next_clock1
 		.ok:
 			add ebx, isrmessage1
 			mov al, [ebx]
 			mov [0xb8042], ax
-			inc DWORD [isrnumero]
+			inc DWORD [isrnumero1]
 			mov ecx, 0
 		.ciclo:
 			inc ecx
 			cmp ecx, 1000000
 			jl .ciclo
-			jmp next_clock
+			jmp next_clock1
 			
-	isrnumero: dd 0x00000000
+	isrnumero1: dd 0x00000000
 	isrmessage1: db '|'
 	isrmessage2: db '/'
 	isrmessage3: db '-'
 	isrmessage4: db '\'
+
 
 
 ; incluimos en el kernel el codigo de los siguientes archivos

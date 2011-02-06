@@ -18,7 +18,7 @@ typedef struct str_tss {
 	unsigned int esp2;
 	unsigned short  ss2;
 	unsigned short  unused3;
-	unsigned int cr3;
+	unsigned int cr3;//265bytes
 	unsigned int eip;
 	unsigned int eflags;
 	unsigned int eax;
@@ -26,7 +26,7 @@ typedef struct str_tss {
 	unsigned int edx;
 	unsigned int ebx;
 	unsigned int esp;
-	unsigned int ebp;
+	unsigned int ebp;//512bytes
 	unsigned int esi;
 	unsigned int edi;
 	unsigned short  es;
@@ -40,16 +40,16 @@ typedef struct str_tss {
 	unsigned short  fs;
 	unsigned short  unused8;
 	unsigned short  gs;
-	unsigned short  unused9;
+	unsigned short  unused9;//1KB
 	unsigned short  ldt;
 	unsigned short  unused10;
 	unsigned short  dtrap;
-	unsigned short  iomap;
+	unsigned short  iomap;//1KB+64bytes
 } __attribute__((__packed__, aligned (8))) tss;
 
 
 /* Funciones */
-void crear_TSS(tss* entrada, dword CR3, dword EIP, dword EFLAGS);
+void crear_TSS(tss* entrada, dword CR3, dword EIP, dword EFLAGS, dword pila);
 tss* buscar_TSS_vacia();
 void vaciar_TSS(byte n);
 
