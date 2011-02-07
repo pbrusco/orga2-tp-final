@@ -115,7 +115,6 @@ modo_protegido:
 		
 	call cargarTarea
 	
-	xchg bx, bx
 	jmp 0x30:0
 	
 
