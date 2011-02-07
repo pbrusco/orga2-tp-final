@@ -6,6 +6,7 @@
 
 extern tss TSS[];
 extern gdt_entry gdt[];
+extern idt[];
 
 void iniciar_BCP(){
 
@@ -95,6 +96,7 @@ void cargarTarea(){
 	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | SUPERVISOR);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | SUPERVISOR);
 	mapear_pagina(directorio, (dword) gdt, (dword) gdt, PRESENT | WRITE | SUPERVISOR);
+	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | WRITE | SUPERVISOR);
 	mapear_pagina(directorio, (dword) 0xe000, (dword) 0xe000, PRESENT | WRITE | SUPERVISOR);
 	//mapear_pagina(directorio, (dword) 0x10000, (dword) 0x10000, PRESENT | WRITE | SUPERVISOR);
 
