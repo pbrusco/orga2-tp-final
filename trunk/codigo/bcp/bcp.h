@@ -45,5 +45,6 @@ ESTO DE ABAJO SON PRUEBAS PARA VER SI CARGA UNA TAREA Y SWITCHEA BIEN
 */
 
 void cargarTarea();
+void switchTarea();
 
 #endif 
