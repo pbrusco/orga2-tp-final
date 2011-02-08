@@ -89,15 +89,15 @@ void cargarTarea(){
 	base_pila += 0xfff;
 
 	//mapeo la primer entrada del directorio a la entrada de tabla que voy a armar
-	mapear_tabla(directorio, (dword) table_entry, 0, PRESENT | WRITE | SUPERVISOR);
+	mapear_tabla(directorio, (dword) table_entry, 0, PRESENT | WRITE | USUARIO);
 
 	//mapeo las paginas que quiero con identity mapping
-	mapear_pagina(directorio, (dword) 0x4000, (dword) 0x4000, PRESENT | WRITE | SUPERVISOR);
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | SUPERVISOR);
-	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | SUPERVISOR);
-	mapear_pagina(directorio, (dword) gdt, (dword) gdt, PRESENT | WRITE | SUPERVISOR);
-	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | WRITE | SUPERVISOR);
-	mapear_pagina(directorio, (dword) 0xe000, (dword) 0xe000, PRESENT | WRITE | SUPERVISOR);
+	mapear_pagina(directorio, (dword) 0x4000, (dword) 0x4000, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) gdt, (dword) gdt, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) 0xe000, (dword) 0xe000, PRESENT | READ_PAGINACION | USUARIO);
 	//mapear_pagina(directorio, (dword) 0x10000, (dword) 0x10000, PRESENT | WRITE | SUPERVISOR);
 
 
@@ -111,14 +111,13 @@ void cargarTarea(){
 	4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	*/
 	word pid = buscar_entradaGDT_vacia();
-	gdt[pid] = make_descriptor((dword) pos_TSS, TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+	gdt[pid] = make_descriptor((dword) pos_TSS, TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
 	/*
 	5to: crear entrada de BCP e inicializarla
 	*/
 	word bcp_pos = buscar_entradaBCP_vacia();
 	crear_entrada(bcp_pos, pid, ACTIVO, (dword *) directorio);
-
 
 }
 

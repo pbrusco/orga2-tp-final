@@ -115,7 +115,8 @@ modo_protegido:
 		
 	call cargarTarea
 	
-	jmp 0x30:0
+
+	int 22h
 	
 
 	mov ah, 2
