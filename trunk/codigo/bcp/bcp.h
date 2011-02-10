@@ -41,7 +41,7 @@ word proxima_tarea();
 /*
 ESTO DE ABAJO SON PRUEBAS PARA VER SI CARGA UNA TAREA Y SWITCHEA BIEN
 */
-
+void arreglar();
 void cargarTarea1();
 void cargarTarea2();/*
 void switchTarea1();

@@ -58,10 +58,12 @@ modo_protegido:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
+	mov es, ax
 
 	;pongo la pila en los 2MB
 	mov ebp, 0x1FFFFF
 	mov esp, 0x1FFFFF
+
 
 
 	call contarMemoria
@@ -121,7 +123,7 @@ modo_protegido:
 
     ; Habilito las interrupciones
 	sti
-	xchg bx, bx
+	
 	
 	
 	jmp $

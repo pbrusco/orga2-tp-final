@@ -43,7 +43,7 @@ void crear_entradaBCP(word entrada, dword id, byte estado, dword* ent_directorio
 
 word buscar_entradaBCP_vacia(){
 
-	word vacia = 1;
+	word vacia = 0;
 	
 	while(BCP[vacia].estado != MUERTO){
 		vacia++;
@@ -146,16 +146,16 @@ void cargarTarea2(){
 	base_pila += 0xfff;
 
 	//mapeo la primer entrada del directorio a la entrada de tabla que voy a armar
-	mapear_tabla(directorio, (dword) table_entry, 0, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_tabla(directorio, (dword) table_entry, 0, PRESENT | READ_PAGINACION | SUPERVISOR);
 
 	//mapeo las paginas que quiero con identity mapping
 	dword dir = 0;
 	while(dir < 0x200000){
-		mapear_pagina(directorio, (dword) dir, (dword) dir, PRESENT | READ_PAGINACION | USUARIO);
+		mapear_pagina(directorio, (dword) dir, (dword) dir, PRESENT | READ_PAGINACION | SUPERVISOR);
 		dir += 0x1000;
 	}
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | SUPERVISOR);
+	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | SUPERVISOR);
 
 
 	
@@ -168,7 +168,7 @@ void cargarTarea2(){
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	
 	word pid = buscar_entradaGDT_vacia();
-	gdt[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+	gdt[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
 	
 	// 5to: crear entrada de BCP e inicializarla
@@ -178,18 +178,7 @@ void cargarTarea2(){
 
 }
 
-
-/*
-void switchTarea1(){
-
-	gdt[6] = make_descriptor((dword) &TSS[1], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
-
+void arreglar(){
+	TSS[0].es = 0x10;
 }
-
-void switchTarea2(){
-
-	gdt[7] = make_descriptor((dword) &TSS[2], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
-
-}
-*/
 
