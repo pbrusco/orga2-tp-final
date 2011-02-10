@@ -117,13 +117,6 @@ void idtFill() {
 	idt[33].segsel = (unsigned short) 0x0008; \
 	idt[33].attr = (unsigned short) 0x8E00; \
 	idt[33].offset_16_31 = (unsigned short) ((unsigned int)(&_isr21) >> 16 & (unsigned int) 0xFFFF);
-	
-	
-	//task gate de prueba
-	idt[34].offset_0_15 = 0; \
-	idt[34].segsel = (unsigned short) 0x0030; \
-	idt[34].attr = (unsigned short) 0xE500; \
-	idt[34].offset_16_31 = 0;
 }
 
 //IDT 
