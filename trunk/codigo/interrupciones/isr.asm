@@ -2,7 +2,6 @@ BITS 32
 %include "macros/macrosmodoprotegido.mac"
 extern pic1_intr_end
 
-extern arreglar
 
 ; ----------------------------------------------------------------
 ; Interrupt Service Routines
@@ -232,8 +231,6 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		sti
 		iret
 	kernel:
-		;xchg bx, bx
-		;call arreglar
 		mov dword [selector], 0x28
 		jmp FAR [offset]
 		sti

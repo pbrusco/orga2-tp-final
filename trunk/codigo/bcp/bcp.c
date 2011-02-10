@@ -178,7 +178,4 @@ void cargarTarea2(){
 
 }
 
-void arreglar(){
-	TSS[0].es = 0x10;
-}
 
