@@ -2,11 +2,9 @@
 #include "tss.h"
 #include "../gdt/gdt.h"
 
-// Arreglo de TSSs, asi tenemos todo mas ordenado
-tss TSS[CANT_TAREAS];
 
-
-void crear_TSS(tss* entry, dword CR3, dword EIP, dword EFLAGS, dword pila){
+void crear_TSS(byte pos, dword CR3, dword EIP, dword EFLAGS, dword pila){
+	tss* entry = &TSS[pos];
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
@@ -22,7 +20,7 @@ void crear_TSS(tss* entry, dword CR3, dword EIP, dword EFLAGS, dword pila){
 
 
 
-tss* buscar_TSS_vacia(){
+byte buscar_TSS_vacia(){
 	//voy a tomar como TSS vacia aquella cuyo cr3 sea igual a 0
 
 	//recordar que devuelve algo igual o mayor que CANT_TAREAS si no hay ningun lugar disponible
@@ -38,9 +36,9 @@ tss* buscar_TSS_vacia(){
 	}
 	
 	if(res == CANT_TAREAS)
-		return NULL;
+		return -1;
 	else
-		return &TSS[res];
+		return res;
 }
 
 

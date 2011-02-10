@@ -67,14 +67,10 @@ typedef struct gdt_entry {
 } __attribute__((__packed__, aligned (8))) gdt_entry;
 
 
-//Declaracion de la GDT y su registro descriptor
-extern gdt_entry gdt[];		
-extern gdt_desc GDT_DESC;			
-gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
-
-
+	
 //funciones para modificar/manipular la GDT 
 
+gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
 word buscar_entradaGDT_vacia();
 void borrar_gdt_entry(word i);
 

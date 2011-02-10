@@ -6,8 +6,10 @@ extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
 
-extern cargarTarea
+extern clear_screen
 
+extern cargarTarea1
+extern cargarTarea2
 
 
 extern IDT_DESC
@@ -17,7 +19,7 @@ extern iniciar_tss_kernel
 
 %define KORG 0x1200				; posicion de inicio de kernel
 %define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
-%define INICIO_TAREAS 0x4000			; posicion de inicio de las tareas estaticas
+%define INICIO_TAREAS 0x2000			; posicion de inicio de las tareas estaticas
 %define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
 
 start:
@@ -108,41 +110,21 @@ modo_protegido:
 	lidt[IDT_DESC]
 
 
+;*******************************
+; ESTO ERA PARA LAS PRUEBAS
+;*******************************
+	call cargarTarea1
+	call cargarTarea2
+;*******************************
+
+	call clear_screen
 
     ; Habilito las interrupciones
 	sti
+	xchg bx, bx
 	
-		
-	call cargarTarea
 	
-
-	int 22h
-	
-
-	mov ah, 2
-	next_clock1:
-		mov ebx, [isrnumero1]
-		cmp ebx, 0x4
-		jl .ok
-			mov DWORD [isrnumero1], 0x0
-			jmp next_clock1
-		.ok:
-			add ebx, isrmessage1
-			mov al, [ebx]
-			mov [0xb8042], ax
-			inc DWORD [isrnumero1]
-			mov ecx, 0
-		.ciclo:
-			inc ecx
-			cmp ecx, 1000000
-			jl .ciclo
-			jmp next_clock1
-			
-	isrnumero1: dd 0x00000000
-	isrmessage1: db '|'
-	isrmessage2: db '/'
-	isrmessage3: db '-'
-	isrmessage4: db '\'
+	jmp $
 
 
 
@@ -155,9 +137,8 @@ modo_protegido:
 ;  rellenamos con 0's hasta la posicion donde inicia el bloque de tareas estaticas (0x4000)
 	TIMES INICIO_TAREAS - KORG - ($ - $$) db 0x00
 
-
-	incbin "relojabajo.tsk"
-;	incbin "relojarriba.tsk"
+	incbin "0x2000.tsk"
+	incbin "0x3000.tsk"
 
 ; por ahora relleno con 0's hasta donde habría tareas (10 tareas por ahora) suponiendo que cada una ocupa 4kb
 	TIMES FIN_TAREAS - KORG - ($ - $$) db 0x00
