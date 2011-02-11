@@ -202,44 +202,12 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 ; rutina de atencion de interrupcion del timertick y cambio de tarea
 
 	_isr20:
-;		cli				;deshabilito las interrupciones
-;		mov al, 0x20
-;		out 0x20, al			;aviso al pic que se atendio la interrupcion
-;		sti
-;		iret
-
-
-;**********************************************************************************
-;	LO DE ABAJO SON PRUEBAS QUE HICE PARA VER QUE TODO ANDE BIEN.
-;**********************************************************************************
-
 		cli				;deshabilito las interrupciones
 		mov al, 0x20
 		out 0x20, al			;aviso al pic que se atendio la interrupcion
-		cmp dword [selector], 0x30
-		je tarea2
-		cmp dword [selector], 0x38
-		je kernel
-	tarea1:
-		mov dword [selector], 0x30
-		jmp FAR [offset]
-		sti
-		iret
-	tarea2:
-		mov dword [selector], 0x38
-		jmp FAR [offset]
-		sti
-		iret
-	kernel:
-		mov dword [selector], 0x28
-		jmp FAR [offset]
 		sti
 		iret
 
-		offset: dd 0
-		selector: dw 0x30
-
-;*****************************************************************************************************
 
 ; rutina de atencion de interrupcion del teclado
 ; al igual que las del procesador, se muestra un mensaje por pantalla avisando que interrupcion se produjo, y continua la ejecucion
@@ -248,13 +216,10 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		cli								;deshabilito interrupciones
 		in al,0x60							;levanto el byte proveniente del teclado
 		mov al, 0x20
-    call keyCatcher
+    		;call keyCatcher
 		out 0x20, al							;aviso al pic que se atendio la interrupcion
 
-		sti										;habilito las interrupciones
-		iret									;vuelvo de la interrupcion
+		sti								;habilito las interrupciones
+		iret								;vuelvo de la interrupcion
 
-
-	cont: db 1
-	tarea: db 0
 

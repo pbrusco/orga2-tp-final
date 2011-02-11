@@ -6,11 +6,6 @@ extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
 
-extern clear_screen
-
-extern cargarTarea1
-extern cargarTarea2
-
 
 extern IDT_DESC
 extern idtFill
@@ -85,9 +80,9 @@ modo_protegido:
 	call llenarBitmap
 
 
-
-
-	;####################################################################################
+	;################################
+	;inicio las distintas estructuras
+	;################################
 	call iniciar_BCP;
 	call iniciar_tss_kernel; crea descriptor de tss en la gdt y la entrada corresp en la tss
 
@@ -112,14 +107,8 @@ modo_protegido:
 	lidt[IDT_DESC]
 
 
-;*******************************
-; ESTO ERA PARA LAS PRUEBAS
-;*******************************
 
-;*******************************
-
-
-  call console
+	;call console
     ; Habilito las interrupciones
 	sti
 
