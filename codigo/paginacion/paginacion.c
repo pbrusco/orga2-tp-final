@@ -16,13 +16,20 @@ void mapear_tabla (dword *directorio, dword dir_tabla, dword dir_virtual, word a
 }
 
 // entry es la direccion del directorio
-void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atributos){
+void mapear_pagina(dword *dir, dword dir_virtual, dword dir_real, word atributos){
 	
 	dword offset = 0;
+	dword *entry = dir;
 	
 	//muevo el puntero del directorio a la entrada del directorio que corresponda
 	offset = dir_virtual / OFFSET_TABLA;
 	entry += offset;
+	
+	// me fijo si la tabla esta presente. Si no lo esta, agrego una tabla de pagina nueva
+	if((*entry & 0x00000001) != PRESENT){
+		mapear_tabla (dir, (dword) pidoPagina(), dir_virtual, atributos);
+	}
+		
 	
 	//muevo el puntero a la tabla que corresponda
 	entry = (dword *) ( (*entry) & 0xFFFFF000);
