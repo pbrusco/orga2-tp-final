@@ -17,7 +17,6 @@ void contarMemoria(){
 	memoria_total = ((dword) dir) / (1*MB);
 	
 	paginas_libres = ( (memoria_total * MB) - (2*MB) ) / TAM_PAG ;
-
 }
 
 
