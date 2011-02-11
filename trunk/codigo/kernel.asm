@@ -25,7 +25,7 @@ extern iniciar_tss_kernel
 start:
 
 	; deshabilito interrupciones
-	cli					
+	cli
 
 
 	; habilito el Gate A20 y checkeo que este habilitado
@@ -39,7 +39,7 @@ start:
 	;#########################################################################################
 	; seteo el bit PE del registro de control CR0 para luego poder habilitar el modo protegido
 	;#########################################################################################
-	mov eax, cr0			
+	mov eax, cr0
 	or eax, 1
 	mov cr0, eax
 
@@ -51,7 +51,7 @@ start:
 	bits 32
 
 modo_protegido:
-	
+
 	; actualizo los selectores para que apunten al descriptor del segmento de datos en la GDT
 	mov ax, 0x10
 	mov ds, ax
@@ -69,31 +69,31 @@ modo_protegido:
 	call contarMemoria
 	call iniciar_paginacion_kernel
 
-	
-	;####################################################################################	
+
+	;####################################################################################
 	;cargo en el registro CR3 la direccion del Directorio de Tablas de Paginas del kernel
 	;####################################################################################
-	mov eax, DIRINIT	
+	mov eax, DIRINIT
 	mov cr3, eax
 
 	; seteo el bit PG del registro de control CR0 para luego poder habilitar paginacion
-	mov eax, cr0				
-	or  eax, 0x80000000			
+	mov eax, cr0
+	or  eax, 0x80000000
 	mov cr0, eax
 
 
 	call llenarBitmap
-	
 
-	
 
-	;####################################################################################	
+
+
+	;####################################################################################
 	call iniciar_BCP;
 	call iniciar_tss_kernel; crea descriptor de tss en la gdt y la entrada corresp en la tss
-	
+
 
 	; Cargo el registro de tareas (TR)
-	mov ax, 0x28		
+	mov ax, 0x28
 	ltr ax
 
 
@@ -103,9 +103,9 @@ modo_protegido:
 
 
 
-    ; remapeamos las interrupciones del vector de interrupciones 
+    ; remapeamos las interrupciones del vector de interrupciones
 	%include "macros/rutina_de_remapeo_pic.asm"
-	
+
 
 
     ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
@@ -115,17 +115,16 @@ modo_protegido:
 ;*******************************
 ; ESTO ERA PARA LAS PRUEBAS
 ;*******************************
-	call cargarTarea1
-	call cargarTarea2
+
 ;*******************************
 
-	call clear_screen
 
+  call console
     ; Habilito las interrupciones
 	sti
-	
-	
-	
+
+
+
 	jmp $
 
 

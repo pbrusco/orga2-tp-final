@@ -10,7 +10,7 @@ typedef struct BCP_Entry_s{
 	dword *entrada_directorio;
 	byte sig;
 	byte ant;
-	byte reservado;
+	word* cursor;
 } __attribute__((__packed__, aligned (8))) BCP_Entry; 
 
 
