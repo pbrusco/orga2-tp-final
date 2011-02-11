@@ -40,3 +40,4 @@ void num2char(dword n, byte* buffer, dword base);
 
 
 #endif
+
