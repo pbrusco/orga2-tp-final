@@ -5,7 +5,7 @@ extern GDT_DESC
 extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
-
+extern console
 
 extern IDT_DESC
 extern idtFill
@@ -108,7 +108,7 @@ modo_protegido:
 
 
 
-	;call console
+	call console
     ; Habilito las interrupciones
 	sti
 
