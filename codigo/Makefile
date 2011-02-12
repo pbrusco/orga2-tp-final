@@ -5,7 +5,7 @@ KERNEL_OBJ=kernel.o
 KERNEL_BIN=kernel.bin
 
 
-OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o interrupciones/idt.o interrupciones/isr.o pantalla/pantalla.o
+OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o interrupciones/idt.o interrupciones/isr.o pantalla/pantalla.o applications/console.o
 DISK_IMG=almacenamiento/diskette.img
 
 
@@ -19,7 +19,7 @@ NASM=nasm
 NASMFLAGS=-felf32
 LD=ld
 LDFLAGS=-static -m elf_i386 --oformat binary -b elf32-i386 -e start -Ttext 0x1200
-.PHONY=clean all image 
+.PHONY=clean all image
 
 all: clean image
 
