@@ -1,5 +1,8 @@
 #include "pantalla.h"
 
+// VARIABLES GLOBALES
+word *puntero_pantalla = DIR_INI_PANTALLA;
+
 void avanzar_puntero(){
 	puntero_pantalla++;
 	if( (dword) puntero_pantalla >= DIR_FIN_PANTALLA ) 

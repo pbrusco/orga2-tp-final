@@ -60,7 +60,6 @@ modo_protegido:
 	mov esp, 0x1FFFFF
 
 
-
 	call contarMemoria
 	call iniciar_paginacion_kernel
 
@@ -109,13 +108,22 @@ modo_protegido:
 
 
 	call console
+	
     ; Habilito las interrupciones
 	sti
-
-
-
+	
+	hola:
+		mov al, 'A'
+		mov ah, [color]
+		mov [0xb8000], ax
+		cmp ah, 0x07
+		je ponuno
+		inc byte [color]
+		jmp hola
+	ponuno: mov byte [color], 1
+		jmp hola
+	color: db 1
 	jmp $
-
 
 
 ; incluimos en el kernel el codigo de los siguientes archivos

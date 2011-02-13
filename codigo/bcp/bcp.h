@@ -15,7 +15,7 @@ typedef struct BCP_Entry_s{
 
 
 //variables globales
-char tarea_actual;
+byte tarea_actual;
 byte cant_tareas_en_sistema;
 
 

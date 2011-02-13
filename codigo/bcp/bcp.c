@@ -5,6 +5,7 @@
 #include "../interrupciones/isr.h"
 #include "../memoria/memoria.h"
 #include "../paginacion/paginacion.h"
+#include "../scheduler/scheduler.h"
 #include "../pantalla/pantalla.h"
 
 extern gdt_entry gdt[];
@@ -40,10 +41,10 @@ void crear_entradaBCP(dword id, byte estado, dword* ent_directorio, word* video)
 	BCP[entrada].estado = ACTIVO;
 	BCP[entrada].pantalla = video;
 	BCP[entrada].entrada_directorio = ent_directorio;
-	BCP[entrada].ant = BCP[(byte) tarea_actual].ant;
-	BCP[entrada].sig = (byte) tarea_actual;
-	BCP[BCP[(byte) tarea_actual].ant].sig = entrada;
-	BCP[(byte) tarea_actual].ant = entrada;
+	BCP[entrada].ant = BCP[tarea_actual].ant;
+	BCP[entrada].sig = tarea_actual;
+	BCP[BCP[tarea_actual].ant].sig = entrada;
+	BCP[tarea_actual].ant = entrada;
 	cant_tareas_en_sistema++;
 } 
 
@@ -93,13 +94,17 @@ void cargarTarea(dword eip){
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
 	dword *directorio = pidoPagina();
+	dword *tabla_entry = pidoPagina();
 	dword *pila = pidoPagina();
 	dword base_pila = (dword) pila;
 	base_pila += 0xfff;
 	word *video = (word *) pidoPagina();
 
 	//mapeo las paginas que quiero con identity mapping
+	//mapear_tabla(directorio, (dword) tabla_entry, 0, PRESENT | READ_PAGINACION | USUARIO);
 	mapeo_paginas_default(directorio);
+	mapear_pagina(directorio, (dword) tabla_entry, (dword) tabla_entry, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) directorio, (dword) directorio, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
@@ -128,6 +133,9 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) &_isr0, (dword) &_isr0, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &_isr21, (dword) &_isr21, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &iniciar_BCP, (dword) &iniciar_BCP, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | WRITE | USUARIO);
 }
 
 
