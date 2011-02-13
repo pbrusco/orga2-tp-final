@@ -2,7 +2,8 @@
 #define __CONSOLE__
 #include "../pantalla/pantalla.h"
 #include "../tipos/tipos_basicos.h"
-void console(int key);
+
+void console(short int key);
 char decode(int key);
 void run (command);
 void help();

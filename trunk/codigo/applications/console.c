@@ -1,29 +1,37 @@
 #include "console.h"
 
 char command[100];
+char levanto;
 
-void console(int key) {
-  //command = "help";
-
-
-  char c = decode(key);
-  if (c == '*') { //if the user press "enter"
-   // clear_line();
-    run(command);
-  }
-  else if (c == '<'){ //if the user press "back"
-
-   // erease_last_char();
-   // remove_last_char(command);
+void console(short int key) {
+  key << 8;
+  *command = "help";
+  if (levanto=='n'){
+    levanto = 's';
+    char c = decode(key);
+    if (c == '*') { //if the user press "enter"
+      char car = getChar(key);
+      putc(car,0x1A);
+     // clear_line();
+      //run(command);
+    }
+    else if (c == '<'){ //if the user press "back"
+     // erease_last_char();
+     // remove_last_char(command);
+    }
+    else
+    {
+      //if (1){ /*exists_place_to_write(command)*/
+        //command[0] == c;//add_char(c,command);
+     }
   }
   else
   {
-    //if (1){ /*exists_place_to_write(command)*/
-      //command[0] == c;//add_char(c,command);
-   putc(c,0);
-   }
-
+    levanto = 'n';
   }
+
+
+}
 
 
 
@@ -33,12 +41,11 @@ char decode(int key){
 
 
 void run (){
-  char first_word = extract_first_word(command);
-  int second_param = extract_number(command);
-  clear_screen();
-  printf("lalalala", 0, 0, 0);
+ // char first_word = extract_first_word(command);
+ // int second_param = extract_number(command);
 
-/*
+help();
+  /*
   switch(first_word){
     case "help":
       help();
@@ -74,39 +81,39 @@ void run (){
 
 
 void help(){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void show_all(){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void show_running_tasks(){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void show_sleeping_tasks(){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void display_task(int id){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void display_merging_task(int id){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void hide_task(int id){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 void send_error_message(){
-  putc('c',0);
+  putc('c',0x1A);
 }
 
 char extract_first_word(){
-  return 'a';
+  return 'x';
 }
 
 int extract_number(){
