@@ -50,7 +50,7 @@ global _isrE, _isr20, _isr21
 		cli								;deshabilito interrupciones
 		in al,0x60							;levanto el byte proveniente del teclado
 		push ax
-		xchg bx, bx
+
     call console
     add esp,2
     mov al, 0x20
