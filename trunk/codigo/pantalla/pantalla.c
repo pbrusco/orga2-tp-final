@@ -36,7 +36,7 @@ void fill_random_screen(){
 
 void printf(const char *frase, byte flag, byte atrib, dword param){
 
-	byte c = (byte) *frase;
+	char c = *frase;
 
 	while(c != '\0') {
 		putc(c, atrib);
@@ -59,10 +59,10 @@ void printf(const char *frase, byte flag, byte atrib, dword param){
 	}
 
 	frase++;
-	c = (byte) *frase;
+	c = *frase;
 }
 
-void putc(byte c, byte atrib){
+void putc(char c, byte atrib){
 	*puntero_pantalla = ( ((word) atrib) << 8 ) | ( (word) c );
 	avanzar_puntero();
 }

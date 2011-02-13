@@ -28,5 +28,7 @@ byte switch_task(){
 	
 	//3ro: devolver el puntero a donde se debe hacer el jmp
 	// TODO: hacer el jmp aca con assembler inline
+	//__asm__ __volatile__ ( "xchg %bx, %bx");
+	//__asm__ __volatile__ ( "ljmp %bx, %bx");
 	return res;		
 }
