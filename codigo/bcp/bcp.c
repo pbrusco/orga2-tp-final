@@ -135,7 +135,7 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) &iniciar_BCP, (dword) &iniciar_BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
 }
 
 
