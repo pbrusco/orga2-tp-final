@@ -13,7 +13,7 @@ typedef struct switch_reg_s{
 
 
 // TODO: provoca el switch de tareas
-dword* switch_task();
+byte switch_task();
 
 
 

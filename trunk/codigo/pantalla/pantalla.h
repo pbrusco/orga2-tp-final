@@ -26,9 +26,6 @@
 #define DIR_INI_PANTALLA 0xB8000
 #define DIR_FIN_PANTALLA 0xB8FA0
 
-// VARIABLES GLOBALES
-word *puntero_pantalla;
-
 // FUNCIONES GLOBALES
 void avanzar_puntero();
 void mover_puntero(byte fila, byte columna);

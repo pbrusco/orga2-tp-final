@@ -2,6 +2,8 @@ BITS 32
 %include "macros/macrosmodoprotegido.mac"
 extern pic1_intr_end
 
+extern switch_task
+extern salto
 
 ; ----------------------------------------------------------------
 ; Interrupt Service Routines
@@ -205,6 +207,11 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		cli				;deshabilito las interrupciones
 		mov al, 0x20
 		out 0x20, al			;aviso al pic que se atendio la interrupcion
+		call switch_task
+		cmp al, 0
+		je continuar
+		jmp FAR [salto]
+	continuar:
 		sti
 		iret
 

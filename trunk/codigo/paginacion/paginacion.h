@@ -39,7 +39,7 @@ entrada de tabla de pagina:
 #define SUPERVISOR	0 << 2
 #define USUARIO		1 << 2
 
-void mapear_tabla (dword *directorio, dword dir_tabla, dword dir_virtual, word atributos);
+void mapear_tabla (dword *directorio, dword dir_tabla, word atributos);
 void mapear_pagina(dword *directorio, dword dir_virtual, dword dir_real, word atributos);
 
 #define OFFSET_TABLA 0X400000
