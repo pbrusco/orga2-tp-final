@@ -18,7 +18,7 @@ void iniciar_BCP(){
 	//variables globales
 	tarea_actual = 0;
 	cant_tareas_en_sistema = 1;
-	
+
 	//datos del kernel
 	BCP[0].pid = 5;
 	BCP[0].estado = ACTIVO;
@@ -46,13 +46,13 @@ void crear_entradaBCP(dword id, byte estado, dword* ent_directorio, word* video)
 	BCP[BCP[tarea_actual].ant].sig = entrada;
 	BCP[tarea_actual].ant = entrada;
 	cant_tareas_en_sistema++;
-} 
+}
 
 
 word buscar_entradaBCP_vacia(){
 
 	word vacia = 1;
-	
+
 	while( (BCP[vacia].estado != MUERTO) && (vacia < CANT_TAREAS) ){
 		vacia++;
 	}
@@ -87,9 +87,9 @@ void cambiar_estado(word id, byte estado_nuevo){
 
 void cargarTarea(dword eip){
 
-	
+
 	// 1ro: averiguar direccion de la tarea y tamaño (en bytes). Por ahora OBSOLETO
-	
+
 
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
@@ -114,12 +114,12 @@ void cargarTarea(dword eip){
 	byte pos_TSS = buscar_TSS_vacia();
 	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, BASIC_EFLAGS, base_pila);
 
-	
+
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	word pid = buscar_entradaGDT_vacia();
 	gdt[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
-	
+
 	// 5to: crear entrada de BCP e inicializarla
 	crear_entradaBCP(pid, ACTIVO, directorio, video);
 }
@@ -130,12 +130,11 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) &gdt[127], (dword) &gdt[127], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &idt[255], (dword) &idt[255], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &_isr0, (dword) &_isr0, PRESENT | READ_PAGINACION | USUARIO);
+
 	mapear_pagina(directorio, (dword) &_isr21, (dword) &_isr21, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &iniciar_BCP, (dword) &iniciar_BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
 }
-
 

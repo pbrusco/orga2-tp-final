@@ -107,22 +107,9 @@ modo_protegido:
 
 
 
-	call console
-	
     ; Habilito las interrupciones
 	sti
-	
-	hola:
-		mov al, 'A'
-		mov ah, [color]
-		mov [0xb8000], ax
-		cmp ah, 0x07
-		je ponuno
-		inc byte [color]
-		jmp hola
-	ponuno: mov byte [color], 1
-		jmp hola
-	color: db 1
+
 	jmp $
 
 

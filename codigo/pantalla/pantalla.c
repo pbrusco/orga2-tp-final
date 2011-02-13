@@ -5,7 +5,7 @@ word *puntero_pantalla = DIR_INI_PANTALLA;
 
 void avanzar_puntero(){
 	puntero_pantalla++;
-	if( (dword) puntero_pantalla >= DIR_FIN_PANTALLA ) 
+	if( (dword) puntero_pantalla >= DIR_FIN_PANTALLA )
 		puntero_pantalla = (word *) DIR_INI_PANTALLA;
 }
 
@@ -22,11 +22,22 @@ void clear_screen(){
 	puntero_pantalla = (word *) DIR_INI_PANTALLA;
 }
 
+void fill_random_screen(){
+	puntero_pantalla = (word *) DIR_INI_PANTALLA;
+	while( (dword) puntero_pantalla != DIR_FIN_PANTALLA){
+		*puntero_pantalla = 0xE200;
+		puntero_pantalla++;
+	}
+	puntero_pantalla = (word *) DIR_INI_PANTALLA;
+
+}
+
+
 
 void printf(const char *frase, byte flag, byte atrib, dword param){
 
 	byte c = (byte) *frase;
-    
+
 	while(c != '\0') {
 		putc(c, atrib);
 		frase++;
@@ -79,7 +90,7 @@ void num2char(dword n, byte* buffer, dword base){
 		buffer[i] = buffer[j];
 		buffer[j] = tmp;
 		j++;
-		i--;    
+		i--;
 	}
 }
 
