@@ -3,15 +3,21 @@
 char command[100];
 char levanto;
 
-void console(short int key) {
-  key << 8;
-  *command = "help";
-  if (levanto=='n'){
+void console(short int tecla) {
+  char key = (char)(tecla & 0x00FF);
+
+  if (levanto=='s'){
+    levanto = 'n';
+    //__asm__ __volatile__ ( "xchg %bx, %bx");
+  }
+  else
+  {
     levanto = 's';
     char c = decode(key);
     if (c == '*') { //if the user press "enter"
       char car = getChar(key);
       putc(car,0x1A);
+      putc("-",0x1A);
      // clear_line();
       //run(command);
     }
@@ -24,10 +30,6 @@ void console(short int key) {
       //if (1){ /*exists_place_to_write(command)*/
         //command[0] == c;//add_char(c,command);
      }
-  }
-  else
-  {
-    levanto = 'n';
   }
 
 
