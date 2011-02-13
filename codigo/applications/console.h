@@ -5,7 +5,7 @@
 
 void console(short int key);
 char decode(int key);
-void run (command);
+void run (/*command*/);
 void help();
 void show_all();
 void show_running_tasks();

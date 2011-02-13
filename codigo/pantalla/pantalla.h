@@ -32,7 +32,7 @@ void mover_puntero(byte fila, byte columna);
 void clear_screen();
 void fill_random_screen();
 void printf(const char *frase, byte flag, byte atrib, dword param);
-void putc(byte c, byte atrib);
+void putc(char c, byte atrib);
 void num2char(dword n, byte* buffer, dword base);
 
 

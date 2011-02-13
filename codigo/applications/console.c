@@ -15,8 +15,8 @@ void console(short int tecla) {
     levanto = 's';
     char c = decode(key);
     if (c == '*') { //if the user press "enter"
-      char car = getChar(key);
-      putc(car,0x1A);
+//      char car = getChar(key);
+//      putc(car,0x1A);
       putc("-",0x1A);
      // clear_line();
       //run(command);

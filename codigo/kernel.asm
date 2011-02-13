@@ -15,7 +15,7 @@ extern iniciar_tss_kernel
 %define KORG 0x1200				; posicion de inicio de kernel
 %define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
 %define INICIO_TAREAS 0x2000			; posicion de inicio de las tareas estaticas
-%define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
+%define FIN_TAREAS 0xC000			; posicion de fin de las tareas estaticas (por ahora)
 
 start:
 
