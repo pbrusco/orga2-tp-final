@@ -12,9 +12,6 @@ typedef struct _tecla{
 }__attribute__((__packed__)) tecla;
 
 
-extern tecla teclado[];
-
-
 char getChar(short codigo);
 short getPos(short codigo);
 void tecladoFill();
