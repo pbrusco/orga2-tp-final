@@ -208,10 +208,6 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		mov al, 0x20
 		out 0x20, al			;aviso al pic que se atendio la interrupcion
 		call switch_task
-		cmp al, 0
-		je continuar
-		jmp FAR [salto]
-	continuar:
 		sti
 		iret
 

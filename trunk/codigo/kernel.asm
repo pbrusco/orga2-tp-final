@@ -8,6 +8,8 @@ extern iniciar_paginacion_kernel
 extern llenarBitmap
 extern console
 
+extern cargarTarea
+
 extern IDT_DESC
 extern idtFill
 extern iniciar_BCP
@@ -108,7 +110,12 @@ modo_protegido:
     ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
 	lidt[IDT_DESC]
 
-
+	push dword 0x2000
+	call cargarTarea
+	add esp, 4
+	push dword 0x2040
+	call cargarTarea
+	add esp, 4
 
     ; Habilito las interrupciones
 	sti
@@ -166,8 +173,8 @@ gdt_desc:
 ;  rellenamos con 0's hasta la posicion donde inicia el bloque de tareas estaticas (0x4000)
 	TIMES INICIO_TAREAS - KORG - ($ - $$) db 0x00
 
-	incbin "0x2000.tsk"
-	incbin "0x3000.tsk"
+	incbin "tareas en binario/0x2000.tsk"
+	incbin "tareas en binario/0x2040.tsk"
 
 ; por ahora relleno con 0's hasta donde habría tareas (10 tareas por ahora) suponiendo que cada una ocupa 4kb
 	TIMES FIN_TAREAS - KORG - ($ - $$) db 0x00
