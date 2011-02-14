@@ -1,7 +1,7 @@
 #include "console.h"
 
 char command[100];
-char levanto;
+char levanto = 'n';
 
 void console(short int tecla) {
   char key = (char)(tecla & 0x00FF);
@@ -17,7 +17,7 @@ void console(short int tecla) {
     if (c == '*') { //if the user press "enter"
 //      char car = getChar(key);
 //      putc(car,0x1A);
-      putc("-",0x1A);
+      putc('-',0x1A);
      // clear_line();
       //run(command);
     }

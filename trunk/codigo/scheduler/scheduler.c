@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include "../bcp/bcp.h"
+#include "../pantalla/pantalla.h"
 
 extern BCP_Entry BCP[];
 

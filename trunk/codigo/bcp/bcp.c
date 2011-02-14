@@ -8,8 +8,8 @@
 #include "../scheduler/scheduler.h"
 #include "../pantalla/pantalla.h"
 
-extern gdt_entry gdt[];
 extern idt_entry idt[];
+extern gdt_entry gdt_vector[];
 
 //declaro el arreglo de BCP's
 BCP_Entry BCP[CANT_TAREAS];
@@ -30,7 +30,7 @@ void iniciar_BCP(){
 void iniciar_tss_kernel(){
     byte tssVacia = buscar_TSS_vacia();
     crear_TSS(tssVacia, DIR_DIRECTORIO, 0, 0, 0);
-    gdt[buscar_entradaGDT_vacia()] = make_descriptor((dword) &TSS[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+    gdt_vector[buscar_entradaGDT_vacia()] = make_descriptor((dword) &TSS[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 }
 
 
@@ -117,7 +117,7 @@ void cargarTarea(dword eip){
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	word pid = buscar_entradaGDT_vacia();
-	gdt[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+	gdt_vector[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
 
 	// 5to: crear entrada de BCP e inicializarla
@@ -126,11 +126,11 @@ void cargarTarea(dword eip){
 
 
 void mapeo_paginas_default(dword* directorio){
-	mapear_pagina(directorio, (dword) gdt, (dword) gdt, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &gdt[127], (dword) &gdt[127], PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) gdt_vector, (dword) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) &gdt_vector[127], (dword) &gdt_vector[127], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &idt[255], (dword) &idt[255], PRESENT | READ_PAGINACION | USUARIO);
-
+	mapear_pagina(directorio, (dword) &_isr0, (dword) &_isr0, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &_isr21, (dword) &_isr21, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &iniciar_BCP, (dword) &iniciar_BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);

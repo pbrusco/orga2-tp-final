@@ -69,7 +69,6 @@ typedef struct gdt_entry {
 
 	
 //funciones para modificar/manipular la GDT 
-
 gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
 word buscar_entradaGDT_vacia();
 void borrar_gdt_entry(word i);
