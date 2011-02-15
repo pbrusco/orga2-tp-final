@@ -26,6 +26,17 @@ void liberoPagina(dword *);
 
 
 
+/*APROX MAPA DE MEMORIA DEL KERNEL*/
+void donde_esta_el_kernel();
+/*
+ 0X1200 - 0X1FFF = kernel.asm con gdt_vector
+ 
+ 0x2000 - 0xEFFF = reservado para tareas
+ 
+ 0xD000 - 
+
+*/
+
 
 
 

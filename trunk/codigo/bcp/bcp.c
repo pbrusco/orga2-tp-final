@@ -150,5 +150,11 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) 0xF000, (dword) 0xF000, PRESENT | READ_PAGINACION | USUARIO);	
+	mapear_pagina(directorio, (dword) TSS, (dword) TSS, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) &TSS[24], (dword) &TSS[24], PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) &TSS[49], (dword) &TSS[49], PRESENT | READ_PAGINACION | USUARIO);
 }
+
+
+
+
