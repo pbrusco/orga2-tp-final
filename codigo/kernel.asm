@@ -119,9 +119,11 @@ modo_protegido:
 
     ; Habilito las interrupciones
 	sti
-
+	
+			
 	jmp $
 
+contadorcito: db 0
 
 ; incluimos en el kernel el codigo de los siguientes archivos
 	%include "macros/a20.asm"

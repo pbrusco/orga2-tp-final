@@ -18,7 +18,7 @@ void iniciar_BCP(){
 	//variables globales
 	tarea_actual = 0;
 	cant_tareas_en_sistema = 1;
-
+	
 	//datos del kernel
 	BCP[0].pid = 5;
 	BCP[0].estado = ACTIVO;
@@ -74,12 +74,12 @@ byte buscar_entradaBCP(word id){
 void cambiar_estado(word id, byte estado_nuevo){
 
 	byte busca = buscar_entradaBCP(id);
-
 	if(busca < CANT_TAREAS){
-		BCP[(byte) busca].estado = estado_nuevo;
+		BCP[busca].estado = estado_nuevo;
 		if(estado_nuevo == MUERTO){
-			BCP[BCP[(byte) busca].ant].sig = BCP[(byte) busca].sig;
-			BCP[BCP[(byte) busca].sig].ant = BCP[(byte) busca].ant;
+			BCP[BCP[busca].ant].sig = BCP[busca].sig;
+			BCP[BCP[busca].sig].ant = BCP[busca].ant;
+			cant_tareas_en_sistema--;
 		}
 	}
 }
@@ -99,6 +99,7 @@ void cargarTarea(dword eip){
 	dword base_pila = (dword) pila;
 	base_pila += 0xfff;
 	word *video = (word *) pidoPagina();
+	//TODO: mapear la pagina de video pedida a la direccion 0xB8000
 
 	//mapeo las paginas que quiero con identity mapping
 	//mapear_tabla(directorio, (dword) tabla_entry, 0, PRESENT | READ_PAGINACION | USUARIO);
@@ -125,6 +126,19 @@ void cargarTarea(dword eip){
 }
 
 
+
+void borrarTarea(byte id){
+	//limpio las interrupciones para evitar problemas
+	__asm__ __volatile__ ("cli");
+	
+	cambiar_estado(id, MUERTO);
+	
+	//activo interrupciones nuevamente
+	__asm__ __volatile__ ("sti");	
+}
+
+
+
 void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) gdt_vector, (dword) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &gdt_vector[127], (dword) &gdt_vector[127], PRESENT | READ_PAGINACION | USUARIO);
@@ -136,5 +150,5 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) 0xF000, (dword) 0xF000, PRESENT | READ_PAGINACION | USUARIO);	
 }
-

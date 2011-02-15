@@ -37,7 +37,7 @@ void fill_random_screen(){
 void printf(const char *frase, byte flag, byte atrib, dword param){
 
 	char c = *frase;
-
+	
 	while(c != '\0') {
 		putc(c, atrib);
 		frase++;
