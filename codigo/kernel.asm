@@ -6,9 +6,10 @@ global start, gdt_vector
 extern contarMemoria
 extern iniciar_paginacion_kernel
 extern llenarBitmap
-extern console
 
 extern cargarTarea
+extern donde_esta_el_kernel
+
 
 extern IDT_DESC
 extern idtFill
@@ -116,6 +117,9 @@ modo_protegido:
 	push dword 0x2040
 	call cargarTarea
 	add esp, 4
+
+	call donde_esta_el_kernel
+	xchg bx, bx
 
     ; Habilito las interrupciones
 	sti
