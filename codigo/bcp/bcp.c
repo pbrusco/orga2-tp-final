@@ -76,7 +76,7 @@ void cambiar_estado(word id, byte estado_nuevo){
 	byte busca = buscar_entradaBCP(id);
 	if(busca < CANT_TAREAS){
 		BCP[busca].estado = estado_nuevo;
-		if(estado_nuevo == MUERTO){
+		if(estado_nuevo == MATAR){
 			BCP[BCP[busca].ant].sig = BCP[busca].sig;
 			BCP[BCP[busca].sig].ant = BCP[busca].ant;
 			cant_tareas_en_sistema--;
@@ -99,17 +99,16 @@ void cargarTarea(dword eip){
 	dword base_pila = (dword) pila;
 	base_pila += 0xfff;
 	word *video = (word *) pidoPagina();
-	//TODO: mapear la pagina de video pedida a la direccion 0xB8000
 
 	//mapeo las paginas que quiero con identity mapping
-	//mapear_tabla(directorio, (dword) tabla_entry, 0, PRESENT | READ_PAGINACION | USUARIO);
 	mapeo_paginas_default(directorio);
 	mapear_pagina(directorio, (dword) tabla_entry, (dword) tabla_entry, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) directorio, (dword) directorio, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
-
+	//mapeo la pagina de video a la pagina de video de la tarea
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
+	
 
 	// 3ro: crear una entrada de TSS e inicializarla
 	byte pos_TSS = buscar_TSS_vacia();
@@ -127,11 +126,11 @@ void cargarTarea(dword eip){
 
 
 
-void borrarTarea(byte id){
+void matarTarea(byte id){
 	//limpio las interrupciones para evitar problemas
 	__asm__ __volatile__ ("cli");
 	
-	cambiar_estado(id, MUERTO);
+	cambiar_estado(id, MATAR);
 	
 	//activo interrupciones nuevamente
 	__asm__ __volatile__ ("sti");	

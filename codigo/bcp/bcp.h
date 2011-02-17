@@ -5,12 +5,12 @@
 
 
 typedef struct BCP_Entry_s{
-	word pid;					//indice de la tarea en el gdt_vector
-	byte estado;				//indica el estado de la tarea
+	word pid;			//indice de la tarea en el gdt_vector
+	byte estado;			//indica el estado de la tarea
 	dword *entrada_directorio;	//direccion del directorio de la tarea
-	byte sig;					//siguiente tarea para el round robin scheduler
-	byte ant;					//anterior tarea para el round robin scheduler
-	word *pantalla;				//TODO: puntero a la pagina destinada al video de la tarea
+	byte sig;			//siguiente tarea para el round robin scheduler
+	byte ant;			//anterior tarea para el round robin scheduler
+	word *pantalla;			//TODO: puntero a la pagina destinada al video de la tarea
 } __attribute__((__packed__, aligned (8))) BCP_Entry; 
 
 
@@ -36,11 +36,19 @@ void cambiar_estado(word pid, byte estado_nuevo);
 // devuelve la posicion en la BCP de la tarea "id"
 byte buscar_entradaBCP(word id);
 
+// TODO: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT_TAREAS
+byte buscar_entradaBCP_muerta();
+
 // carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
 void cargarTarea(dword eip);
 
-// TODO: marcar tarea como muerta para que luego el KERNEL se encargue de eliminarla
-void borrarTarea(byte id);
+// marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla
+void matarTarea(byte id);
+
+/*TODO: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
+Recibe como parametro la entrada de BCP de la tarea.
+*/
+void desaparecerTarea(byte );
 
 // mapea las paginas por default para una tarea (paginas de la gdt,idt,tss,y demas estructuras)
 void mapeo_paginas_default(dword* directorio);

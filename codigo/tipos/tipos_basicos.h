@@ -33,6 +33,7 @@ typedef unsigned long long qword;
 #define CORRIENDO 1
 #define ACTIVO 2
 #define DORMIDO 3
+#define MATAR 4
 #define KERNEL -1
 
 

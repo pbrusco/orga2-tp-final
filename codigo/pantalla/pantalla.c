@@ -1,8 +1,11 @@
 #include "pantalla.h"
 
 // VARIABLES GLOBALES
+
+//TODO: esto deberia moverse a la ultima fila
 word *puntero_pantalla = DIR_INI_PANTALLA;
 
+//TODO: esto debería desaparecer
 void avanzar_puntero(){
 	puntero_pantalla++;
 	if( (dword) puntero_pantalla >= DIR_FIN_PANTALLA )
@@ -22,6 +25,8 @@ void clear_screen(){
 	puntero_pantalla = (word *) DIR_INI_PANTALLA;
 }
 
+
+//TODO: esto que es?
 void fill_random_screen(){
 	puntero_pantalla = (word *) DIR_INI_PANTALLA;
 	while( (dword) puntero_pantalla != DIR_FIN_PANTALLA){
@@ -33,7 +38,7 @@ void fill_random_screen(){
 }
 
 
-
+/* TODO: por más que sea molesto, podriamos pasarle 2 parametros mas: fila y columna donde queremos que se imprima la "frase" */
 void printf(const char *frase, byte flag, byte atrib, dword param){
 
 	char c = *frase;
@@ -62,6 +67,7 @@ void printf(const char *frase, byte flag, byte atrib, dword param){
 	c = *frase;
 }
 
+//TODO: si se elminina el avanzar_puntero, cambiar por *puntero++
 void putc(char c, byte atrib){
 	*puntero_pantalla = ( ((word) atrib) << 8 ) | ( (word) c );
 	avanzar_puntero();

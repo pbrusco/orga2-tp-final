@@ -23,6 +23,11 @@ void llenarBitmap();
 dword* pidoPagina();
 void liberoPagina(dword *);
 
+// TODO: setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
+void setmem(byte* dir, byte set, dword cant);
+
+// TODO: copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
+void cpmem(byte* from, byte* to, dword cant);
 
 
 
@@ -31,9 +36,17 @@ void donde_esta_el_kernel();
 /*
  0X1200 - 0X1FFF = kernel.asm con gdt_vector
  
- 0x2000 - 0xEFFF = reservado para tareas
+ 0x2000 - 0xCFFF = reservado para tareas
  
- 0xD000 - 
+ 0xD000 - 0xDFFF = make_descriptor | pidoPagina | mapear_pagina | crear_TSS
+ 
+ 0xE000 - 0xEFFF = idtFill | _isr0-21
+ 
+ 0xF000 - 0xFFFF = console | extraerNumero | printf | switch_task | getChar
+ 
+ 0x10000- 0x10FFF = levanto | tarea_actual | idt[] | IDT_DESC | paginas_libres | puntero_pantalla | teclado | TSS[0]
+ 
+ 0x
 
 */
 
