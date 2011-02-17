@@ -75,7 +75,7 @@ void printf(const char *frase, byte flag, byte atrib, dword param){
 
 void printl(const char *frase, byte flag, byte atrib, dword param){
 
- *puntero_pantalla = DIR_INI_PANTALLA;
+puntero_pantalla = ( (int) puntero_pantalla - (((int)puntero_pantalla)%80) + 80);
 	char c = *frase;
 
 	while(c != '\0') {

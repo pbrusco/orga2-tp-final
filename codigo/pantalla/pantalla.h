@@ -3,6 +3,7 @@
 
 #include "../tipos/tipos_basicos.h"
 
+
 // el byte de atributos es asi
 // 7(parpadeo), 654(fondo), 3(brillante), 210(letra)
 
