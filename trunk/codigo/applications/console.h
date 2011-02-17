@@ -20,5 +20,6 @@ void clear_screen();
 void send_error_message();
 char extract_code();
 int extract_number();
+void remove_last_char_from_command();
 #endif
 

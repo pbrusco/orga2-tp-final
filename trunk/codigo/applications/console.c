@@ -1,5 +1,6 @@
 #include "console.h"
 #include "../teclado/teclado.h"
+#include "../pantalla/pantalla.h"
 
 char command_incializado = 'n';
 char command[100];
@@ -23,20 +24,15 @@ void console(short int tecla) {
 
     }
     else if (c == '<'){ //if the user press "back"
-
      remove_last_char_from_command();
      borrarc();
     }
-    else if (c == '!'){ //if error on pulse
-
-
-    }
-
+    else if (c == '!'){}
     else
     {
       if (command[0] == '?'){clear_screen();}
       add_char_to_command(c);
-      putc(c,VERDE);
+      putc(c,VERDE_L);
     }
   }
 
@@ -69,7 +65,6 @@ void run (){
   char first_word = extract_code(command);
   int second_param = extract_number(command);
 
-  help();
 
   switch(first_word){
     case 'h':
@@ -114,45 +109,43 @@ void add_char_to_command(char c){
 
 
 void help(){
-  printl("HELP: ",0,VERDE,0);
-  printl("h: help ",0,AZUL,0);
-  printl("l: show_all_tasks: ",0,AZUL,0);
-  printl("p: show_running_tasks: ",0,AZUL,0);
-  printl("s: show_sleeping_tasks ",0,AZUL,0);
-  printl("d: display_task x ",0,AZUL,0);
-  printl("m: display_merging_task x",0,AZUL,0);
-  printl("i: hide_task x ",0,AZUL,0);
+  printf("HELP: (comandos utiles) ",0,VERDE_L,0);
+  printl("h: help ",0,AZUL_L,0);
+  printl("l: show_all_tasks: ",0,AZUL_L,0);
+  printl("p: show_running_tasks: ",0,AZUL_L,0);
+  printl("s: show_sleeping_tasks ",0,AZUL_L,0);
+  printl("d: display_task x ",0,AZUL_L,0);
+  printl("m: display_merging_task x",0,AZUL_L,0);
+  printl("i: hide_task x ",0,AZUL_L,0);
 
 }
 
 void show_all(){
-  printf("l: show_all_tasks: ",0,AZUL,0);
+  printf("l: show_all_tasks: ",0,AZUL_L,0);
 }
 
 void show_running_tasks(){
-  printf("p: show_running_tasks: ",0,AZUL,0);
+  printf("p: show_running_tasks: ",0,AZUL_L,0);
 }
 
 void show_sleeping_tasks(){
-  printf("s: show_sleeping_tasks ",0,AZUL,0);
+  printf("s: show_sleeping_tasks ",0,AZUL_L,0);
 }
 
 void display_task(int id){
-  printf("d: display_task x ",0,AZUL,0);
+  printf("d: display_task x ",0,AZUL_L,0);
 }
 
 void display_merging_task(int id){
-  printf("m: display_merging_task x",0,AZUL,0);
+  printf("m: display_merging_task x",0,AZUL_L,0);
 }
 
 void hide_task(int id){
-  printf("i: hide_task x ",0,AZUL,0);
+  printf("i: hide_task x ",0,AZUL_L,0);
 }
 
-
-
 char extract_code(){
-  return 'h';
+  return command[0];
 }
 
 int extract_number(){
