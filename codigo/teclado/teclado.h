@@ -17,6 +17,5 @@ short getPos(short codigo);
 void tecladoFill();
 
 
-
-
 #endif
+

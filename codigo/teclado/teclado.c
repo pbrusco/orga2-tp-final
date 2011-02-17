@@ -1,8 +1,8 @@
 #include "teclado.h"
 
-tecla teclado[39] = {
-
-	(tecla)	{ (char) 'a', (short) 0x1E }, //[teclado] = 'a'...[teclado+1] = 0x1e...[teclado+2] = 0x00...
+tecla teclado[43] = {
+  (tecla)	{ (char) '!', (short) 0x00 },
+	(tecla)	{ (char) 'a', (short) 0x1E },
 	(tecla)	{ (char) 'b', (short) 0x30 },
 	(tecla)	{ (char) 'c', (short) 0x2E },
 	(tecla)	{ (char) 'd', (short) 0x20 },
@@ -40,13 +40,17 @@ tecla teclado[39] = {
 	(tecla)	{ (char) '-', (short) 0x0C },
 	(tecla)	{ (char) ',', (short) 0x33 },
 	(tecla)	{ (char) '.', (short) 0x34 },
-	(tecla)	{ (char) 'z', (short) 0x2C }
+	(tecla)	{ (char) 'z', (short) 0x2C },
+  (tecla)	{ (char) '*', (short) 0x1C },
+  (tecla) { (char) '<', (short) 0x0e },
+  (tecla) { (char) ' ', (short) 0x39 },
+
 };
 
 char getChar(short code){
 
 	short pos = getPos(code);
-	
+
 	return teclado[pos].letra;
 }
 
@@ -54,11 +58,13 @@ short getPos(short code){
 
 	short res = 0;
 	short i;
-	for(i = 0; i < 39 ; i++){
+	short cant_teclas = 43;
+	for(i = 0; i < cant_teclas ; i++){
 		if(teclado[i].codigo == code){
 			res = i;
-			i = 39 ;
+			i = 43;
 		}
 	}
 	return res;
 }
+

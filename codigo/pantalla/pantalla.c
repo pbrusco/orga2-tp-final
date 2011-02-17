@@ -12,6 +12,12 @@ void avanzar_puntero(){
 		puntero_pantalla = (word *) DIR_INI_PANTALLA;
 }
 
+void retroceder_puntero(){
+	puntero_pantalla--;
+	if( (dword) puntero_pantalla < DIR_INI_PANTALLA )
+		puntero_pantalla = (word *) DIR_FIN_PANTALLA;
+}
+
 void mover_puntero(byte fila, byte columna){
 	puntero_pantalla = (word *) (DIR_INI_PANTALLA + (80*2*fila) + (columna*2));
 }
@@ -42,7 +48,7 @@ void fill_random_screen(){
 void printf(const char *frase, byte flag, byte atrib, dword param){
 
 	char c = *frase;
-	
+
 	while(c != '\0') {
 		putc(c, atrib);
 		frase++;
@@ -67,10 +73,47 @@ void printf(const char *frase, byte flag, byte atrib, dword param){
 	c = *frase;
 }
 
+void printl(const char *frase, byte flag, byte atrib, dword param){
+
+ *puntero_pantalla = DIR_INI_PANTALLA;
+	char c = *frase;
+
+	while(c != '\0') {
+		putc(c, atrib);
+		frase++;
+		c = (byte) *frase;
+	}
+	if(flag != 0){
+		byte base = 10;
+		if(flag == 2){
+			base = 16;
+		}
+		//aca guardo los digitos
+		byte buffer[12];
+		num2char(param, buffer, base);
+		byte i=0;
+		while(buffer[i] != '\0') {
+		    putc(buffer[i], atrib);
+		    i++;
+		}
+	}
+
+	frase++;
+	c = *frase;
+}
+
+
+
 //TODO: si se elminina el avanzar_puntero, cambiar por *puntero++
 void putc(char c, byte atrib){
 	*puntero_pantalla = ( ((word) atrib) << 8 ) | ( (word) c );
 	avanzar_puntero();
+}
+
+
+void borrarc(){
+	retroceder_puntero();
+  *puntero_pantalla = ( (word) ' ' );
 }
 
 
