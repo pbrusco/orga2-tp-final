@@ -36,6 +36,15 @@ void putc(char c, byte atrib);
 void num2char(dword n, byte* buffer, dword base);
 
 
+// FUNCIONES PARA MOVIMIENTO DE PANTALLAS
+
+/*TODO: El pid es el indice en la gdt de la tarea que se quiere ver por pantalla. La idea es copiar los 24 renglones enteros de la tarea "pid" Recordar que la pantalla será de 80*24, de manera de dejarle el ultimo "renglon" para el kernel y la consola.*/
+void mostrar_pantalla_entera(word pid);
+
+/*TODO: 
+*/
+
+
 
 #endif
 

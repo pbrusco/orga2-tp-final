@@ -3,7 +3,6 @@ BITS 32
 extern pic1_intr_end
 extern console
 extern switch_task
-extern salto
 
 ; ----------------------------------------------------------------
 ; Interrupt Service Routines

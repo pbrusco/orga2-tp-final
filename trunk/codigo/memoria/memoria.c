@@ -115,6 +115,17 @@ void liberoPagina(dword* pagina){
 
 
 
+// TODO: setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
+void setmem(byte* dir, byte set, dword cant){}
+
+// TODO: copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
+void cpmem(byte* from, byte* to, dword cant){}
+
+
+
+
+
+
 
 /***********************************************************************/
 /*********ESTO ES PARA VER A DONDE ESTA UBICADO EL KERNEL ENTERO********/

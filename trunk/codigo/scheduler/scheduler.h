@@ -15,8 +15,6 @@ typedef struct switch_reg_s{
 // TODO: provoca el switch de tareas
 void switch_task();
 
-// TODO: funcion que borra todos los datos de una tarea muerta (solo se llama desde la tarea KERNEL)
-
 
 
 #endif 

@@ -8,7 +8,6 @@ extern iniciar_paginacion_kernel
 extern llenarBitmap
 
 extern cargarTarea
-extern donde_esta_el_kernel
 
 
 extern IDT_DESC
@@ -118,16 +117,18 @@ modo_protegido:
 	call cargarTarea
 	add esp, 4
 
-	call donde_esta_el_kernel
-	xchg bx, bx
 
     ; Habilito las interrupciones
 	sti
 	
 			
 	jmp $
+	
+; POR AHORA EL KERNEL QUEDA COLGADO. LUEGO HABRÁ QUE HACERLE UNA TAREA PARA QUE CADA VEZ QUE SE EJECUTE, REALICE LOS SIGUIENTES PASOS:
+; 1) LIMPIE LAS TAREAS CON ESTADO "MATAR"
+; 2) REALICE EL CAMBIO DE PANTALLA QUE SE HAYA PEDIDO
+	
 
-contadorcito: db 0
 
 ; incluimos en el kernel el codigo de los siguientes archivos
 	%include "macros/a20.asm"
