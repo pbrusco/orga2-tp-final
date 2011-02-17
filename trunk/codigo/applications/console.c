@@ -133,15 +133,36 @@ void show_sleeping_tasks(){
 }
 
 void display_task(int id){
-  printf("d: display_task x ",0,AZUL_L,0);
+  if (id == -1){
+    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+  }
+  else
+  {
+    printf("d: display_task ",0,AZUL_L,0);
+    putc(num2char2(id),AZUL_L);
+  }
 }
 
 void display_merging_task(int id){
-  printf("m: display_merging_task x",0,AZUL_L,0);
+  if (id == -1){
+    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+  }
+  else
+  {
+    printf("m: display_merging_task ",0,AZUL_L,0);
+    putc(num2char2(id),AZUL_L);
+  }
 }
 
 void hide_task(int id){
-  printf("i: hide_task x ",0,AZUL_L,0);
+  if (id == -1){
+    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+  }
+  else
+  {
+    printf("i: hide_task ",0,AZUL_L,0);
+    putc(num2char2(id),AZUL_L);
+  }
 }
 
 char extract_code(){
@@ -149,7 +170,13 @@ char extract_code(){
 }
 
 int extract_number(){
-  return 1;
+  short i;
+  for(i = 0;i<100;i++){
+    if (command[i] == ' ') {
+      return char2num(command[i+1]);
+    }
+  }
+  return -1;
 
 }
 
