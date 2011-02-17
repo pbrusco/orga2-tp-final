@@ -5,7 +5,7 @@ KERNEL_OBJ=kernel.o
 KERNEL_BIN=kernel.bin
 
 
-OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o interrupciones/idt.o interrupciones/isr.o pantalla/pantalla.o scheduler/scheduler.o applications/console.o teclado/teclado.o
+OBJ_MINIMOS= $(KERNEL_OBJ)  gdt/gdt.o memoria/memoria.o paginacion/paginacion.o tss/tss.o bcp/bcp.o interrupciones/idt.o interrupciones/isr.o pantalla/pantalla.o scheduler/scheduler.o applications/console.o teclado/teclado.o kernel/kernel.o
 
 DISK_IMG=almacenamiento/diskette.img
 

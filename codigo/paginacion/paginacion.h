@@ -49,7 +49,7 @@ void mapear_pagina(dword *directorio, dword dir_virtual, dword dir_real, word at
 void iniciar_paginacion_kernel();
 
 //TODO: funcion que dada la direccion de un directorio pone en cero (o NO presente) todas las tablas y paginas mapeadas y libera las paginas utilizadas para contenerlas
-
+void liberar_directorio(dword* dir_entry);
 
 
 #endif

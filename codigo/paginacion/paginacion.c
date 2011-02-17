@@ -67,3 +67,6 @@ void iniciar_paginacion_kernel(){
 		dir_entry++;
 	}
 }
+
+
+void liberar_directorio(dword* dir_entry){}

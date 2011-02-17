@@ -24,6 +24,9 @@ typedef unsigned short word;
 typedef unsigned int dword;
 typedef unsigned long long qword;
 
+//booleanos
+#define true 1
+#define false 0
 
 
 

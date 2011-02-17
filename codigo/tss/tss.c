@@ -42,6 +42,6 @@ byte buscar_TSS_vacia(){
 }
 
 
-void vaciar_TSS(byte n){
-	TSS[n].cr3 = 0;
+void vaciar_TSS(tss* tss_task){
+	tss_task->cr3 = 0;
 }

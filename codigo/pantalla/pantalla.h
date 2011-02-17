@@ -7,14 +7,23 @@
 // 7(parpadeo), 654(fondo), 3(brillante), 210(letra)
 
 // DEFINO LOS COLORES
-#define NEGRO 0x0
-#define AZUL 0x1
-#define VERDE 0x2
-#define CELESTE 0x3
-#define ROJO 0x4
-#define VIOLETA 0x5
-#define NARANJA 0x6
-#define GRIS 0x7
+#define NEGRO_L 0x0
+#define AZUL_L 0x1
+#define VERDE_L 0x2
+#define CELESTE_L 0x3
+#define ROJO_L 0x4
+#define VIOLETA_L 0x5
+#define NARANJA_L 0x6
+#define GRIS_L 0x7
+
+#define NEGRO_F 0x0 << 4
+#define AZUL_F 0x1 << 4
+#define VERDE_F 0x2 << 4
+#define CELESTE_F 0x3 << 4
+#define ROJO_F 0x4 << 4
+#define VIOLETA_F 0x5 << 4
+#define NARANJA_F 0x6 << 4
+#define GRIS_F 0x7 << 4
 
 // DEFINO LAS OPCIONES
 #define PARPADEO 1 << 7

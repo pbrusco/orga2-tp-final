@@ -8,7 +8,7 @@ extern iniciar_paginacion_kernel
 extern llenarBitmap
 
 extern cargarTarea
-
+extern kernel_infinito
 
 extern IDT_DESC
 extern idtFill
@@ -19,13 +19,14 @@ extern iniciar_tss_kernel
 %define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
 %define INICIO_TAREAS 0x2000			; posicion de inicio de las tareas estaticas
 %define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
+%define PRIMER_PILA 0xCFFF
+%define DEFINITIVA_PILA 0x1FFFFF
 %define GDT_COUNT 128
 
 start:
 
 	; deshabilito interrupciones
 	cli
-
 
 	; habilito el Gate A20 y checkeo que este habilitado
 	call enable_A20
@@ -61,8 +62,8 @@ modo_protegido:
 	mov es, ax
 
 	;pongo la pila en los 2MB
-	mov ebp, 0x1FFFFF
-	mov esp, 0x1FFFFF
+	mov ebp, DEFINITIVA_PILA
+	mov esp, DEFINITIVA_PILA
 
 
 	call contarMemoria
@@ -121,12 +122,8 @@ modo_protegido:
     ; Habilito las interrupciones
 	sti
 	
-			
-	jmp $
 	
-; POR AHORA EL KERNEL QUEDA COLGADO. LUEGO HABRÁ QUE HACERLE UNA TAREA PARA QUE CADA VEZ QUE SE EJECUTE, REALICE LOS SIGUIENTES PASOS:
-; 1) LIMPIE LAS TAREAS CON ESTADO "MATAR"
-; 2) REALICE EL CAMBIO DE PANTALLA QUE SE HAYA PEDIDO
+	call kernel_infinito
 	
 
 
@@ -171,7 +168,7 @@ gdt_vector:
 	db 0		;limite 31:24
 
 
-; relleno con 0's hasta donde termine la gdt (son 128 entradas menos las 3 que ya inicialice
+; relleno con 0's hasta donde termine la gdt (son 128 entradas menos las 5 que ya inicialice
 	TIMES ((GDT_COUNT-5)*8) db 0x00
 gdt_desc:
 	dw (gdt_desc - gdt_vector -1)
