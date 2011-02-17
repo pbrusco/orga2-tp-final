@@ -111,20 +111,23 @@ modo_protegido:
     ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
 	lidt[IDT_DESC]
 
-	push dword 0x2000
-	call cargarTarea
-	add esp, 4
-	push dword 0x2040
-	call cargarTarea
-	add esp, 4
+	;push dword 0x2000
+	;call cargarTarea
+	;add esp, 4
+	;push dword 0x2040
+	;call cargarTarea
+	;add esp, 4
 
 
     ; Habilito las interrupciones
 	sti
-	
-	
+
+
+
+
+
 	call kernel_infinito
-	
+
 
 
 ; incluimos en el kernel el codigo de los siguientes archivos
@@ -134,7 +137,7 @@ gdt_vector:
 	;entrada nula
 	dd 0
 	dd 0
-	
+
 	;gdt codigo kernel
 	dw 0xFFFF	;limite 15:0
 	dw 0x0000	;base 15:0
@@ -142,7 +145,7 @@ gdt_vector:
 	db 0x9A		;presente | dpl 0 | 1b(codigo/datos) | codigo
 	db 0xCF		;granularidad | D/B | limite 19:16
 	db 0		;limite 31:24
-	
+
 	;gdt datos kernel
 	dw 0xFFFF	;limite 15:0
 	dw 0x0000	;base 15:0
@@ -150,7 +153,7 @@ gdt_vector:
 	db 0x92		;presente | dpl 0 | 1b(codigo/datos) | datos
 	db 0xCF		;granularidad | D/B | limite 19:16
 	db 0		;limite 31:24
-	
+
 	;gdt codigo usuario
 	dw 0xFFFF	;limite 15:0
 	dw 0x0000	;base 15:0
@@ -158,7 +161,7 @@ gdt_vector:
 	db 0xFA		;presente | dpl 3 | 1b(codigo/datos) | codigo
 	db 0xCF		;granularidad | D/B | limite 19:16
 	db 0		;limite 31:24
-	
+
 	;gdt datos usuario
 	dw 0xFFFF	;limite 15:0
 	dw 0x0000	;base 15:0

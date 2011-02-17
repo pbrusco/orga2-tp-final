@@ -1,122 +1,158 @@
 #include "console.h"
 #include "../teclado/teclado.h"
 
+char command_incializado = 'n';
 char command[100];
 char levanto = 'n';
 
 void console(short int tecla) {
-  char key = (char)(tecla & 0x00FF);
 
-  if (levanto=='s'){
-    levanto = 'n';
-    //__asm__ __volatile__ ( "xchg %bx, %bx");
+  if (command_incializado == 'n'){
+    inicializar_command();
   }
-  else
-  {
+
+  char c = getChar(tecla & 0x00FF);
+
+  if (levanto=='s'){levanto = 'n';}
+  else{
     levanto = 's';
-    char c = decode(key);
     if (c == '*') { //if the user press "enter"
-      char car = getChar(key);
-      putc(car,0x1A);
-      putc('-',0x1A);
-     // clear_line();
-      //run(command);
+      clear_screen(); //TODO: replace by clear_line();
+      run(command);
+      inicializar_command();
+
     }
     else if (c == '<'){ //if the user press "back"
-     // erease_last_char();
-     // remove_last_char(command);
+
+     remove_last_char_from_command();
+     borrarc();
     }
+    else if (c == '!'){ //if error on pulse
+
+
+    }
+
     else
     {
-      //if (1){ /*exists_place_to_write(command)*/
-        //command[0] == c;//add_char(c,command);
-     }
+      if (command[0] == '?'){clear_screen();}
+      add_char_to_command(c);
+      putc(c,VERDE);
+    }
   }
 
 
 }
 
 
+void inicializar_command(){
+  short e;
+    for (e = 0; e<100; e++){
+       command[e] = '?';
+    }
+    command_incializado = 'y';
+}
 
-char decode(int key){
-    return '*';
+void remove_last_char_from_command(){
+
+  short i;
+  for (i = 99; i>=0;i--){
+    if (command[i] != '?'){
+      command[i] = '?';
+      i = -1;
+    }
+  }
+
 }
 
 
 void run (){
- // char first_word = extract_first_word(command);
- // int second_param = extract_number(command);
+  char first_word = extract_code(command);
+  int second_param = extract_number(command);
 
-help();
-  /*
+  help();
+
   switch(first_word){
-    case "help":
+    case 'h':
       help();
       break;
-    case "ls":
+    case 'l':
       show_all();
        break;
-    case "ps":
+    case 'p':
       show_running_tasks();
       break;
-    case "sleeping":
+    case 's':
       show_sleeping_tasks();
       break;
-    case "display":
+    case 'd':
       display_task(second_param);
       break;
-    case "merge":
+    case 'm':
       display_merging_task(second_param);
       break;
-    case "hide":
+    case 'i':
       hide_task(second_param);
       break;
-    case "cls":
+    case 'c':
       clear_screen();
       break;
-    case else:
-      send_error_message();
-      break;
     }
-    */
+
 }
 
+
+void add_char_to_command(char c){
+
+  short i;
+  for (i = 0; i<100;i++){
+    if (command[i] == '?'){
+      command[i] = c;
+      i = 100;
+    }
+  }
+}
 
 
 void help(){
-  putc('c',0x1A);
+  printl("HELP: ",0,VERDE,0);
+  printl("h: help ",0,AZUL,0);
+  printl("l: show_all_tasks: ",0,AZUL,0);
+  printl("p: show_running_tasks: ",0,AZUL,0);
+  printl("s: show_sleeping_tasks ",0,AZUL,0);
+  printl("d: display_task x ",0,AZUL,0);
+  printl("m: display_merging_task x",0,AZUL,0);
+  printl("i: hide_task x ",0,AZUL,0);
+
 }
 
 void show_all(){
-  putc('c',0x1A);
+  printf("l: show_all_tasks: ",0,AZUL,0);
 }
 
 void show_running_tasks(){
-  putc('c',0x1A);
+  printf("p: show_running_tasks: ",0,AZUL,0);
 }
 
 void show_sleeping_tasks(){
-  putc('c',0x1A);
+  printf("s: show_sleeping_tasks ",0,AZUL,0);
 }
 
 void display_task(int id){
-  putc('c',0x1A);
+  printf("d: display_task x ",0,AZUL,0);
 }
 
 void display_merging_task(int id){
-  putc('c',0x1A);
+  printf("m: display_merging_task x",0,AZUL,0);
 }
 
 void hide_task(int id){
-  putc('c',0x1A);
+  printf("i: hide_task x ",0,AZUL,0);
 }
 
-void send_error_message(){
-  putc('c',0x1A);
-}
 
-char extract_first_word(){
-  return 'x';
+
+char extract_code(){
+  return 'h';
 }
 
 int extract_number(){

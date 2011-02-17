@@ -41,16 +41,18 @@ void mover_puntero(byte fila, byte columna);
 void clear_screen();
 void fill_random_screen();
 void printf(const char *frase, byte flag, byte atrib, dword param);
+void printl(const char *frase, byte flag, byte atrib, dword param);
 void putc(char c, byte atrib);
 void num2char(dword n, byte* buffer, dword base);
-
+void borrarc();
+void retroceder_puntero();
 
 // FUNCIONES PARA MOVIMIENTO DE PANTALLAS
 
 /*TODO: El pid es el indice en la gdt de la tarea que se quiere ver por pantalla. La idea es copiar los 24 renglones enteros de la tarea "pid" Recordar que la pantalla será de 80*24, de manera de dejarle el ultimo "renglon" para el kernel y la consola.*/
 void mostrar_pantalla_entera(word pid);
 
-/*TODO: 
+/*TODO:
 */
 
 
