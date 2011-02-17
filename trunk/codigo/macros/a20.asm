@@ -54,7 +54,7 @@ disable_A20:
 		ret
 
 
-enable_A20:
+enable_A20:	
 		pushf
 		pusha
 		IMPRIMIR_MODO_REAL habilitando, habilitando_len, 0x07, 0, 0
