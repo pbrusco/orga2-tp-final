@@ -107,8 +107,7 @@ void cargarTarea(dword eip){
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
 	//mapeo la pagina de video a la pagina de video de la tarea
-	//TODO: mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xb8000, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
 	
 
 	// 3ro: crear una entrada de TSS e inicializarla
@@ -174,7 +173,7 @@ void desaparecerTarea(byte bcpPos){
 	//recupero la direccion de la tss
 	tss* task_tss = (tss*) ( ( ((dword) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
 				 ( (word) gdt_vector[BCP[bcpPos].pid].base1) );
-				 
+	
 	//recupero la dir de la pila
 	byte* task_pila = (byte*) (task_tss->ebp & 0xFFFFF000);
 
@@ -183,15 +182,15 @@ void desaparecerTarea(byte bcpPos){
 	liberoPagina((dword*) task_pila);
 	
 	//pongo en 0 y libero pagina del video
-	setmem((byte*) BCP[bcpPos].pantalla,0x00,TAM_PAG);
+	setmem((byte*) BCP[bcpPos].pantalla,0x00,80*24*2);
 	liberoPagina((dword*) BCP[bcpPos].pantalla);
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);
-	
+		
 	//libero la entrada de GDT
 	gdt_vector[BCP[bcpPos].pid] = make_descriptor(0,0,0,0);
-	
+
 	//libero la entrada del BCP	
 	BCP[bcpPos].estado = MUERTO;
 }

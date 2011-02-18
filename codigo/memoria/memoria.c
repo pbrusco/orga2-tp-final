@@ -85,12 +85,12 @@ dword* pidoPagina() {
 	
 	return 0;
 }
-
+//TODO: YA LA HABIA PROBADO, PERO POR LAS DUDAS REVISAR QUE ANDE BIEN, Y CAMBIAR ESOS WHILE HORRIBLES POR UNA DIVISION Y UN SHIFT RESPECTIVAMENTE
 //Dada una dir de una pagina, la libera dentro del bitmap
 void liberoPagina(dword* pagina){
-
+	
 	//me guardo el numero de la pagina que se quiere liberar, comenzando a contar desde los 2MB
-	dword numero_de_pagina = (((int) pagina) / TAM_PAG) - (2*MB / TAM_PAG);
+	dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - (2*MB / TAM_PAG);
 	
 	//comienzo del bitmap + offset ocupado
 	byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);
@@ -113,13 +113,22 @@ void liberoPagina(dword* pagina){
 }
 
 
+void setmem(byte* dir, byte set, dword cant){
+	while(cant > 0){
+		*dir = set;
+		dir++;
+		cant--;
+	}
+}
 
 
-// TODO: setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
-void setmem(byte* dir, byte set, dword cant){}
-
-// TODO: copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
-void cpmem(byte* from, byte* to, dword cant){}
+void cpmem(byte* from, byte* to, dword cant){
+	while(cant > 0){
+		*to = *from;
+		to++; from++;
+		cant--;
+	}
+}
 
 
 
@@ -146,66 +155,66 @@ extern char levanto;
 extern idt_descriptor IDT_DESC;
 extern word* puntero_pantalla;
 extern switch_reg salto;
-extern tecla teclado[];
+extern char teclado[];
 extern gdt_entry gdt_vector[];
 
 
 void donde_esta_el_kernel(){
 	mover_puntero(0,0);
-	printf("                                          ",0,NEGRO, 0);
+	printf("                                          ",0,0, 0);
 	mover_puntero(1,0);
-	printf("                                          ",0,NEGRO, 0);
+	printf("                                          ",0,0, 0);
 	mover_puntero(0,0);
-	printf("consoleD: ",2,VERDE | BRILLANTE, (dword) &console);
+	printf("consoleD: ",2,VERDE_L | BRILLANTE, (dword) &console);
 	mover_puntero(1,0);
-	printf("extraerNumero: ",2,VERDE | BRILLANTE, (dword) &extract_number);
+	printf("extraerNumero: ",2,VERDE_L | BRILLANTE, (dword) &extract_number);
 	mover_puntero(2,0);
-	printf("command[0]: ",2,VERDE | BRILLANTE, (dword) &command);
-	printf("      command[99]: ",2,VERDE | BRILLANTE, (dword) &command);
+	printf("command[0]: ",2,VERDE_L | BRILLANTE, (dword) &command);
+	printf("      command[99]: ",2,VERDE_L | BRILLANTE, (dword) &command);
 	mover_puntero(3,0);
-	printf("levanto(consola): ",2,VERDE | BRILLANTE, (dword) &levanto);
+	printf("levanto(consola): ",2,VERDE_L | BRILLANTE, (dword) &levanto);
 	mover_puntero(4,0);
-	printf("tarea_actual: ",2,VERDE | BRILLANTE, (dword) &tarea_actual);
+	printf("tarea_actual: ",2,VERDE_L | BRILLANTE, (dword) &tarea_actual);
 	mover_puntero(5,0);
-	printf("cant_tareas_en_sistema: ",2,VERDE | BRILLANTE, (dword) &cant_tareas_en_sistema);
+	printf("cant_tareas_en_sistema: ",2,VERDE_L | BRILLANTE, (dword) &cant_tareas_en_sistema);
 	mover_puntero(6,0);
-	printf("gdt_vector[0]: ",2,VERDE | BRILLANTE, (dword) &gdt_vector);
-	printf("      gdt_vector[127]: ",2,VERDE | BRILLANTE, (dword) &gdt_vector[127]);
+	printf("gdt_vector[0]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector);
+	printf("      gdt_vector[127]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector[127]);
 	mover_puntero(7,0);
-	printf("make_descriptor: ",2,VERDE | BRILLANTE, (dword) &make_descriptor);
+	printf("make_descriptor: ",2,VERDE_L | BRILLANTE, (dword) &make_descriptor);
 	mover_puntero(8,0);
-	printf("idt_fill: ",2,VERDE | BRILLANTE, (dword) (dword) &idtFill);
+	printf("idt_fill: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idtFill);
 	mover_puntero(9,0);
-	printf("idt[0]: ",2,VERDE | BRILLANTE, (dword) (dword) &idt[0]);
-	printf("      idt[255]: ",2,VERDE | BRILLANTE, (dword) &idt[255]);
+	printf("idt[0]: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idt[0]);
+	printf("      idt[255]: ",2,VERDE_L | BRILLANTE, (dword) &idt[255]);
 	mover_puntero(10,0);
-	printf("_isr0: ",2,VERDE | BRILLANTE, (dword) &_isr0);
-	printf("      _isr21: ",2,VERDE | BRILLANTE, (dword) &_isr21);
+	printf("_isr0: ",2,VERDE_L | BRILLANTE, (dword) &_isr0);
+	printf("      _isr21: ",2,VERDE_L | BRILLANTE, (dword) &_isr21);
 	mover_puntero(11,0);
-	printf("IDT_DESC: ",2,VERDE | BRILLANTE, (dword) &IDT_DESC);
+	printf("IDT_DESC: ",2,VERDE_L | BRILLANTE, (dword) &IDT_DESC);
 	mover_puntero(12,0);
-	printf("paginas_libres: ",2,VERDE | BRILLANTE, (dword) &paginas_libres);
+	printf("paginas_libres: ",2,VERDE_L | BRILLANTE, (dword) &paginas_libres);
 	mover_puntero(13,0);
-	printf("pidoPagina: ",2,VERDE | BRILLANTE, (dword) &pidoPagina);
+	printf("pidoPagina: ",2,VERDE_L | BRILLANTE, (dword) &pidoPagina);
 	mover_puntero(14,0);
-	printf("mapear_pagina: ",2,VERDE | BRILLANTE, (dword) &mapear_pagina);
+	printf("mapear_pagina: ",2,VERDE_L | BRILLANTE, (dword) &mapear_pagina);
 	mover_puntero(15,0);
-	printf("printf: ",2,VERDE | BRILLANTE, (dword) &printf);		
+	printf("printf: ",2,VERDE_L | BRILLANTE, (dword) &printf);		
 	mover_puntero(16,0);
-	printf("puntero_pantalla: ",2,VERDE | BRILLANTE, (dword) &puntero_pantalla);
+	printf("puntero_pantalla: ",2,VERDE_L | BRILLANTE, (dword) &puntero_pantalla);
 	mover_puntero(17,0);
-	printf("salto: ",2,VERDE | BRILLANTE, (dword) &salto);
+	printf("salto: ",2,VERDE_L | BRILLANTE, (dword) &salto);
 	mover_puntero(18,0);
-	printf("switch_task: ",2,VERDE | BRILLANTE, (dword) &switch_task);
+	printf("switch_task: ",2,VERDE_L | BRILLANTE, (dword) &switch_task);
 	mover_puntero(19,0);
-	printf("teclado: ",2,VERDE | BRILLANTE, (dword) teclado);
+	printf("teclado: ",2,VERDE_L | BRILLANTE, (dword) teclado);
 	mover_puntero(20,0);
-	printf("getChar: ",2,VERDE | BRILLANTE, (dword) &getChar);
+	printf("getChar: ",2,VERDE_L | BRILLANTE, (dword) &getChar);
 	mover_puntero(21,0);
-	printf("TSS[0]: ",2,VERDE | BRILLANTE, (dword) &TSS);
-	printf("      TSS[49]: ",2,VERDE | BRILLANTE, (dword) &TSS[49]);
+	printf("TSS[0]: ",2,VERDE_L | BRILLANTE, (dword) &TSS);
+	printf("      TSS[49]: ",2,VERDE_L | BRILLANTE, (dword) &TSS[49]);
 	mover_puntero(22,0);
-	printf("crear_TSS: ",2,VERDE | BRILLANTE, (dword) &crear_TSS);
+	printf("crear_TSS: ",2,VERDE_L | BRILLANTE, (dword) &crear_TSS);
 }
 
 
