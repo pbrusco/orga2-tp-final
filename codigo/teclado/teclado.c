@@ -1,6 +1,7 @@
 #include "teclado.h"
+#include "../pantalla/pantalla.h"
 
-tecla teclado[43] = {
+/*tecla teclado[43] = {
   (tecla)	{ (char) '!', (short) 0x00 },
 	(tecla)	{ (char) 'a', (short) 0x1E },
 	(tecla)	{ (char) 'b', (short) 0x30 },
@@ -45,16 +46,9 @@ tecla teclado[43] = {
   (tecla) { (char) '<', (short) 0x0e },
   (tecla) { (char) ' ', (short) 0x39 },
 
-};
+};*/
 
-char getChar(short code){
-
-	short pos = getPos(code);
-
-	return teclado[pos].letra;
-}
-
-short getPos(short code){
+/*short getPos(short code){
 
 	short res = 0;
 	short i;
@@ -66,5 +60,24 @@ short getPos(short code){
 		}
 	}
 	return res;
+}*/
+
+
+
+//esto es mucho mas lindo y anda mas rapido!
+
+char teclado[] = "! 1234567890- < "	//0x00 a 0x0f (falta el 0x01, 0x0d y 0x0f)
+		  "qwertyuiop  * as"	//0x10 a 0x1f (falta el 0x1a, 0x1b y 0x1d)
+		  "dfghjkl     zxcv"	//0x20 a 0x2f (falta el 0x27, 0x28, 0x29, 0x2a y 0x2b)
+		  "bnm,.           "	//0x30 a 0x3f (faltan del 0x35 al 0x3f menos el 0x39)
+		  "                "	//DE ACA EN ADELANTE FALTAN TODOS
+		  "                "
+		  "                "
+		  "                ";	//tiene tamaño 127
+		  
+char getChar(short code){
+	return teclado[code];
 }
+
+
 
