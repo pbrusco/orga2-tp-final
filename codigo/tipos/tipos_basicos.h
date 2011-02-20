@@ -41,8 +41,8 @@ typedef unsigned long long qword;
 
 
 
-
-
+//definicion de funciones en assembler inline
+#define breakpoint() __asm__ __volatile__("xchg %bx, %bx")
 
 
 
