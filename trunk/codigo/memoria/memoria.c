@@ -85,27 +85,25 @@ dword* pidoPagina() {
 	
 	return 0;
 }
-//TODO: YA LA HABIA PROBADO, PERO POR LAS DUDAS REVISAR QUE ANDE BIEN, Y CAMBIAR ESOS WHILE HORRIBLES POR UNA DIVISION Y UN SHIFT RESPECTIVAMENTE
+
+
 //Dada una dir de una pagina, la libera dentro del bitmap
 void liberoPagina(dword* pagina){
 	
 	//me guardo el numero de la pagina que se quiere liberar, comenzando a contar desde los 2MB
-	dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - (2*MB / TAM_PAG);
-	
+	dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - ( (dword) (2*MB / TAM_PAG) );
+
 	//comienzo del bitmap + offset ocupado
 	byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);
 
-	while(numero_de_pagina > 7){
-		numero_de_pagina -= 8;
-		bitmap_dir++;
-	}
-	
-	byte mascara = 0x01;
-	while(numero_de_pagina > 0){
-		numero_de_pagina--;
-		mascara = mascara << 1;
-	}
+	//muevo el puntero a donde corresponde y me fijo que pagina dentro de ese puntero debo liberar
+	bitmap_dir += numero_de_pagina/8;
+	numero_de_pagina = numero_de_pagina - (8*(numero_de_pagina/8));	
 
+	byte mascara = 0x01;
+	mascara = mascara << numero_de_pagina;
+
+	//actualizo el valor del bitmap, liberando la pagina
 	*bitmap_dir = *bitmap_dir & (mascara ^ 0xFF); // el operador ^ es el XOR, con FF invierto todos los bits
 	
 	//actualizo la cant de paginas libres
