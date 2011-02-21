@@ -94,7 +94,6 @@ void cargarTarea(dword eip){
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
 	dword *directorio = pidoPagina();
-	dword *tabla_entry = pidoPagina();
 	dword *pila = pidoPagina();
 	dword base_pila = (dword) pila;
 	base_pila += 0xfff;
@@ -102,8 +101,6 @@ void cargarTarea(dword eip){
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
-	mapear_pagina(directorio, (dword) tabla_entry, (dword) tabla_entry, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) directorio, (dword) directorio, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
 	//mapeo la pagina de video a la pagina de video de la tarea
