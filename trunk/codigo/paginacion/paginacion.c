@@ -69,4 +69,47 @@ void iniciar_paginacion_kernel(){
 }
 
 
-void liberar_directorio(dword* dir_entry){}
+void liberar_directorio(dword* dir_entry){
+	
+	//declaro variables que voy a usar para indexar las tablas y el directorio
+	word indice_d = 0;
+	word indice_t;
+	dword* table_entry;
+	
+	//para todas las entradas del directorio
+	for(indice_d; indice_d < 1024;indice_d++){
+		
+		//si la tabla de pagina esta presente
+		if( (*dir_entry & 1) == PRESENT ){
+	
+			//inicio variables
+			indice_t = 0;
+			table_entry = (dword*) (*dir_entry & 0xFFFFF000);
+			
+			//para cada entrada de la tabla
+			for(indice_t; indice_t < 1024;indice_t++){
+				
+				//si la pagina esta mapeada
+				if( (*table_entry & 1) == PRESENT ){
+
+					//limpio y libero la pagina, siempre que la misma este por encima de los 2MB
+					if(*table_entry >= 2*MB){
+						setmem((byte*) (*table_entry & 0xFFFFF000), 0x00, TAM_PAG);
+						liberoPagina((dword*) *table_entry);
+					}
+				}
+				table_entry++;
+			}
+			
+			//luego de liberar y limpiar todo, limpio y libero la pagina usada para la tabla
+			setmem((byte*) (*dir_entry & 0xFFFFF000), 0x00, TAM_PAG);
+			liberoPagina((dword*) (*dir_entry & 0xFFFFF000));
+		}
+		dir_entry++;
+	}
+	
+	//una vez limpias y libres todas las paginas y las tablas, limpio y libero el directorio
+	dir_entry -= 1024;//notar que luego del for, queda apuntando al primer dword de la siguiente pagina
+	setmem((byte*) dir_entry, 0x00, TAM_PAG);
+	liberoPagina(dir_entry);
+}

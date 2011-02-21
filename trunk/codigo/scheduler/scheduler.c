@@ -15,7 +15,7 @@ void switch_task(){
 		
 	//1ro: me fijo que haya mas de una tarea, sino termino
 	if(cant_tareas_en_sistema != 1){
-		
+	
 		//2do: cambio el estado de la tarea actual de CORRIENDO a ACTIVO, paso la tarea actual
 		//a la siguiente y cambio el estado de la tarea siguiente de ACTIVO a CORRIENDO
 		BCP[tarea_actual].estado = ACTIVO;

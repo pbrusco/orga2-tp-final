@@ -90,24 +90,26 @@ dword* pidoPagina() {
 //Dada una dir de una pagina, la libera dentro del bitmap
 void liberoPagina(dword* pagina){
 	
-	//me guardo el numero de la pagina que se quiere liberar, comenzando a contar desde los 2MB
-	dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - ( (dword) (2*MB / TAM_PAG) );
+	if( ((dword) pagina) >= 2*MB){
+		//me guardo el numero de la pagina que se quiere liberar, comenzando a contar desde los 2MB
+		dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - ( (dword) (2*MB / TAM_PAG) );
 
-	//comienzo del bitmap + offset ocupado
-	byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);
+		//comienzo del bitmap + offset ocupado
+		byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);
 
-	//muevo el puntero a donde corresponde y me fijo que pagina dentro de ese puntero debo liberar
-	bitmap_dir += numero_de_pagina/8;
-	numero_de_pagina = numero_de_pagina - (8*(numero_de_pagina/8));	
+		//muevo el puntero a donde corresponde y me fijo que pagina dentro de ese puntero debo liberar
+		bitmap_dir += numero_de_pagina/8;
+		numero_de_pagina = numero_de_pagina - (8*(numero_de_pagina/8));	
 
-	byte mascara = 0x01;
-	mascara = mascara << numero_de_pagina;
+		byte mascara = 0x01;
+		mascara = mascara << numero_de_pagina;
 
-	//actualizo el valor del bitmap, liberando la pagina
-	*bitmap_dir = *bitmap_dir & (mascara ^ 0xFF); // el operador ^ es el XOR, con FF invierto todos los bits
+		//actualizo el valor del bitmap, liberando la pagina
+		*bitmap_dir = *bitmap_dir & (mascara ^ 0xFF); // el operador ^ es el XOR, con FF invierto todos los bits
 	
-	//actualizo la cant de paginas libres
-	paginas_libres++;
+		//actualizo la cant de paginas libres
+		paginas_libres++;
+	}
 }
 
 
