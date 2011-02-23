@@ -107,8 +107,8 @@ void cargarTarea(dword eip){
 	mapeo_paginas_default(directorio);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
-	//TODO: mapeo la pagina de video a la pagina de video de la tarea
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000/*video*/, PRESENT | WRITE | USUARIO);
+	//mapeo la pagina de video a la pagina de video de la tarea
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
 	
 
 	// 3ro: crear una entrada de TSS e inicializarla

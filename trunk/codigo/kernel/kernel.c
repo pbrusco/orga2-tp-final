@@ -7,8 +7,8 @@ extern BCP_Entry BCP[];
 
 void kernel_infinito(){
 		
-	cargarTarea(0x2000);
-	cargarTarea(0x2040);
+/*	cargarTarea(0x2000);*/
+/*	cargarTarea(0x2040);*/
 
 
 /*	matarTarea(6);*/

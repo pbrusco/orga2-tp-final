@@ -8,12 +8,12 @@ void crear_TSS(byte pos, dword CR3, dword EIP, dword EFLAGS, dword pila){
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
-	entry->cs = 0x1B;
-	entry->ss = 0x23;
-	entry->ds = 0x23;
-	entry->fs = 0x23;
-	entry->gs = 0x23;
-	entry->es = 0x23;
+	entry->cs = 0x8;
+	entry->ss = 0x10;
+	entry->ds = 0x10;
+	entry->fs = 0x10;
+	entry->gs = 0x10;
+	entry->es = 0x10;
 	entry->esp = pila;
 	entry->ebp = pila;
 	//TODO: ver el valor que debe ir en los selectores
