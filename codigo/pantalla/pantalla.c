@@ -1,9 +1,13 @@
 #include "pantalla.h"
+#include "../memoria/memoria.h"
 
 // VARIABLES GLOBALES
 
 //TODO: esto deberia moverse a la ultima fila
-word *puntero_pantalla = DIR_INI_PANTALLA;
+word *puntero_pantalla = (word*) DIR_INI_PANTALLA;
+
+//esta variable contiene el indice de la BCP de la tarea que se está viendo por pantalla
+byte tarea_en_pantalla, tarea_a_mostrar;
 
 //TODO: esto debería desaparecer
 void avanzar_puntero(){
@@ -75,7 +79,7 @@ void printf(const char *frase, byte flag, byte atrib, dword param){
 
 void printl(const char *frase, byte flag, byte atrib, dword param){
 
-puntero_pantalla = ( (int) puntero_pantalla - (((int)puntero_pantalla)%80) + 80);
+puntero_pantalla = (word*) ( (int) puntero_pantalla - (((int)puntero_pantalla)%80) + 80);
 	char c = *frase;
 
 	while(c != '\0') {
@@ -199,3 +203,40 @@ int char2num(char c){
 
 }
 
+
+void mostrar_pantalla_entera(){
+	//limpio las interrupciones
+	cli();
+	
+	//si tengo que cambiar la pantalla
+	if(tarea_en_pantalla != tarea_a_mostrar){
+		
+		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
+		cpmem((byte*) DIR_INI_PANTALLA, (byte*) BCP[tarea_en_pantalla].pantalla, TAM_PANTALLA_TAREA);
+		
+		//remapeo la pagina de video de la tarea a donde le corresponde escribir
+		mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
+				DIR_INI_PANTALLA,
+				(dword) BCP[tarea_en_pantalla].pantalla,
+				USUARIO | WRITE | PRESENT);
+		
+		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
+		cpmem(BCP[tarea_a_mostrar].pantalla, (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
+		
+		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
+		mapear_pagina(	BCP[tarea_a_mostrar].entrada_directorio,
+				DIR_INI_PANTALLA,
+				DIR_INI_PANTALLA,
+				USUARIO | WRITE | PRESENT);
+				
+		//actualizo la variable "tarea_en_pantalla"
+		tarea_en_pantalla = tarea_a_mostrar;
+	}
+		
+	//activo las interrupciones nuevamente
+	sti();
+}
+
+void cambiar_de_pantalla(byte bcpPos){
+	tarea_a_mostrar = bcpPos;
+}

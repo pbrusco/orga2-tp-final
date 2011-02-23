@@ -23,10 +23,10 @@ void llenarBitmap();
 dword* pidoPagina();
 void liberoPagina(dword *);
 
-// TODO: setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
+// setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
 void setmem(byte* dir, byte set, dword cant);
 
-// TODO: copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
+// copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
 void cpmem(byte* from, byte* to, dword cant);
 
 

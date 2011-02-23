@@ -10,6 +10,8 @@
 
 extern idt_entry idt[];
 extern gdt_entry gdt_vector[];
+extern byte tarea_en_pantalla;
+extern byte tarea_a_mostrar;
 
 //declaro el arreglo de BCP's
 BCP_Entry BCP[CANT_TAREAS];
@@ -18,13 +20,15 @@ void iniciar_BCP(){
 	//variables globales
 	tarea_actual = 0;
 	cant_tareas_en_sistema = 1;
+	tarea_en_pantalla = 0;
+	tarea_a_mostrar = 0;
 	
 	//datos del kernel
 	BCP[0].pid = 5;
 	BCP[0].estado = ACTIVO;
 	BCP[0].entrada_directorio = (dword *) DIR_DIRECTORIO;
 	BCP[0].sig = BCP[0].ant = 0;
-	BCP[0].pantalla = (word *) 0xB8000;
+	BCP[0].pantalla = (word *) 0xB0000;
 }
 
 void iniciar_tss_kernel(){
@@ -125,12 +129,12 @@ void cargarTarea(dword eip){
 
 void matarTarea(byte id){
 	//limpio las interrupciones para evitar problemas
-	__asm__ __volatile__ ("cli");
+	cli();
 	
 	cambiar_estado(id, MATAR);
 	
 	//activo interrupciones nuevamente
-	__asm__ __volatile__ ("sti");	
+	sti();	
 }
 
 
