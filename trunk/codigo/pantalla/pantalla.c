@@ -1,6 +1,9 @@
 #include "pantalla.h"
 #include "../memoria/memoria.h"
+#include "../bcp/bcp.h"
+#include "../paginacion/paginacion.h"
 
+extern BCP_Entry BCP[];
 // VARIABLES GLOBALES
 
 //TODO: esto deberia moverse a la ultima fila
@@ -214,14 +217,14 @@ void mostrar_pantalla_entera(){
 		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
 		cpmem((byte*) DIR_INI_PANTALLA, (byte*) BCP[tarea_en_pantalla].pantalla, TAM_PANTALLA_TAREA);
 		
+		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
+		cpmem(BCP[tarea_a_mostrar].pantalla, (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
+		
 		//remapeo la pagina de video de la tarea a donde le corresponde escribir
 		mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
 				DIR_INI_PANTALLA,
 				(dword) BCP[tarea_en_pantalla].pantalla,
 				USUARIO | WRITE | PRESENT);
-		
-		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(BCP[tarea_a_mostrar].pantalla, (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
 		
 		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
 		mapear_pagina(	BCP[tarea_a_mostrar].entrada_directorio,

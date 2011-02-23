@@ -19,7 +19,6 @@ extern iniciar_tss_kernel
 %define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
 %define INICIO_TAREAS 0x2000			; posicion de inicio de las tareas estaticas
 %define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
-%define PRIMER_PILA 0xCFFF
 %define DEFINITIVA_PILA 0x1FFFFF
 %define GDT_COUNT 128
 
@@ -121,10 +120,6 @@ modo_protegido:
 
     ; Habilito las interrupciones
 	sti
-
-
-
-
 
 	call kernel_infinito
 
