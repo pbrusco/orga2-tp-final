@@ -28,7 +28,7 @@ void iniciar_BCP(){
 	BCP[0].estado = ACTIVO;
 	BCP[0].entrada_directorio = (dword *) DIR_DIRECTORIO;
 	BCP[0].sig = BCP[0].ant = 0;
-	BCP[0].pantalla = (word *) 0xB0000;
+	BCP[0].pantalla = (word *) 0xb9000;//TODO: agregar al mapa de memoria
 }
 
 void iniciar_tss_kernel(){
@@ -107,8 +107,8 @@ void cargarTarea(dword eip){
 	mapeo_paginas_default(directorio);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
-	//mapeo la pagina de video a la pagina de video de la tarea
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
+	//TODO: mapeo la pagina de video a la pagina de video de la tarea
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000/*video*/, PRESENT | WRITE | USUARIO);
 	
 
 	// 3ro: crear una entrada de TSS e inicializarla
@@ -119,7 +119,6 @@ void cargarTarea(dword eip){
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	word pid = buscar_entradaGDT_vacia();
 	gdt_vector[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
-
 
 	// 5to: crear entrada de BCP e inicializarla
 	crear_entradaBCP(pid, ACTIVO, directorio, video);
@@ -150,9 +149,9 @@ void mapeo_paginas_default(dword* directorio){
 	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) TSS, (dword) TSS, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &TSS[24], (dword) &TSS[24], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &TSS[49], (dword) &TSS[49], PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (dword) TSS, (dword) TSS, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) &TSS[24], (dword) &TSS[24], PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) &TSS[49], (dword) &TSS[49], PRESENT | WRITE | USUARIO);
 }
 
 

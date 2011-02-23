@@ -40,7 +40,7 @@
 #define TRAP_GATE       0xF
 
 //Valores de los campos ATRIBUTOS Descriptor de GDT de TSS
-#define TSS_AVAILABLE       1001 << 0
+#define TSS_AVAILABLE       9
 #define TSS_0_OBLIGATORIO  0 << 4
 #define TSS_GRANULARIDAD    1 << 7
 
