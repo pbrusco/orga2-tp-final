@@ -46,7 +46,7 @@ void cargarTarea(dword eip);
 // El param "id" es el indice de la tss en la gdt de la tarea que se quiere eliminar.
 void matarTarea(byte id);
 
-/*TODO: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
+/*Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
 Recibe como parametro la entrada de BCP de la tarea.
 */
 void desaparecerTarea(byte );

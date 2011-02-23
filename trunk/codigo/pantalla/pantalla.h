@@ -36,6 +36,8 @@
 #define DIR_INI_PANTALLA 0xB8000
 #define DIR_FIN_PANTALLA 0xB8FA0
 
+#define TAM_PANTALLA_TAREA 2*80*24
+
 // FUNCIONES GLOBALES
 void avanzar_puntero();
 void mover_puntero(byte fila, byte columna);
@@ -49,13 +51,18 @@ void borrarc();
 void retroceder_puntero();
 int char2num(char c);
 char num2char2(const int n);
+
+
 // FUNCIONES PARA MOVIMIENTO DE PANTALLAS
 
-/*TODO: El pid es el indice en la gdt de la tarea que se quiere ver por pantalla. La idea es copiar los 24 renglones enteros de la tarea "pid" Recordar que la pantalla será de 80*24, de manera de dejarle el ultimo "renglon" para el kernel y la consola.*/
-void mostrar_pantalla_entera(word pid);
-
-/*TODO:
+/*TODO: PROBARLA   La idea es copiar los 24 renglones enteros de la tarea "pid". Recordar que la pantalla será de 80*24, de manera de dejarle el ultimo "renglon" para el kernel y la consola.
+IMPORTANTE: ESTA FUNCION DEBE SER LLAMADA UNICAMENTE POR EL KERNEL, YA QUE ES EL UNICO QUE PUEDE VER Y MODIFICAR EL DIRECTORIO Y LAS TABLAS DE PAGINAS DE TODAS LAS TAREAS.
 */
+void mostrar_pantalla_entera();
+
+/*: Esta funcion modifica el valor de la variable "tarea_a_mostrar", que luego será utilizada por "mostrar_pantalla_entera" para hacer el cambio de pantalla correspondiente.
+*/
+void cambiar_de_pantalla(byte bcpPos);
 
 
 

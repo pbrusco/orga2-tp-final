@@ -4,7 +4,6 @@
 
 extern BCP_Entry BCP[];
 
-#define outb(p,v) __asm__ __volatile__("outb %%al, %%dx" : : "al"(v), "dx"(p) )
 
 void kernel_infinito(){
 		
@@ -20,10 +19,19 @@ void kernel_infinito(){
 	byte aMatar;
 	
 	while(true){
+		
+		// 1ero:
+		//busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();
+		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
 			desaparecerTarea(aMatar);
 		}
+		
+		//2do:
+		//hago un cambio de pantalla si fue pedido
+		mostrar_pantalla_entera();
+		
 	}
 }
 
