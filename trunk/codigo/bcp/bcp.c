@@ -22,7 +22,7 @@ void iniciar_BCP(){
 	cant_tareas_en_sistema = 1;
 	tarea_en_pantalla = 0;
 	tarea_a_mostrar = 0;
-	
+
 	//datos del kernel
 	BCP[0].pid = 5;
 	BCP[0].estado = ACTIVO;
@@ -108,8 +108,8 @@ void cargarTarea(dword eip){
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
 	//mapeo la pagina de video a la pagina de video de la tarea
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
-	
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
+
 
 	// 3ro: crear una entrada de TSS e inicializarla
 	byte pos_TSS = buscar_TSS_vacia();
@@ -129,11 +129,11 @@ void cargarTarea(dword eip){
 void matarTarea(byte id){
 	//limpio las interrupciones para evitar problemas
 	cli();
-	
+
 	cambiar_estado(id, MATAR);
-	
+
 	//activo interrupciones nuevamente
-	sti();	
+	sti();
 }
 
 
@@ -156,8 +156,8 @@ void mapeo_paginas_default(dword* directorio){
 
 
 
-byte buscar_entradaBCP_matar(){
-	byte res = 0;
+int buscar_entradaBCP_matar(){
+	int res = 0;
 	while(res < CANT_TAREAS && BCP[res].estado != MATAR){
 		res++;
 	}
@@ -173,26 +173,25 @@ void desaparecerTarea(byte bcpPos){
 	//recupero la direccion de la tss
 	tss* task_tss = (tss*) ( ( ((dword) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
 				 ( (word) gdt_vector[BCP[bcpPos].pid].base1) );
-	
+
 	//recupero la dir de la pila
 	byte* task_pila = (byte*) (task_tss->ebp & 0xFFFFF000);
 
 	//pongo en 0 y libero pagina de la pila
 	setmem(task_pila,0x00,TAM_PAG);
 	liberoPagina((dword*) task_pila);
-	
+
 	//pongo en 0 y libero pagina del video
 	setmem((byte*) BCP[bcpPos].pantalla,0x00,80*24*2);
 	liberoPagina((dword*) BCP[bcpPos].pantalla);
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);
-		
+
 	//libero la entrada de GDT
 	gdt_vector[BCP[bcpPos].pid] = make_descriptor(0,0,0,0);
 
-	//libero la entrada del BCP	
+	//libero la entrada del BCP
 	BCP[bcpPos].estado = MUERTO;
 }
-
 

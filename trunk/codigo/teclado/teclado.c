@@ -10,10 +10,9 @@ char teclado[] = "! 1234567890- < "	//0x00 a 0x0f (falta el 0x01, 0x0d y 0x0f)
 		  "                "
 		  "                "
 		  "                ";	//tiene tamaño 127
-		  
+
 char getChar(short code){
-	return teclado[code];
+	if (code > 127) {return '!';}
+	else{return teclado[code];}
 }
-
-
 

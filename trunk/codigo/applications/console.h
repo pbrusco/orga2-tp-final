@@ -1,9 +1,7 @@
 #ifndef __CONSOLE__
 #define __CONSOLE__
-#include "../pantalla/pantalla.h"
-#include "../tipos/tipos_basicos.h"
 
-
+void cargar_tarea(int);
 void console(short int key);
 char decode(int key);
 void run (/*command*/);

@@ -11,7 +11,7 @@ typedef struct BCP_Entry_s{
 	byte sig;			//siguiente tarea para el round robin scheduler
 	byte ant;			//anterior tarea para el round robin scheduler
 	word *pantalla;			//puntero a la pagina destinada al video de la tarea
-} __attribute__((__packed__, aligned (8))) BCP_Entry; 
+} __attribute__((__packed__, aligned (8))) BCP_Entry;
 
 
 //variables globales
@@ -22,7 +22,7 @@ byte cant_tareas_en_sistema;
 /* Funciones */
 
 // llena el BPC[0] con los datos del kernel, y inicializa variables globales
-void iniciar_BCP(); 
+void iniciar_BCP();
 
 // busca entrada libre en el BCP (libre <=> estado == muerto)
 word buscar_entradaBCP_vacia();
@@ -37,7 +37,7 @@ void cambiar_estado(word pid, byte estado_nuevo);
 byte buscar_entradaBCP(word id);
 
 // devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT_TAREAS
-byte buscar_entradaBCP_matar();
+int buscar_entradaBCP_matar();
 
 // carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
 void cargarTarea(dword eip);
@@ -54,4 +54,5 @@ void desaparecerTarea(byte );
 // mapea las paginas por default para una tarea (paginas de la gdt,idt,tss,y demas estructuras)
 void mapeo_paginas_default(dword* directorio);
 
-#endif 
+#endif
+
