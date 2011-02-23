@@ -1,12 +1,18 @@
 #include "console.h"
+#include "../bcp/bcp.h"
 #include "../teclado/teclado.h"
 #include "../pantalla/pantalla.h"
+#include "../paginacion/paginacion.h"
+#include "../memoria/memoria.h"
+extern BCP_Entry BCP[];
 
+word posicion_de_las_tareas_en_memoria[2] = {0x2000,0x2040};
 char command_incializado = 'n';
 char command[100];
 char levanto = 'n';
 
 void console(short int tecla) {
+  //mapear_pagina(BCP[tarea_actual].entrada_directorio, 0xB8000, 0xB8000, WRITE | PRESENT | USUARIO);
 
   if (command_incializado == 'n'){
     inicializar_command();
@@ -33,9 +39,12 @@ void console(short int tecla) {
       if (command[0] == '?'){clear_screen();}
       add_char_to_command(c);
       putc(c,VERDE_L);
+
     }
   }
 
+
+  //mapear_pagina(BCP[tarea_actual].entrada_directorio, 0xB8000, BCP[tarea_actual].pantalla, WRITE | PRESENT | USUARIO);
 
 }
 
@@ -67,6 +76,9 @@ void run (){
 
 
   switch(first_word){
+    case 'z':
+      cargar_tarea(second_param);
+      break;
     case 'h':
       help();
       break;
@@ -117,7 +129,12 @@ void help(){
   printl("d: display_task x ",0,AZUL_L,0);
   printl("m: display_merging_task x",0,AZUL_L,0);
   printl("i: hide_task x ",0,AZUL_L,0);
+  printl("z: cargar_tarea x ",0,AZUL_L,0);
 
+}
+
+void cargar_tarea(int id){
+  cargarTarea(posicion_de_las_tareas_en_memoria[id]);
 }
 
 void show_all(){
