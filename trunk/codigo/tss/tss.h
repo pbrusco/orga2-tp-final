@@ -53,7 +53,7 @@ tss TSS[CANT_TAREAS];
 
 
 /* Funciones */
-void crear_TSS(byte entrada, dword CR3, dword EIP, dword EFLAGS, dword pila);
+void crear_TSS(byte entrada, dword CR3, dword EIP, dword EFLAGS, dword pila, dword);
 byte buscar_TSS_vacia();
 void vaciar_TSS(tss*);
 

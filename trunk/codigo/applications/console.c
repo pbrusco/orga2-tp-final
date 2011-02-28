@@ -6,7 +6,7 @@
 #include "../memoria/memoria.h"
 extern BCP_Entry BCP[];
 
-word posicion_de_las_tareas_en_memoria[2] = {0x2000,0x2040};
+dword posicion_de_las_tareas_en_memoria[2] = {0x2000,0x2040};
 char command_incializado = 'n';
 char command[100];
 char levanto = 'n';

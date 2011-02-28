@@ -33,7 +33,7 @@ void iniciar_BCP(){
 
 void iniciar_tss_kernel(){
     byte tssVacia = buscar_TSS_vacia();
-    crear_TSS(tssVacia, DIR_DIRECTORIO, 0, 0, 0);
+    crear_TSS(tssVacia, DIR_DIRECTORIO, 0, 0, 0, 0);
     gdt_vector[buscar_entradaGDT_vacia()] = make_descriptor((dword) &TSS[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 }
 
@@ -99,21 +99,21 @@ void cargarTarea(dword eip){
 	// y otra para el video
 	dword *directorio = pidoPagina();
 	dword *pila = pidoPagina();
-	dword base_pila = (dword) pila;
-	base_pila += 0xfff;
+	dword *pila0 = pidoPagina();
 	word *video = (word *) pidoPagina();
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
 	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) pila0, (dword) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
 	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
 
 
 	// 3ro: crear una entrada de TSS e inicializarla
 	byte pos_TSS = buscar_TSS_vacia();
-	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, BASIC_EFLAGS, base_pila);
+	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, BASIC_EFLAGS, ((dword)pila) + TAM_PAG, ((dword)pila0) + TAM_PAG);
 
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla

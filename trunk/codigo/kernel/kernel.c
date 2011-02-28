@@ -18,19 +18,17 @@ void kernel_infinito(){
 	while(true){
 		// 1ero:
 		//busco si hay alguna tarea para matar
-		aMatar = buscar_entradaBCP_matar();
+/*		aMatar = buscar_entradaBCP_matar();
 		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
-      if (BCP[aMatar].estado ==4){
-			  desaparecerTarea(aMatar);
+      			if (BCP[aMatar].estado ==4){
+				desaparecerTarea(aMatar);
 			}
-
-
 		}
 
 		//2do:
 		//hago un cambio de pantalla si fue pedido
-    mostrar_pantalla_entera();
+		mostrar_pantalla_entera();*/
 
 	}
 }
