@@ -206,7 +206,7 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		cli				;deshabilito las interrupciones
 		mov al, 0x20
 		out 0x20, al			;aviso al pic que se atendio la interrupcion
-		;call switch_task
+		call switch_task
 		sti
 		iret
 
@@ -218,9 +218,9 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		xor eax,eax
 		in al,0x60							;levanto el byte proveniente del teclado
 		push ax
-    call console
-    add esp,2
-    mov al, 0x20
+    		call console
+		add esp,2
+		mov al, 0x20
 		out 0x20, al							;aviso al pic que se atendio la interrupcion
 
 		sti								;habilito las interrupciones
