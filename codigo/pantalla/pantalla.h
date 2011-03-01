@@ -30,6 +30,10 @@
 #define PARPADEO 1 << 7
 #define BRILLANTE 1 << 3
 
+// BASES COMUNES
+#define BASE10 (10 << 8)
+#define BASE16 (16 << 8)
+
 // DEFINO VALORES UTILES SOBRE LA PANTALLA
 #define CANT_COLS 80
 #define CANT_FILAS 25
@@ -43,7 +47,18 @@ void avanzar_puntero();
 void mover_puntero(byte fila, byte columna);
 void clear_screen();
 void fill_random_screen();
-void printf(const char *frase, byte flag, byte atrib, dword param);
+
+/*Avanza el puntero de la pantalla una fila.*/
+void salto_de_linea();
+
+/*printf la vamos a usar sólo para imprimir caracteres. Imprime por defecto en GRIS con fondo NEGRO*/
+void printf(const char *frase);
+
+/*printdword se usará para ver valores de variables.
+Recibe como parámetros la dword a imprimir y los atributos de escritura (el byte alto es la base a usar y el bajo son los atributos de impresion, como el color, brillo, etc)*/
+void printdword(const dword var, const word atr);
+
+
 void printl(const char *frase, byte flag, byte atrib, dword param);
 void putc(char c, byte atrib);
 void num2char(dword n, byte* buffer, dword base);

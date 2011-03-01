@@ -33,11 +33,11 @@ entrada de tabla de pagina:
 
 
 
-#define PRESENT 	1 << 0
-#define READ_PAGINACION	0 << 1
-#define WRITE 		1 << 1
-#define SUPERVISOR	0 << 2
-#define USUARIO		1 << 2
+#define PRESENT 	0x1
+#define READ_PAGINACION	0x0
+#define WRITE 		0x2
+#define SUPERVISOR	0x0
+#define USUARIO		0x4
 
 void mapear_tabla (dword *directorio, dword dir_tabla, word atributos);
 void mapear_pagina(dword *directorio, dword dir_virtual, dword dir_real, word atributos);
