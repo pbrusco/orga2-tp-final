@@ -160,12 +160,8 @@ extern gdt_entry gdt_vector[];
 
 
 void donde_esta_el_kernel(){
-	mover_puntero(0,0);
-	printf("                                          ",0,0, 0);
-	mover_puntero(1,0);
-	printf("                                          ",0,0, 0);
-	mover_puntero(0,0);
-	printf("consoleD: ",2,VERDE_L | BRILLANTE, (dword) &console);
+/*	clear_screen();
+	printf("consoleD: "); printdword();,2,VERDE_L | BRILLANTE, (dword) &console);
 	mover_puntero(1,0);
 	printf("extraerNumero: ",2,VERDE_L | BRILLANTE, (dword) &extract_number);
 	mover_puntero(2,0);
@@ -214,7 +210,7 @@ void donde_esta_el_kernel(){
 	printf("TSS[0]: ",2,VERDE_L | BRILLANTE, (dword) &TSS);
 	printf("      TSS[49]: ",2,VERDE_L | BRILLANTE, (dword) &TSS[49]);
 	mover_puntero(22,0);
-	printf("crear_TSS: ",2,VERDE_L | BRILLANTE, (dword) &crear_TSS);
+	printf("crear_TSS: ",2,VERDE_L | BRILLANTE, (dword) &crear_TSS);*/
 }
 
 

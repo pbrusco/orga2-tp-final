@@ -19,7 +19,7 @@ extern iniciar_tss_kernel
 %define DIRINIT 0x100000			; posicion de inicio del directorio de paginas
 %define INICIO_TAREAS 0x2000			; posicion de inicio de las tareas estaticas
 %define FIN_TAREAS 0xD000			; posicion de fin de las tareas estaticas (por ahora)
-%define DEFINITIVA_PILA 0x1FFFFF
+%define DEFINITIVA_PILA 0x200000
 %define GDT_COUNT 128
 
 start:

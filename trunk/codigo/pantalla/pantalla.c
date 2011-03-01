@@ -50,35 +50,54 @@ void fill_random_screen(){
 
 }
 
+void salto_de_linea(){
+	byte fila_actual = (((dword) puntero_pantalla) % DIR_INI_PANTALLA) / 160;
+	puntero_pantalla = (word*) (DIR_INI_PANTALLA + 160*(fila_actual+1));
+	if( ((dword) puntero_pantalla) >= DIR_FIN_PANTALLA){
+		puntero_pantalla = (word *) DIR_INI_PANTALLA;
+	}
+		
+}
+
+
 
 /* TODO: por más que sea molesto, podriamos pasarle 2 parametros mas: fila y columna donde queremos que se imprima la "frase" */
-void printf(const char *frase, byte flag, byte atrib, dword param){
+void printf(const char *frase){
 
 	char c = *frase;
 
 	while(c != '\0') {
-		putc(c, atrib);
+		if(c != '\n')
+			putc(c, GRIS_L);
+		else
+			salto_de_linea();
+		
 		frase++;
 		c = (byte) *frase;
 	}
-	if(flag != 0){
-		byte base = 10;
-		if(flag == 2){
-			base = 16;
-		}
+}
+
+void printdword(const dword var, const word atr){
+		
+		//recupero la base
+		byte base = (byte) (atr >> 8);
+		
+		//recupero los atributos de impresion
+		byte atrib = (byte) (atr & 0x00FF);
+		
 		//aca guardo los digitos
 		byte buffer[12];
-		num2char(param, buffer, base);
+		
+		num2char(var, buffer, base);
 		byte i=0;
 		while(buffer[i] != '\0') {
 		    putc(buffer[i], atrib);
 		    i++;
 		}
-	}
-
-	frase++;
-	c = *frase;
 }
+
+
+
 
 void printl(const char *frase, byte flag, byte atrib, dword param){
 
@@ -173,7 +192,8 @@ switch(n){
       return '8';
     case 9:
       return '9';
-
+    default: //si hay un error
+      return 'I';
     }
 
 }
@@ -218,7 +238,7 @@ void mostrar_pantalla_entera(){
 		cpmem((byte*) DIR_INI_PANTALLA, (byte*) BCP[tarea_en_pantalla].pantalla, TAM_PANTALLA_TAREA);
 
 		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(BCP[tarea_a_mostrar].pantalla, (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
+		cpmem((byte*) BCP[tarea_a_mostrar].pantalla, (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
 
 		//remapeo la pagina de video de la tarea a donde le corresponde escribir
 		mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,

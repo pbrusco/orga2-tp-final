@@ -23,9 +23,14 @@ void switch_task(){
 		BCP[tarea_actual].estado = CORRIENDO;
 
 		//3ro: cambio el selector de "salto" a donde marque el "pid" de la tarea_actual
-		salto.selector = BCP[tarea_actual].pid * 8 | 3;//multiplicopor 8 porque cada entrada es de 8 bytes
-
-		//breakpoint();
+		//teniendo en cuenta de qué RPL elegir dependiendo de qué tarea se va a pasar a ejecutar
+		if(tarea_actual != 0){
+			salto.selector = BCP[tarea_actual].pid * 8 | 3;//multiplicopor 8 porque cada entrada es de 8 bytes
+		}
+		else{
+			salto.selector = BCP[tarea_actual].pid * 8;
+		}
+		breakpoint();
 		//4to: hago el cambio de tarea
 		__asm__ __volatile__ ( "ljmp *(salto)");
 	}
