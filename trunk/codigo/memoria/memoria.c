@@ -161,51 +161,94 @@ extern gdt_entry gdt_vector[];
 
 void donde_esta_el_kernel(){
 /*	clear_screen();
-	printf("consoleD: "); printdword();,2,VERDE_L | BRILLANTE, (dword) &console);
-	mover_puntero(1,0);
-	printf("extraerNumero: ",2,VERDE_L | BRILLANTE, (dword) &extract_number);
-	mover_puntero(2,0);
-	printf("command[0]: ",2,VERDE_L | BRILLANTE, (dword) &command);
-	printf("      command[99]: ",2,VERDE_L | BRILLANTE, (dword) &command);
-	mover_puntero(3,0);
-	printf("levanto(consola): ",2,VERDE_L | BRILLANTE, (dword) &levanto);
-	mover_puntero(4,0);
-	printf("tarea_actual: ",2,VERDE_L | BRILLANTE, (dword) &tarea_actual);
-	mover_puntero(5,0);
-	printf("cant_tareas_en_sistema: ",2,VERDE_L | BRILLANTE, (dword) &cant_tareas_en_sistema);
-	mover_puntero(6,0);
+	//CONSOLE
+	printf("consoleD: ", VERDE_L | BRILLANTE); printdword((dword) &console, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("extraerNumero: ",VERDE_L | BRILLANTE); printdword((dword) &extract_number, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("pos_de_las_tareas(var): ", VERDE_L | BRILLANTE); printdword((dword) &posicion_de_las_tareas_en_memoria, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("command_incializado: ", VERDE_L | BRILLANTE); printdword((dword) &command_incializado, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("command[0]: ",VERDE_L | BRILLANTE); printdword((dword) &command, VERDE_L | BRILLANTE);
+	printf("      command[99]: ",VERDE_L | BRILLANTE); printdword((dword) &command[99], VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("levanto(consola): ",VERDE_L | BRILLANTE); printdword((dword) &levanto, VERDE_L | BRILLANTE);
+
+	//BCP
+	salto_de_linea();
+	printf("tarea_actual: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_actual, VERDE_L | BRILLANTE);	
+	salto_de_linea();
+	printf("cant_tareas_en_sistema",VERDE_L | BRILLANTE); printdword((dword) &cant_tareas_en_sistema, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("iniciar_BCP",VERDE_L | BRILLANTE); printdword((dword) &iniciar_BCP, VERDE_L | BRILLANTE);
+	salto_de_linea();
+	printf("desaparecerTarea",VERDE_L | BRILLANTE); printdword((dword) &desaparecerTarea, VERDE_L | BRILLANTE);
+	
+	
+	//GDT
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("gdt_vector[0]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector);
 	printf("      gdt_vector[127]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector[127]);
-	mover_puntero(7,0);
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("make_descriptor: ",2,VERDE_L | BRILLANTE, (dword) &make_descriptor);
-	mover_puntero(8,0);
+
+	
+	//IDT
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("idt_fill: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idtFill);
-	mover_puntero(9,0);
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("idt[0]: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idt[0]);
 	printf("      idt[255]: ",2,VERDE_L | BRILLANTE, (dword) &idt[255]);
-	mover_puntero(10,0);
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("_isr0: ",2,VERDE_L | BRILLANTE, (dword) &_isr0);
 	printf("      _isr21: ",2,VERDE_L | BRILLANTE, (dword) &_isr21);
-	mover_puntero(11,0);
+	salto_de_linea();
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("IDT_DESC: ",2,VERDE_L | BRILLANTE, (dword) &IDT_DESC);
+	
+	
+	//PAGINACION
 	mover_puntero(12,0);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("paginas_libres: ",2,VERDE_L | BRILLANTE, (dword) &paginas_libres);
 	mover_puntero(13,0);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("pidoPagina: ",2,VERDE_L | BRILLANTE, (dword) &pidoPagina);
 	mover_puntero(14,0);
+	printf("",VERDE_L | BRILLANTE); printdword((dword) &, VERDE_L | BRILLANTE);
 	printf("mapear_pagina: ",2,VERDE_L | BRILLANTE, (dword) &mapear_pagina);
+	
+	
+	//PANTALLA
 	mover_puntero(15,0);
 	printf("printf: ",2,VERDE_L | BRILLANTE, (dword) &printf);		
 	mover_puntero(16,0);
 	printf("puntero_pantalla: ",2,VERDE_L | BRILLANTE, (dword) &puntero_pantalla);
+	
+	
+	//SCHEDULER
 	mover_puntero(17,0);
 	printf("salto: ",2,VERDE_L | BRILLANTE, (dword) &salto);
 	mover_puntero(18,0);
 	printf("switch_task: ",2,VERDE_L | BRILLANTE, (dword) &switch_task);
+	
+	
+	//TECLADO
 	mover_puntero(19,0);
 	printf("teclado: ",2,VERDE_L | BRILLANTE, (dword) teclado);
 	mover_puntero(20,0);
 	printf("getChar: ",2,VERDE_L | BRILLANTE, (dword) &getChar);
+	
+	//TSS
 	mover_puntero(21,0);
 	printf("TSS[0]: ",2,VERDE_L | BRILLANTE, (dword) &TSS);
 	printf("      TSS[49]: ",2,VERDE_L | BRILLANTE, (dword) &TSS[49]);

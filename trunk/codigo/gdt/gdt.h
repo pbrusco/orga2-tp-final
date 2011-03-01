@@ -24,7 +24,7 @@
 //Valores del campo GENERAL del Segmento Descriptor de GDT
 #define DATOS           0x2
 #define EXPAND_DOWN     1 << 2
-#define WRITE           1 << 1
+#define WRITE_GDT       1 << 1
 #define CODIGO          0xA
 #define CONFORMING      1 << 2
 #define READ_GDT        1 << 1
