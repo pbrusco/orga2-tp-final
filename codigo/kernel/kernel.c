@@ -13,8 +13,6 @@ void kernel_infinito(){
 
 /*	matarTarea(6);*/
 
-	printf("HOLA MUNDo!\ncomo les baila enguenguengueeeeea?");
-
 	int aMatar;
 
 	while(true){

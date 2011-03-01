@@ -52,7 +52,7 @@ void fill_random_screen();
 void salto_de_linea();
 
 /*printf la vamos a usar sólo para imprimir caracteres. Imprime por defecto en GRIS con fondo NEGRO*/
-void printf(const char *frase);
+void printf(const char *frase, const byte atrib);
 
 /*printdword se usará para ver valores de variables.
 Recibe como parámetros la dword a imprimir y los atributos de escritura (el byte alto es la base a usar y el bajo son los atributos de impresion, como el color, brillo, etc)*/

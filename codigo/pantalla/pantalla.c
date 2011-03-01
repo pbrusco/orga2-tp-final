@@ -62,13 +62,13 @@ void salto_de_linea(){
 
 
 /* TODO: por más que sea molesto, podriamos pasarle 2 parametros mas: fila y columna donde queremos que se imprima la "frase" */
-void printf(const char *frase){
+void printf(const char *frase, const byte atrib){
 
 	char c = *frase;
 
 	while(c != '\0') {
 		if(c != '\n')
-			putc(c, GRIS_L);
+			putc(c, atrib);
 		else
 			salto_de_linea();
 		

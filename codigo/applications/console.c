@@ -121,7 +121,7 @@ void add_char_to_command(char c){
 
 
 void help(){
-  printf("HELP: (comandos utiles) ",0,VERDE_L,0);
+  printf("HELP: (comandos utiles) ",VERDE_L);
   printl("h: help ",0,AZUL_L,0);
   printl("l: show_all_tasks: ",0,AZUL_L,0);
   printl("p: show_running_tasks: ",0,AZUL_L,0);
@@ -138,46 +138,46 @@ void cargar_tarea(int id){
 }
 
 void show_all(){
-  printf("l: show_all_tasks: ",0,AZUL_L,0);
+  printf("l: show_all_tasks: ",AZUL_L);
 }
 
 void show_running_tasks(){
-  printf("p: show_running_tasks: ",0,AZUL_L,0);
+  printf("p: show_running_tasks: ",AZUL_L);
 }
 
 void show_sleeping_tasks(){
-  printf("s: show_sleeping_tasks ",0,AZUL_L,0);
+  printf("s: show_sleeping_tasks ",AZUL_L);
 }
 
 void display_task(int id){
   if (id == -1){
-    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+    printf("ERROR!! Fijate el parametro vistes",AZUL_L);
   }
   else
   {
-    printf("d: display_task ",0,AZUL_L,0);
+    printf("d: display_task ",AZUL_L);
     putc(num2char2(id),AZUL_L);
   }
 }
 
 void display_merging_task(int id){
   if (id == -1){
-    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+    printf("ERROR!! Fijate el parametro vistes",AZUL_L);
   }
   else
   {
-    printf("m: display_merging_task ",0,AZUL_L,0);
+    printf("m: display_merging_task ",AZUL_L);
     putc(num2char2(id),AZUL_L);
   }
 }
 
 void hide_task(int id){
   if (id == -1){
-    printf("ERROR!! Fijate el parametro vistes",0,AZUL_L,0);
+    printf("ERROR!! Fijate el parametro vistes",AZUL_L);
   }
   else
   {
-    printf("i: hide_task ",0,AZUL_L,0);
+    printf("i: hide_task ",AZUL_L);
     putc(num2char2(id),AZUL_L);
   }
 }
