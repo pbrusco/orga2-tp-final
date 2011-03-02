@@ -4,15 +4,14 @@
 
 extern BCP_Entry BCP[];
 
-extern word* puntero_pantalla;
-
 // este registro lo voy a usar para hacer el "jmp" para cambiar de tarea
 switch_reg salto;
 
 
 void switch_task(){
 //recordar que las interrupciones en el contexto de esta tarea estan deshabilitadas
-
+	
+	
 	//1ro: me fijo que haya mas de una tarea, sino termino
 	if(cant_tareas_en_sistema != 1){
 

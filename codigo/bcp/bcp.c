@@ -12,6 +12,7 @@ extern idt_entry idt[];
 extern gdt_entry gdt_vector[];
 extern byte tarea_en_pantalla;
 extern byte tarea_a_mostrar;
+extern byte command[];
 
 //declaro el arreglo de BCP's
 BCP_Entry BCP[CANT_TAREAS];
@@ -91,7 +92,6 @@ void cambiar_estado(word id, byte estado_nuevo){
 
 void cargarTarea(dword eip){
 
-
 	// 1ro: averiguar direccion de la tarea y tamaño (en bytes). Por ahora OBSOLETO
 
 
@@ -139,26 +139,29 @@ void matarTarea(byte id){
 
 
 void mapeo_paginas_default(dword* directorio){
+	
+	//pagina en donde empieza el codigo del kernel
+	dword kernel_init = ((dword) &make_descriptor) & 0xFFFFF000;
+	
+	//pagina siguiente a la pagina donde termina el kernel
+	dword kernel_end = ( ((dword) &command[99]) & 0xFFFFF000) + TAM_PAG;
+	
+	//mapeo la pagina en donde esta la estructura de la GDT
 	mapear_pagina(directorio, (dword) gdt_vector, (dword) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &gdt_vector[127], (dword) &gdt_vector[127], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) idt, (dword) idt, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &idt[255], (dword) &idt[255], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &_isr0, (dword) &_isr0, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &_isr21, (dword) &_isr21, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &iniciar_BCP, (dword) &iniciar_BCP, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) BCP, (dword) BCP, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &BCP[CANT_TAREAS-1], (dword) &BCP[CANT_TAREAS-1], PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) &switch_task, (dword) &switch_task, PRESENT | READ_PAGINACION | USUARIO);
-	mapear_pagina(directorio, (dword) TSS, (dword) TSS, PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) &TSS[24], (dword) &TSS[24], PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) &TSS[49], (dword) &TSS[49], PRESENT | WRITE | USUARIO);
+	
+	//mapeo todas las paginas en donde se encuentra el kernel
+	while(kernel_init != kernel_end){
+		mapear_pagina(directorio, kernel_init, kernel_init, PRESENT | READ_PAGINACION | USUARIO);
+		kernel_init += TAM_PAG;
+	}
+		
 }
 
 
 
 int buscar_entradaBCP_matar(){
 	int res = 0;
-	while(res < CANT_TAREAS && BCP[res].estado != MATAR){
+	while( (res < CANT_TAREAS) && (BCP[res].estado != MATAR) ){
 		res++;
 	}
 	return res; //NOTA: devuelve la posicion de la tarea en la BCP
