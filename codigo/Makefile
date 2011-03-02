@@ -44,5 +44,5 @@ image: kernel.bin
 
 clean:
 	rm -f *.bin
-	rm -fr *.o
+	rm -f *.o ./*/*.o
 

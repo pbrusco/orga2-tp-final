@@ -104,7 +104,7 @@ void cargarTarea(dword eip){
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
-	mapear_pagina(directorio, eip, eip, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, eip, eip, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (dword) pila0, (dword) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
