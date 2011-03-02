@@ -27,6 +27,11 @@ void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atribut
 		mapear_tabla(entry, (dword) tabla, atributos);
 	}
 	
+	//si tengo que hacer una escritura y no tengo permisos para escribir, cambio los permisos
+	if(    ((atributos & WRITE) == 2) && ((*entry & 0x2) != 0x2)    ){
+		*entry = *entry | WRITE;
+	}
+	
 	//muevo el puntero a la tabla que corresponda
 	entry = (dword *) ( (*entry) & 0xFFFFF000);
 	
