@@ -10,9 +10,6 @@ main:
 		mov ah, 3
 		mov ebx, [isrnumero]
 		cmp ebx, 0x4
-		jmp next_clock
-		;quiero que corte acá para probar algo. Si quieren el reloj, borren la linea de arriba		
-		
 		jl .ok
 		mov DWORD [isrnumero], 0x0
 		jmp next_clock	

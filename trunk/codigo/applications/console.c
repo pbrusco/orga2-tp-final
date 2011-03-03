@@ -9,45 +9,45 @@ extern BCP_Entry BCP[];
 dword posicion_de_las_tareas_en_memoria[2] = {0x2000,0x2040};
 char command_incializado = 'n';
 char command[100];
-char levanto = 'n';
 
 void console(short int tecla) {
+	
 	/*esto es para que siempre se escriba en la pantalla*/
   		//1ero: guardo el mapeo de la pantalla
   		dword entrada_video = obtener_mapeo(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA);
   		//2do: mapeo la entrada de video a la pantalla
-  		mapear_pagina(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA, DIR_INI_PANTALLA, WRITE | PRESENT | USUARIO);
+  		mapear_pagina(	BCP[tarea_actual].entrada_directorio, 
+  				DIR_INI_PANTALLA, 
+  				DIR_INI_PANTALLA, 
+  				(word) (entrada_video & 0x00000FFF));
   		
   	/**/
 
-  if (command_incializado == 'n'){
-    inicializar_command();
-  }
+	if (command_incializado == 'n'){
+		inicializar_command();
+	}
 
-  char c = getChar(tecla & 0x00FF);
+	char c = getChar(tecla & 0x00FF);
 
-  if (levanto=='s'){levanto = 'n';}
-  else{
-    levanto = 's';
-    if (c == '*') { //if the user press "enter"
-      clear_screen(); //TODO: replace by clear_line();
-      run(command);
-      inicializar_command();
-
-    }
-    else if (c == '<'){ //if the user press "back"
-     remove_last_char_from_command();
-     borrarc();
-    }
-    else if (c == '!'){}
-    else
-    {
-      if (command[0] == '?'){clear_screen();}
-      add_char_to_command(c);
-      putc(c,VERDE_L);
-
-    }
-  }
+	//si el codigo indica que se presiono una tecla
+	if(c < 0x80){
+	    	if (c == '*') { //if the user press "enter"
+	      		clear_command_line();//TODO
+	      		run(command);
+	      		inicializar_command();
+	    	}
+	    	else if (c == '<'){ //if the user press "back"
+	     		remove_last_char_from_command();
+			removerc();//TODO: que borre el ultimo caracter de la linea de comando
+		}
+	    	else if (c == '!'){
+	    	}
+	    	else{
+	      		// TODO: esto creo que va a estar demás: if (command[0] == '?'){clear_screen();}
+			add_char_to_command(c);
+		      	agregarc(c,VERDE_L);//TODO: que agregue el caracter a la linea de comando
+	    	}
+  	}
 
 	/*dejo el mapeo de video igual que estaba antes*/
 	mapear_pagina(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA, entrada_video, (word) (entrada_video & 0x00000FFF));
@@ -162,7 +162,8 @@ void display_task(int id){
   else
   {
     printf("d: display_task ",AZUL_L);
-    putc(num2char2(id),AZUL_L);
+    printdword(id,AZUL_L);
+    cambiar_de_pantalla(id);
   }
 }
 
@@ -173,7 +174,7 @@ void display_merging_task(int id){
   else
   {
     printf("m: display_merging_task ",AZUL_L);
-    putc(num2char2(id),AZUL_L);
+    printdword(id,AZUL_L);
   }
 }
 
@@ -184,7 +185,7 @@ void hide_task(int id){
   else
   {
     printf("i: hide_task ",AZUL_L);
-    putc(num2char2(id),AZUL_L);
+    printdword(id,AZUL_L);
   }
 }
 
