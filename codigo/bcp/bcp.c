@@ -29,7 +29,7 @@ void iniciar_BCP(){
 	BCP[0].estado = ACTIVO;
 	BCP[0].entrada_directorio = (dword *) DIR_DIRECTORIO;
 	BCP[0].sig = BCP[0].ant = 0;
-	BCP[0].pantalla = (word *) 0xb9000;//TODO: agregar al mapa de memoria
+	BCP[0].pantalla = (word *) 0xB9000;//TODO: agregar al mapa de memoria
 }
 
 void iniciar_tss_kernel(){
