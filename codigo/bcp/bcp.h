@@ -37,7 +37,10 @@ void cambiar_estado(word pid, byte estado_nuevo);
 byte buscar_entradaBCP(word id);
 
 // devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT_TAREAS
-int buscar_entradaBCP_matar();
+byte buscar_entradaBCP_matar();
+
+// Sirve para debuggear. Dada una entrada de BCP, imprime por pantalla todo su contenido
+void info_BCP(byte index);
 
 // carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
 void cargarTarea(dword eip);

@@ -110,13 +110,6 @@ modo_protegido:
     ; cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c
 	lidt[IDT_DESC]
 
-	;push dword 0x2000
-	;call cargarTarea
-	;add esp, 4
-	;push dword 0x2040
-	;call cargarTarea
-	;add esp, 4
-
 
     ; Habilito las interrupciones
 	sti

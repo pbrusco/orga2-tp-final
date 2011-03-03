@@ -13,22 +13,20 @@ void kernel_infinito(){
 
 /*	matarTarea(6);*/
 
-	int aMatar;
+	byte aMatar;
 
 	while(true){
-		// 1ero:
-		//busco si hay alguna tarea para matar
-/*		aMatar = buscar_entradaBCP_matar();
+	
+		// 1ero: busco si hay alguna tarea para matar
+		aMatar = buscar_entradaBCP_matar();
+		
 		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
-      			if (BCP[aMatar].estado ==4){
-				desaparecerTarea(aMatar);
-			}
+			desaparecerTarea(aMatar);
 		}
 
-		//2do:
-		//hago un cambio de pantalla si fue pedido
-		mostrar_pantalla_entera();*/
+		//2do: hago un cambio de pantalla si fue pedido
+		mostrar_pantalla_entera();
 
 	}
 }

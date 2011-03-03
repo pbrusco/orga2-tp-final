@@ -42,6 +42,9 @@ entrada de tabla de pagina:
 void mapear_tabla (dword *directorio, dword dir_tabla, word atributos);
 void mapear_pagina(dword *directorio, dword dir_virtual, dword dir_real, word atributos);
 
+// Dado un directorio y una dirección virtual, devuelve a qué página física está mapeada y sus atributos
+dword obtener_mapeo(dword *directorio, dword dir_virtual);
+
 #define OFFSET_TABLA 0X400000
 #define OFFSET_PAGINA 0X1000
 
