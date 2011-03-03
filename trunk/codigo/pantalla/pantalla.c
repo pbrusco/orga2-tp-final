@@ -82,6 +82,11 @@ void printdword(const dword var, const word atr){
 		//recupero la base
 		byte base = (byte) (atr >> 8);
 		
+		//si la base es cero, pongo por default base 10
+		if(base == 0){
+			base = 10;
+		}
+		
 		//recupero los atributos de impresion
 		byte atrib = (byte) (atr & 0x00FF);
 		

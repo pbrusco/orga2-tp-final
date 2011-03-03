@@ -12,7 +12,13 @@ char command[100];
 char levanto = 'n';
 
 void console(short int tecla) {
-  //mapear_pagina(BCP[tarea_actual].entrada_directorio, 0xB8000, 0xB8000, WRITE | PRESENT | USUARIO);
+	/*esto es para que siempre se escriba en la pantalla*/
+  		//1ero: guardo el mapeo de la pantalla
+  		dword entrada_video = obtener_mapeo(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA);
+  		//2do: mapeo la entrada de video a la pantalla
+  		mapear_pagina(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA, DIR_INI_PANTALLA, WRITE | PRESENT | USUARIO);
+  		
+  	/**/
 
   if (command_incializado == 'n'){
     inicializar_command();
@@ -43,8 +49,8 @@ void console(short int tecla) {
     }
   }
 
-
-  //mapear_pagina(BCP[tarea_actual].entrada_directorio, 0xB8000, BCP[tarea_actual].pantalla, WRITE | PRESENT | USUARIO);
+	/*dejo el mapeo de video igual que estaba antes*/
+	mapear_pagina(BCP[tarea_actual].entrada_directorio, DIR_INI_PANTALLA, entrada_video, (word) (entrada_video & 0x00000FFF));
 
 }
 

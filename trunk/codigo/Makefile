@@ -22,7 +22,7 @@ LD=ld
 LDFLAGS=-static -m elf_i386 --oformat binary -b elf32-i386 -e start -Ttext 0x1200
 .PHONY=clean all image
 
-all: tareas clean image
+all: tareas small_clean image
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
@@ -41,6 +41,10 @@ tareas:
 image: kernel.bin
 	@echo 'Copiando el $(KERNEL_BIN) a la imagen de diskette\n'
 	$(MCOPY) -i $(DISK_IMG) $(KERNEL_BIN) ::/ -o
+
+small_clean:
+	rm -f *.bin
+	rm -f *.o
 
 clean:
 	rm -f *.bin

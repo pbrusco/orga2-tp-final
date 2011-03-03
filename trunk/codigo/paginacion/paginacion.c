@@ -45,6 +45,26 @@ void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atribut
 }
 
 
+dword obtener_mapeo(dword *directorio, dword dir_virtual){
+	
+	dword offset = 0;
+	
+	//muevo el puntero del directorio a la entrada del directorio que corresponda
+	offset = dir_virtual / OFFSET_TABLA;
+	directorio += offset;
+	
+	//muevo el puntero a la tabla que corresponda
+	directorio = (dword *) ( (*directorio) & 0xFFFFF000);
+	
+	//muevo el puntero a la entrada de tabla que corresponda
+	dir_virtual = dir_virtual - (offset * OFFSET_TABLA);
+	offset = dir_virtual / OFFSET_PAGINA;
+	directorio += offset;
+	
+	return *directorio;
+}
+
+
 void iniciar_paginacion_kernel(){
 	dword *dir_entry = (dword *) DIR_DIRECTORIO;
 	dword tabla_entry = (DIR_DIRECTORIO + 0x1000);

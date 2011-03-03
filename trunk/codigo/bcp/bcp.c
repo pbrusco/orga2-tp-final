@@ -108,7 +108,7 @@ void cargarTarea(dword eip){
 	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (dword) pila0, (dword) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) 0xB8000, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
 
 
 	// 3ro: crear una entrada de TSS e inicializarla
@@ -159,13 +159,28 @@ void mapeo_paginas_default(dword* directorio){
 
 
 
-int buscar_entradaBCP_matar(){
-	int res = 0;
+byte buscar_entradaBCP_matar(){
+
+	byte res = 0;
 	while( (res < CANT_TAREAS) && (BCP[res].estado != MATAR) ){
 		res++;
 	}
+	
 	return res; //NOTA: devuelve la posicion de la tarea en la BCP
 }
+
+
+void info_BCP(byte index){
+	mover_puntero(10,0);
+	printf("Entrada BCP: ", CELESTE_L); printdword(index, CELESTE_L); printf("\n",0);
+	printf("pid: ", GRIS_L | BRILLANTE); printdword(BCP[index].pid, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("estado: ", GRIS_L | BRILLANTE); printdword(BCP[index].estado, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("directorio: ", GRIS_L | BRILLANTE); printdword((dword) BCP[index].entrada_directorio, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("siguiente: ", GRIS_L | BRILLANTE); printdword(BCP[index].sig, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("anterior: ", GRIS_L | BRILLANTE); printdword(BCP[index].ant, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((dword) BCP[index].pantalla, GRIS_L | BRILLANTE); printf("\n",0);
+}
+
 
 
 void desaparecerTarea(byte bcpPos){
