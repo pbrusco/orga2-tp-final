@@ -152,9 +152,7 @@ void cpmem(byte* from, byte* to, dword cant){
 #include "../kernel/kernel.h"
 
 extern dword posicion_de_las_tareas_en_memoria[];
-extern char command_incializado;
 extern char command[];
-extern char levanto;
 
 
 extern idt_descriptor IDT_DESC;
@@ -179,12 +177,8 @@ void donde_esta_el_kernel(){
 	salto_de_linea();
 	printf("pos_de_las_tareas(var): ",VERDE_L | BRILLANTE); printdword((dword) &posicion_de_las_tareas_en_memoria, BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
-	printf("command_incializado: ",VERDE_L | BRILLANTE); printdword((dword) &command_incializado, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
 	printf("command[0]: ",VERDE_L | BRILLANTE); printdword((dword) &command, BASE16 | VERDE_L | BRILLANTE);
 	printf("      command[99]: ",VERDE_L | BRILLANTE); printdword((dword) &command[99], BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("levanto(consola): ",VERDE_L | BRILLANTE); printdword((dword) &levanto, BASE16 | VERDE_L | BRILLANTE);
 
 	//BCP
 	salto_de_linea();salto_de_linea();

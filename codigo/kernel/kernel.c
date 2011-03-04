@@ -3,9 +3,22 @@
 #include "../pantalla/pantalla.h"
 
 extern BCP_Entry BCP[];
-
+extern cursor_consola;
 
 void kernel_infinito(){
+
+	//dejo limpia la pantalla
+	clear_screen();
+
+	//inicio el prompt
+	clear_command_line();
+	
+	//inicio el interprete de comandos
+	inicializar_command();
+	
+	
+	mover_puntero(10,0);
+	printf("LALALA", ROJO_L);
 
 /*	cargarTarea(0x2000);*/
 /*	cargarTarea(0x2040);*/
