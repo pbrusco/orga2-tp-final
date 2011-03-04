@@ -132,11 +132,12 @@ void clear_screen(){
 byte tarea_en_pantalla, tarea_a_mostrar;
 
 //este es el puntero que se va a usar para la consola
-word* cursor_consola = (word*) (DIR_INI_PANTALLA + 80*2*24);
+word* cursor_consola = (word*) (DIR_INI_PANTALLA + 80*2*24 + 4);
 
 //este puntero se va a usar para mostrar informacion
 word* cursor_informacion = (word*) DIR_INI_PANTALLA;
 
+char* prompt = "$>";
 
 void mostrar_pantalla_entera(){
 	//limpio las interrupciones
@@ -146,10 +147,14 @@ void mostrar_pantalla_entera(){
 	if(tarea_en_pantalla != tarea_a_mostrar){
 
 		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
-		cpmem((byte*) (DIR_INI_PANTALLA + 80*2), (byte*) BCP[tarea_en_pantalla].pantalla, TAM_PANTALLA_TAREA);
+		cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
+		 		(byte*) ( ((dword) BCP[tarea_en_pantalla].pantalla) + (80*2)),
+		 		TAM_PANTALLA_TAREA);
 
 		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem((byte*) (((dword) BCP[tarea_a_mostrar].pantalla) + 80*2), (byte*) DIR_INI_PANTALLA, TAM_PANTALLA_TAREA);
+		cpmem(	(byte*) (((dword) BCP[tarea_a_mostrar].pantalla) + 80*2),
+			(byte*) (DIR_INI_PANTALLA + (80*2)),
+			TAM_PANTALLA_TAREA);
 
 		//remapeo la pagina de video de la tarea a donde le corresponde escribir
 		mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
@@ -175,46 +180,36 @@ void cambiar_de_pantalla(byte bcpPos){
 	tarea_a_mostrar = bcpPos;
 }
 
-
-
-
-
-
-
-
-
-void printl(const char *frase, byte flag, byte atrib, dword param){
-
-  puntero_pantalla = (word*) ( (int) puntero_pantalla - (((int)puntero_pantalla)%160) + 160);
-	char c = *frase;
-
-	while(c != '\0') {
-		putc(c, atrib);
-		frase++;
-		c = (byte) *frase;
-	}
-	if(flag != 0){
-		byte base = 10;
-		if(flag == 2){
-			base = 16;
-		}
-		//aca guardo los digitos
-		byte buffer[12];
-		num2char(param, buffer, base);
-		byte i=0;
-		while(buffer[i] != '\0') {
-		    putc(buffer[i], atrib);
-		    i++;
-		}
-	}
-
-	frase++;
-	c = *frase;
+void clear_command_line(){
+	setmem((byte*) DIR_INI_PANTALLA + 80*2*24, 0x00, 80*2);
+	cursor_consola = (word *) DIR_INI_COMMAND;
+	mover_puntero(24,0);
+	printf(prompt, COLOR_PROMPT);
 }
 
 
+void clear_info_line(){
+	setmem((byte*) DIR_INI_PANTALLA, 0x00, 80*2);
+	cursor_informacion = (word*) DIR_INI_PANTALLA;
+}
 
 
+void removerc(){
+	//si no esta el cursor al lado del prompt
+	if( ((dword)cursor_consola) != DIR_INI_COMMAND ){
+		cursor_consola--;
+		*cursor_consola = 0x0000;
+	}
+}
+
+
+void agregarc(byte letra, byte atrib){
+	//si NO se llenó linea en la que estoy intentando escribir
+	if(   ( ((dword) cursor_consola) != (DIR_FIN_PANTALLA) )   ){
+		*cursor_consola = ( ((word) atrib) << 8 ) | ( (word) letra );
+		cursor_consola++;
+	}
+}
 
 
 char num2char2(const int n){

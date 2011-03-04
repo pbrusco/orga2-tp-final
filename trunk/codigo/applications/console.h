@@ -1,6 +1,8 @@
 #ifndef __CONSOLE__
 #define __CONSOLE__
 
+#define TAM_COMMAND 80
+
 void cargar_tarea(int);
 void console(short int key);
 char decode(int key);
@@ -19,5 +21,6 @@ void send_error_message();
 char extract_code();
 int extract_number();
 void remove_last_char_from_command();
+
 #endif
 

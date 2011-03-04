@@ -40,7 +40,6 @@
 #define DIR_INI_PANTALLA 0xB8000
 #define DIR_FIN_PANTALLA 0xB8FA0
 
-#define TAM_PANTALLA_TAREA 2*80*23
 
 //FUNCIONES DE DEBUGGING
 
@@ -69,9 +68,11 @@ void clear_screen();
 
 
 // FUNCIONES PARA MOVIMIENTO DE PANTALLAS Y LA LINEA DE COMANDOS
-
-#define FILA_INFORMACION 0
-#define FILA_COMMAND_LINE 24
+#define TAM_PANTALLA_TAREA (2*80*23)
+#define COLOR_PROMPT (VERDE_L | BRILLANTE)
+#define COLOR_INFO (CELESTE_L | BRILLANTE)
+#define DIR_INI_COMMAND (DIR_INI_PANTALLA + 80*24*2 + 2*2)
+#define DIR_PROMPT (DIR_INI_PANTALLA + 80*24*2)
 
 /*La idea es copiar 23 renglones enteros de la tarea "pid". Recordar que la pantalla será de 80*23, de manera de dejarle el ultimo "renglon" para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
 IMPORTANTE: ESTA FUNCION DEBE SER LLAMADA UNICAMENTE POR EL KERNEL, YA QUE ES EL UNICO QUE PUEDE VER Y MODIFICAR EL DIRECTORIO Y LAS TABLAS DE PAGINAS DE TODAS LAS TAREAS.
@@ -83,14 +84,17 @@ void mostrar_pantalla_entera();
 void cambiar_de_pantalla(byte bcpPos);
 
 
-/*Limpia la linea indicada*/
-clear_line(byte linea);
+/*limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado*/
+void clear_command_line();
+
+/*limpia la linea de informacion (fila 0 de la pantalla) y deja el puntero a dicha linea inicializado*/
+void clear_info_line();
 
 /*Borra el ultimo caracter de la linea de comandos*/
-removerc();
+void removerc();
 
 /*Escribe un caracter en la linea de comandos*/
-agregarc();
+void agregarc(byte letra, byte atrib);
 
 
 /*
@@ -105,11 +109,6 @@ IDEA PARA LAS PANTALLAS:
 
 
 
-
-
-
-
-void printl(const char *frase, byte flag, byte atrib, dword param);
 int char2num(char c);
 char num2char2(const int n);
 
