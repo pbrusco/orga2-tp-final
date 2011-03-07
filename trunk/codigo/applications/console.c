@@ -9,23 +9,13 @@ extern BCP_Entry BCP[];
 extern word* cursor_consola, cursor_informacion;
 extern byte tarea_a_mostrar, tarea_en_pantalla;
 
-dword posicion_de_las_tareas_en_memoria[2] = {0x2000,0x2040};
+dword posicion_de_las_tareas_en_memoria[] = {0x0000,0x2000,0x2040};
 char command[TAM_COMMAND];
 byte command_position = 0;
 
 
 void console(short int tecla) {
 	/*RECORDAR QUE CUANDO SE INGRESA ACA, NO IMPORTA QUE TAREA SE ESTE EJECUTANDO, SIEMPRE SE INGRESA UTILIZANDO EL DIRECTORIO DEL KERNEL*/
-	/*esto es para que siempre se escriba en la pantalla*/
-  		//1ero: guardo el mapeo de la pantalla
-/*  		dword entrada_video = obtener_mapeo(BCP[0].entrada_directorio, DIR_INI_PANTALLA);*/
-/*  		//2do: mapeo la entrada de video a la pantalla*/
-/*  		mapear_pagina(	BCP[0].entrada_directorio, */
-/*  				DIR_INI_PANTALLA, */
-/*  				DIR_INI_PANTALLA,*/
-/*  				(word) (entrada_video & 0x00000FFF));*/
-  		
-  	/**/
 
 	char c = getChar(tecla & 0x00FF);
 
@@ -48,10 +38,6 @@ void console(short int tecla) {
 		      	agregarc(c, COLOR_PROMPT);//TODO: que agregue el caracter a la linea de comando
 	    	}
   	}
-
-	/*dejo el mapeo de video igual que estaba antes*/
-/*	mapear_pagina(BCP[0].entrada_directorio, DIR_INI_PANTALLA, entrada_video, (word) (entrada_video & 0x00000FFF));*/
-
 }
 
 
@@ -106,6 +92,9 @@ void run (){
       	clear_command_line();
       	break;
       }
+    case 'k':
+    	kill_task(second_param);
+    	break;    	
     }
 
 }
@@ -130,15 +119,22 @@ void help(){
 	printf("m: display_merging_task x\n",AZUL_L);
 	printf("i: hide_task x\n",AZUL_L);
 	printf("z: cargar_tarea x\n",AZUL_L);
+	printf("k: matar tarea x\n",AZUL_L);
 
 }
 
 void cargar_tarea(int id){
-	clear_info_line();
-	cargarTarea(posicion_de_las_tareas_en_memoria[id]);
-	mover_puntero(0,0);
-	printf("Se ha cargado con exito la tarea ", COLOR_INFO);
-	printdword(id, COLOR_INFO);
+	if(id == 0){
+		mover_puntero(0,0);
+		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
+	}
+	else{
+		clear_info_line();
+		cargarTarea(posicion_de_las_tareas_en_memoria[id]);
+		mover_puntero(0,0);
+		printf("Se ha cargado con exito la tarea ", COLOR_INFO);
+		printdword(id, COLOR_INFO);
+	}
 }
 
 void show_all(){
@@ -155,16 +151,22 @@ void show_sleeping_tasks(){
 
 
 void display_task(int id){
-	//TODO: ver por que no funciona el genérico!!!
+	
+	clear_info_line();
+	mover_puntero(0,0);
+	
 	if (id == -1){
 		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
 	}
 	else{
-		clear_info_line();
-		mover_puntero(0,0);
-		printf("d: display_task ", COLOR_INFO);
-		printdword(id,COLOR_INFO);
-		cambiar_de_pantalla(id);
+		if(BCP[id].estado != MUERTO){
+			printf("d: display_task ", COLOR_INFO);
+			printdword(id,COLOR_INFO);
+			cambiar_de_pantalla(id);
+		}
+		else{
+			printf("ERROR: No existe tal tarea", COLOR_INFO);
+		}
 	}
 }
 
@@ -188,6 +190,16 @@ void hide_task(int id){
     printf("i: hide_task ",COLOR_INFO);
     printdword(id,COLOR_INFO);
   }
+}
+
+
+void kill_task(dword id){
+	clear_info_line();
+	mover_puntero(0,0);
+	printf("k: Mataste a la tarea con id ", COLOR_INFO);
+	printdword(id,COLOR_INFO);
+	matarTarea(id);
+	//TODO: por ahora queda así, pero se puede poner aca que si se mata a la tarea en pantalla, se pasa a mostrar la pantalla del kernel...
 }
 
 char extract_code(){

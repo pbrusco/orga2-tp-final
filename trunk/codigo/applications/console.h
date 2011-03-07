@@ -21,6 +21,7 @@ void send_error_message();
 char extract_code();
 int extract_number();
 void remove_last_char_from_command();
+void kill_task(dword);
 
 #endif
 
