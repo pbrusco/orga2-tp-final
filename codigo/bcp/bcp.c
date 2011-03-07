@@ -127,13 +127,7 @@ void cargarTarea(dword eip){
 
 
 void matarTarea(byte id){
-	//limpio las interrupciones para evitar problemas
-	cli();
-
 	cambiar_estado(id, MATAR);
-
-	//activo interrupciones nuevamente
-	sti();
 }
 
 

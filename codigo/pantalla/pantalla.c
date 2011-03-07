@@ -146,11 +146,14 @@ void mostrar_pantalla_entera(){
 	//si tengo que cambiar la pantalla
 	if(tarea_en_pantalla != tarea_a_mostrar){
 
-		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
-		cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
-		 		(byte*) ( ((dword) BCP[tarea_en_pantalla].pantalla) + (80*2)),
-		 		TAM_PANTALLA_TAREA);
-
+		//si la tarea en pantalla no esta muerta
+		if(BCP[tarea_en_pantalla].estado != MUERTO){
+			//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
+			cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
+			 		(byte*) ( ((dword) BCP[tarea_en_pantalla].pantalla) + (80*2)),
+			 		TAM_PANTALLA_TAREA);
+		}
+		
 		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
 		cpmem(	(byte*) (((dword) BCP[tarea_a_mostrar].pantalla) + 80*2),
 			(byte*) (DIR_INI_PANTALLA + (80*2)),
