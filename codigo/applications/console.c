@@ -101,9 +101,11 @@ void run (){
     case 'i':
       hide_task(second_param);
       break;
-    case 'c':
-      clear_screen();
-      break;
+    case 'c':{
+      	clear_screen();
+      	clear_command_line();
+      	break;
+      }
     }
 
 }
