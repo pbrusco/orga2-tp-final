@@ -18,12 +18,12 @@ void console(short int tecla) {
 	/*RECORDAR QUE CUANDO SE INGRESA ACA, NO IMPORTA QUE TAREA SE ESTE EJECUTANDO, SIEMPRE SE INGRESA UTILIZANDO EL DIRECTORIO DEL KERNEL*/
 	/*esto es para que siempre se escriba en la pantalla*/
   		//1ero: guardo el mapeo de la pantalla
-  		dword entrada_video = obtener_mapeo(BCP[0].entrada_directorio, DIR_INI_PANTALLA);
-  		//2do: mapeo la entrada de video a la pantalla
-  		mapear_pagina(	BCP[0].entrada_directorio, 
-  				DIR_INI_PANTALLA, 
-  				DIR_INI_PANTALLA,
-  				(word) (entrada_video & 0x00000FFF));
+/*  		dword entrada_video = obtener_mapeo(BCP[0].entrada_directorio, DIR_INI_PANTALLA);*/
+/*  		//2do: mapeo la entrada de video a la pantalla*/
+/*  		mapear_pagina(	BCP[0].entrada_directorio, */
+/*  				DIR_INI_PANTALLA, */
+/*  				DIR_INI_PANTALLA,*/
+/*  				(word) (entrada_video & 0x00000FFF));*/
   		
   	/**/
 
@@ -50,7 +50,7 @@ void console(short int tecla) {
   	}
 
 	/*dejo el mapeo de video igual que estaba antes*/
-	mapear_pagina(BCP[0].entrada_directorio, DIR_INI_PANTALLA, entrada_video, (word) (entrada_video & 0x00000FFF));
+/*	mapear_pagina(BCP[0].entrada_directorio, DIR_INI_PANTALLA, entrada_video, (word) (entrada_video & 0x00000FFF));*/
 
 }
 
@@ -154,62 +154,15 @@ void show_sleeping_tasks(){
 
 void display_task(int id){
 	//TODO: ver por que no funciona el genérico!!!
-/*	if (id == -1){*/
-/*		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);*/
-/*	}*/
-/*	else{*/
-/*		clear_info_line();*/
-/*		mover_puntero(0,0);*/
-/*		printf("d: display_task ", COLOR_INFO);*/
-/*		printdword(id,COLOR_INFO);*/
-/*		cambiar_de_pantalla(id);*/
-/*	}*/
-
-	if(id == 1){
-		//copio la pantalla a donde debe escribir realmente el kernel
-		cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
-		 		(byte*) ( ((dword) BCP[0].pantalla) + (80*2)),
-		 		TAM_PANTALLA_TAREA);
-
-		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(	(byte*) (((dword) BCP[1].pantalla) + 80*2),
-			(byte*) (DIR_INI_PANTALLA + (80*2)),
-			TAM_PANTALLA_TAREA);
-			
-		//remapeo la pagina de video de la tarea a donde le corresponde escribir
-		mapear_pagina(	BCP[0].entrada_directorio,
-				DIR_INI_PANTALLA,
-				(dword) BCP[0].pantalla,
-				USUARIO | WRITE | PRESENT);
-
-		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
-		mapear_pagina(	BCP[1].entrada_directorio,
-				DIR_INI_PANTALLA,
-				DIR_INI_PANTALLA,
-				USUARIO | WRITE | PRESENT);
+	if (id == -1){
+		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
 	}
-	if(id == 0){
-		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
-		cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
-		 		(byte*) ( ((dword) BCP[1].pantalla) + (80*2)),
-		 		TAM_PANTALLA_TAREA);
-
-		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(	(byte*) (((dword) BCP[0].pantalla) + 80*2),
-			(byte*) (DIR_INI_PANTALLA + (80*2)),
-			TAM_PANTALLA_TAREA);
-		
-		//remapeo la pagina de video de la tarea a donde le corresponde escribir
-		mapear_pagina(	BCP[1].entrada_directorio,
-				DIR_INI_PANTALLA,
-				(dword) BCP[1].pantalla,
-				USUARIO | WRITE | PRESENT);
-
-		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
-		mapear_pagina(	BCP[0].entrada_directorio,
-				DIR_INI_PANTALLA,
-				DIR_INI_PANTALLA,
-				USUARIO | WRITE | PRESENT);
+	else{
+		clear_info_line();
+		mover_puntero(0,0);
+		printf("d: display_task ", COLOR_INFO);
+		printdword(id,COLOR_INFO);
+		cambiar_de_pantalla(id);
 	}
 }
 
