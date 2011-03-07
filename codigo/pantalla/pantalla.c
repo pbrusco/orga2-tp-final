@@ -156,12 +156,16 @@ void mostrar_pantalla_entera(){
 			(byte*) (DIR_INI_PANTALLA + (80*2)),
 			TAM_PANTALLA_TAREA);
 
-		//remapeo la pagina de video de la tarea a donde le corresponde escribir
-		mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
-				DIR_INI_PANTALLA,
-				(dword) BCP[tarea_en_pantalla].pantalla,
-				USUARIO | WRITE | PRESENT);
-
+		
+		//si la tarea en pantalla NO es el KERNEL
+		if(tarea_en_pantalla != 0){
+			//remapeo la pagina de video de la tarea a donde le corresponde escribir
+			mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
+					DIR_INI_PANTALLA,
+					(dword) BCP[tarea_en_pantalla].pantalla,
+					USUARIO | WRITE | PRESENT);
+		}
+		
 		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
 		mapear_pagina(	BCP[tarea_a_mostrar].entrada_directorio,
 				DIR_INI_PANTALLA,
