@@ -271,12 +271,12 @@ void donde_esta_el_kernel(){
 	printf("puntero_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &puntero_pantalla, BASE16 | VERDE_L | BRILLANTE);	
 	salto_de_linea();
 	printf("tarea_en_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_en_pantalla, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("tarea_a_mostrar: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_a_mostrar, BASE16 | VERDE_L | BRILLANTE);
+/*	salto_de_linea();*/
+/*	printf("tarea_a_mostrar: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_a_mostrar, BASE16 | VERDE_L | BRILLANTE);*/
 	salto_de_linea();
 	printf("avanzar_puntero: ",VERDE_L | BRILLANTE); printdword((dword) &avanzar_puntero, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("cambiar_de_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &cambiar_de_pantalla, BASE16 | VERDE_L | BRILLANTE);
+/*	salto_de_linea();*/
+/*	printf("cambiar_de_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &cambiar_de_pantalla, BASE16 | VERDE_L | BRILLANTE);*/
 	
 	
 	breakpoint();

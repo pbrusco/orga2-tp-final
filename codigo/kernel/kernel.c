@@ -8,6 +8,8 @@ extern word* cursor_consola;
 
 void kernel_infinito(){
 
+	breakpoint();
+
 	//dejo limpia la pantalla
 	clear_screen();
 
@@ -33,10 +35,6 @@ void kernel_infinito(){
 		if(aMatar != CANT_TAREAS){
 			desaparecerTarea(aMatar);
 		}
-
-		//2do: hago un cambio de pantalla si fue pedido
-		mostrar_pantalla_entera();
-
 	}
 }
 

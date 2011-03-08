@@ -191,7 +191,7 @@ void display_task(int id){
 		if(BCP[id].estado != MUERTO){
 			printf("d: display_task ", COLOR_INFO);
 			printdword(id,COLOR_INFO);
-			cambiar_de_pantalla(tareas_en_memoria[id].bcp_pos);
+			mostrar_pantalla_entera(tareas_en_memoria[id].bcp_pos);
 		}
 		else{
 			printf("ERROR: No existe tal tarea", COLOR_INFO);
