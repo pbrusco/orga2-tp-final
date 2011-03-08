@@ -1,9 +1,10 @@
 #include "kernel.h"
 #include "../bcp/bcp.h"
 #include "../pantalla/pantalla.h"
+#include "../applications/console.h"
 
 extern BCP_Entry BCP[];
-extern cursor_consola;
+extern word* cursor_consola;
 
 void kernel_infinito(){
 
@@ -20,11 +21,6 @@ void kernel_infinito(){
 	mover_puntero(10,0);
 	printf("LALALA", ROJO_L);
 
-/*	cargarTarea(0x2000);*/
-/*	cargarTarea(0x2040);*/
-
-
-/*	matarTarea(6);*/
 
 	byte aMatar;
 
@@ -32,7 +28,7 @@ void kernel_infinito(){
 	
 		// 1ero: busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();
-		
+
 		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
 			desaparecerTarea(aMatar);

@@ -2,12 +2,6 @@
 #define __KERNEL__
 
 #include "../tipos/tipos_basicos.h"
- 
-/*ESTAS DEFINICIONES SIRVEN PARA HACER SALIDA DE VALORES A PUERTOS*/
-#define outb(p,v) __asm__ __volatile__("outb %%al, %%dx" : : "al"(v), "dx"(p) )
-#define outw(p,v) __asm__ __volatile__("outw %%al, %%dx" : : "ax"(v), "dx"(p) )
-#define outd(p,v) __asm__ __volatile__("outd %%al, %%dx" : : "eax"(v), "dx"(p) )
-
 
 
 /* TODO: Esta función debería hacer todo lo que se hace en "kernel.asm" desde que se mueve la pila hasta que se llega al "jmp $", reemplazando este ultimo por un llamado a la funcion "kernel_infinito" */

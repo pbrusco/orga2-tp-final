@@ -1,5 +1,6 @@
 #include "console.h"
 #include "../bcp/bcp.h"
+#include "../gdt/gdt.h"
 #include "../teclado/teclado.h"
 #include "../pantalla/pantalla.h"
 #include "../paginacion/paginacion.h"
@@ -9,13 +10,31 @@ extern BCP_Entry BCP[];
 extern word* cursor_consola, cursor_informacion;
 extern byte tarea_a_mostrar, tarea_en_pantalla;
 
-dword posicion_de_las_tareas_en_memoria[] = {0x0000,0x2000,0x2040};
+Info_Tareas tareas_en_memoria[3] = 	{	(Info_Tareas) {(word) 0, (byte) 0, (byte) 5},
+						(Info_Tareas) 	{(word) 0x2000,//eip
+								 (byte) 0,//bcp
+								 (byte) 0//gdt
+								},
+						(Info_Tareas) 	{(word) 0x2040,//eip
+								 (byte) 0,//bcp
+								 (byte) 0//gdt
+								}
+					};
+					
 char command[TAM_COMMAND];
 byte command_position = 0;
 
 
 void console(short int tecla) {
-	/*RECORDAR QUE CUANDO SE INGRESA ACA, NO IMPORTA QUE TAREA SE ESTE EJECUTANDO, SIEMPRE SE INGRESA UTILIZANDO EL DIRECTORIO DEL KERNEL*/
+	
+	dword cr3_actual;
+	dword cr3_kernel = DIR_DIRECTORIO;
+	
+	//guardo el CR3 de la tarea actualmente ejecutandose
+	get_cr3(cr3_actual);
+	//seteo como CR3 al del kernel, para que se pueda acceder a toda la memoria
+	set_cr3(cr3_kernel);
+	
 
 	char c = getChar(tecla & 0x00FF);
 
@@ -38,6 +57,9 @@ void console(short int tecla) {
 		      	agregarc(c, COLOR_PROMPT);//TODO: que agregue el caracter a la linea de comando
 	    	}
   	}
+  	
+  	//vuelvo a setear el CR3 como estaba antes de llamar a esta funcion
+  	set_cr3(cr3_actual);
 }
 
 
@@ -130,7 +152,14 @@ void cargar_tarea(int id){
 	}
 	else{
 		clear_info_line();
-		cargarTarea(posicion_de_las_tareas_en_memoria[id]);
+
+		/*LO SIGUIENTE LO HAGO PARA RELLENAR LOS CAMPOS DE LA INFORMACION DE CADA TAREA,
+		Y ASI MANEJARME CON UN UNICO NUMERO DE TAREA A LA HORA DE CARGAR, MATAR Y MOSTRAR*/
+		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
+		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
+		/*********************************************************************************/
+		
+		cargarTarea(tareas_en_memoria[id].eip);
 		mover_puntero(0,0);
 		printf("Se ha cargado con exito la tarea ", COLOR_INFO);
 		printdword(id, COLOR_INFO);
@@ -162,7 +191,7 @@ void display_task(int id){
 		if(BCP[id].estado != MUERTO){
 			printf("d: display_task ", COLOR_INFO);
 			printdword(id,COLOR_INFO);
-			cambiar_de_pantalla(id);
+			cambiar_de_pantalla(tareas_en_memoria[id].bcp_pos);
 		}
 		else{
 			printf("ERROR: No existe tal tarea", COLOR_INFO);
@@ -193,12 +222,12 @@ void hide_task(int id){
 }
 
 
-void kill_task(dword id){
+void kill_task(int id){
 	clear_info_line();
 	mover_puntero(0,0);
 	printf("k: Mataste a la tarea con id ", COLOR_INFO);
 	printdword(id,COLOR_INFO);
-	matarTarea(id);
+	matarTarea(tareas_en_memoria[id].gdt_pos);
 	//TODO: por ahora queda así, pero se puede poner aca que si se mata a la tarea en pantalla, se pasa a mostrar la pantalla del kernel...
 }
 

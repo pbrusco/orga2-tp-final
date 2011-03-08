@@ -13,11 +13,14 @@ void switch_task(){
 	
 	
 	//1ro: me fijo que haya mas de una tarea, sino termino
-	if(cant_tareas_en_sistema != 1){
+	if(tarea_actual != BCP[tarea_actual].sig){
 
-		//2do: cambio el estado de la tarea actual de CORRIENDO a ACTIVO, paso la tarea actual
+		//2do: cambio el estado de la tarea actual de CORRIENDO a ACTIVO 
+		//(o lo dejo en MATAR si es que estaba asi), paso la tarea actual 
 		//a la siguiente y cambio el estado de la tarea siguiente de ACTIVO a CORRIENDO
-		BCP[tarea_actual].estado = ACTIVO;
+		if(BCP[tarea_actual].estado != MATAR){
+			BCP[tarea_actual].estado = ACTIVO;
+		}
 		tarea_actual = BCP[tarea_actual].sig;
 		BCP[tarea_actual].estado = CORRIENDO;
 
@@ -29,6 +32,7 @@ void switch_task(){
 		else{
 			salto.selector = BCP[tarea_actual].pid * 8;
 		}
+
 
 		//4to: hago el cambio de tarea
 		__asm__ __volatile__ ( "ljmp *(salto)");
