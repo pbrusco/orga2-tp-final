@@ -151,7 +151,7 @@ void cpmem(byte* from, byte* to, dword cant){
 #include "../applications/console.h"
 #include "../kernel/kernel.h"
 
-extern dword posicion_de_las_tareas_en_memoria[];
+extern Info_Tareas tareas_en_memoria[];
 extern char command[];
 
 
@@ -175,7 +175,7 @@ void donde_esta_el_kernel(){
 	salto_de_linea();
 	printf("extraerNumero: ",VERDE_L | BRILLANTE); printdword((dword) &extract_number, BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
-	printf("pos_de_las_tareas(var): ",VERDE_L | BRILLANTE); printdword((dword) &posicion_de_las_tareas_en_memoria, BASE16 | VERDE_L | BRILLANTE);
+	printf("tareas_en_memoria_info(var): ",VERDE_L | BRILLANTE); printdword((dword) &tareas_en_memoria, BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
 	printf("command[0]: ",VERDE_L | BRILLANTE); printdword((dword) &command, BASE16 | VERDE_L | BRILLANTE);
 	printf("      command[99]: ",VERDE_L | BRILLANTE); printdword((dword) &command[99], BASE16 | VERDE_L | BRILLANTE);

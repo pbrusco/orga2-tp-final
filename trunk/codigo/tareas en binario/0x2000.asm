@@ -10,7 +10,7 @@ main:
 		mov ah, 4
 		mov ebx, [isrnumero]
 		cmp ebx, 0x4
-		jl .ok
+		jl .ok		
 		mov DWORD [isrnumero], 0x0
 		jmp next_clock	
 		.ok:

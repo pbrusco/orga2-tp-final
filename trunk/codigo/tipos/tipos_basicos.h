@@ -40,11 +40,22 @@ typedef unsigned long long qword;
 #define KERNEL -1
 
 
+/**************************************************
+****definicion de funciones en assembler inline****
+**************************************************/
 
-//definicion de funciones en assembler inline
 #define breakpoint() __asm__ __volatile__("xchg %bx, %bx")
 #define cli() __asm__ __volatile__ ("cli");
 #define sti() __asm__ __volatile__ ("sti");
+
+/*ESTAS DEFINICIONES SIRVEN PARA HACER SALIDA DE VALORES A PUERTOS*/
+#define outb(p,v) __asm__ __volatile__("outb %%al, %%dx" : : "al"(v), "dx"(p) )
+#define outw(p,v) __asm__ __volatile__("outw %%al, %%dx" : : "ax"(v), "dx"(p) )
+#define outd(p,v) __asm__ __volatile__("outd %%al, %%dx" : : "eax"(v), "dx"(p) )
+
+/*FUNCIONES PARA MANEJO DEL REGISTRO CR3*/
+#define get_cr3(v) __asm__ __volatile__ ( "movl %%cr3, %0" : "=r"(v) )
+#define set_cr3(v) __asm__ __volatile__ ( "movl %0, %%cr3" : : "r"(v) )
 
 
 
