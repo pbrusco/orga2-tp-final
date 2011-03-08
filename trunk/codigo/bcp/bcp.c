@@ -22,7 +22,6 @@ void iniciar_BCP(){
 	tarea_actual = 0;
 	cant_tareas_en_sistema = 1;
 	tarea_en_pantalla = 0;
-	tarea_a_mostrar = 0;
 
 	//datos del kernel
 	BCP[0].pid = 5;

@@ -33,7 +33,6 @@ void switch_task(){
 			salto.selector = BCP[tarea_actual].pid * 8;
 		}
 
-
 		//4to: hago el cambio de tarea
 		__asm__ __volatile__ ( "ljmp *(salto)");
 	}

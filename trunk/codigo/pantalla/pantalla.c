@@ -129,7 +129,7 @@ void clear_screen(){
 *********************************************************************/
 
 //esta variable contiene el indice de la BCP de la tarea que se está viendo por pantalla
-byte tarea_en_pantalla, tarea_a_mostrar;
+byte tarea_en_pantalla;//, tarea_a_mostrar;
 
 //este es el puntero que se va a usar para la consola
 word* cursor_consola = (word*) (DIR_INI_PANTALLA + 80*2*24 + 4);
@@ -139,9 +139,7 @@ word* cursor_informacion = (word*) DIR_INI_PANTALLA;
 
 char* prompt = "$>";
 
-void mostrar_pantalla_entera(){
-	//limpio las interrupciones
-	cli();
+void mostrar_pantalla_entera(byte tarea_a_mostrar){
 
 	//si tengo que cambiar la pantalla
 	if(tarea_en_pantalla != tarea_a_mostrar){
@@ -178,13 +176,10 @@ void mostrar_pantalla_entera(){
 		//actualizo la variable "tarea_en_pantalla"
 		tarea_en_pantalla = tarea_a_mostrar;
 	}
-
-	//activo las interrupciones nuevamente
-	sti();
 }
 
 void cambiar_de_pantalla(byte bcpPos){
-	tarea_a_mostrar = bcpPos;
+	//tarea_a_mostrar = bcpPos;
 }
 
 void clear_command_line(){
