@@ -35,7 +35,6 @@ typedef struct Info_Tareas_s{
 	word eip;
 	byte bcp_pos;
 	byte gdt_pos;
-	byte activa;
 } __attribute__((__packed__, aligned (8))) Info_Tareas;
 
 

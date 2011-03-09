@@ -6,6 +6,9 @@ main:
 ; Funcion para dibujar el reloj.
 
 	next_clock:
+		inc DWORD [contador]
+		cmp DWORD [contador], 0xFFFFFF
+		je salir
 		mov ah, 3
 		mov ebx, [isrnumero]
 		cmp ebx, 0x4
@@ -19,11 +22,14 @@ main:
 			inc DWORD [isrnumero]
 			jmp next_clock
 
+	salir:
+		int 0x80
+		
 	isrnumero: dd 0x00000000
 	isrmessage1: db '|'
 	isrmessage2: db '/'
 	isrmessage3: db '-'
 	isrmessage4: db '\'
-	contador: dw 0
+	contador: dd 0
 
 ;TIMES 0x1000 - ($ - $$) db 0x00

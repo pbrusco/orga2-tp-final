@@ -9,21 +9,20 @@
 extern BCP_Entry BCP[];
 extern word* cursor_consola, cursor_informacion;
 extern byte tarea_a_mostrar, tarea_en_pantalla;
+extern gdt_entry gdt_vector[];
 
 #define TAREAS_EN_MEMORIA 3
 
 Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{	
 						
-						(Info_Tareas) {(word) 0, (byte) 0, (byte) 5, (byte) 1},
+						(Info_Tareas) {(word) 0, (byte) 0, (byte) 5},
 						(Info_Tareas) 	{(word) 0x2000,//eip
 								 (byte) 0,//bcp
 								 (byte) 0,//gdt
-								 (byte) 0//activa
 								},
 						(Info_Tareas) 	{(word) 0x2040,//eip
 								 (byte) 0,//bcp
 								 (byte) 0,//gdt
-								 (byte) 0//activa
 								}
 							};
 					
@@ -158,7 +157,6 @@ void cargar_tarea(int id){
 		Y ASI MANEJARME CON UN UNICO NUMERO DE TAREA A LA HORA DE CARGAR, MATAR Y MOSTRAR*/
 		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
 		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
-		tareas_en_memoria[id].activa = 1;
 		/*********************************************************************************/
 		
 		cargarTarea(tareas_en_memoria[id].eip);
@@ -185,15 +183,12 @@ void show_running_tasks(){
 	clear_screen();
 	
 	mover_puntero(2,0);
-	printf("Tareas actualmente corriendo: \n",COLOR_INFO);
+	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
 	
-	word i;
-	for(i=1; i<TAREAS_EN_MEMORIA; i++){
-		if(tareas_en_memoria[i].activa == 1){
-			printf("Tarea ",COLOR_INFO);
-			printdword(i, COLOR_INFO);
-			printf("\n",0);
-		}
+	word i = 6;
+	while( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
+		printdword(i, COLOR_INFO); printf("\n", 0);
+		i++;
 	}
 }
 
@@ -253,7 +248,6 @@ void kill_task(int id){
 	printdword(id,COLOR_INFO);
 	matarTarea(tareas_en_memoria[id].bcp_pos);
 	
-	tareas_en_memoria[id].activa = 0;
 	
 	if(tarea_en_pantalla == tareas_en_memoria[id].bcp_pos){
 		//paso a la pantalla del kernel
