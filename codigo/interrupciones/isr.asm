@@ -232,4 +232,3 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		popad
 		sti								;habilito las interrupciones
 		iret								;vuelvo de la interrupcion
-

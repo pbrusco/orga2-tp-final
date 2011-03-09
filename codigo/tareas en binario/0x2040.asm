@@ -5,7 +5,6 @@ BITS 32
 main:
 ; Funcion para dibujar el reloj.
 
-	
 	next_clock:
 		mov ah, 3
 		mov ebx, [isrnumero]
@@ -25,5 +24,6 @@ main:
 	isrmessage2: db '/'
 	isrmessage3: db '-'
 	isrmessage4: db '\'
+	contador: dw 0
 
 ;TIMES 0x1000 - ($ - $$) db 0x00

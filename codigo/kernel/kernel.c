@@ -8,8 +8,6 @@ extern word* cursor_consola;
 
 void kernel_infinito(){
 
-	breakpoint();
-
 	//dejo limpia la pantalla
 	clear_screen();
 
@@ -19,10 +17,6 @@ void kernel_infinito(){
 	//inicio el interprete de comandos
 	inicializar_command();
 	
-	
-	mover_puntero(10,0);
-	printf("LALALA", ROJO_L);
-
 
 	byte aMatar;
 
@@ -34,6 +28,8 @@ void kernel_infinito(){
 		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
 			desaparecerTarea(aMatar);
+			//TODO: ver si se puede hacer algo con "kill_app", que tira un error "codigo de operacion invalido"
+			//cuando se la llama desde console (creo que cuando se la llama desde el contexto de la tarea)
 		}
 	}
 }

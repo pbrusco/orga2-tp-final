@@ -10,16 +10,22 @@ extern BCP_Entry BCP[];
 extern word* cursor_consola, cursor_informacion;
 extern byte tarea_a_mostrar, tarea_en_pantalla;
 
-Info_Tareas tareas_en_memoria[3] = 	{	(Info_Tareas) {(word) 0, (byte) 0, (byte) 5},
+#define TAREAS_EN_MEMORIA 3
+
+Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{	
+						
+						(Info_Tareas) {(word) 0, (byte) 0, (byte) 5, (byte) 1},
 						(Info_Tareas) 	{(word) 0x2000,//eip
 								 (byte) 0,//bcp
-								 (byte) 0//gdt
+								 (byte) 0,//gdt
+								 (byte) 0//activa
 								},
 						(Info_Tareas) 	{(word) 0x2040,//eip
 								 (byte) 0,//bcp
-								 (byte) 0//gdt
+								 (byte) 0,//gdt
+								 (byte) 0//activa
 								}
-					};
+							};
 					
 char command[TAM_COMMAND];
 byte command_position = 0;
@@ -41,9 +47,9 @@ void console(short int tecla) {
 	//si el codigo indica que se presiono una tecla
 	if(c < 0x80){
 	    	if (c == '*') { //if the user press "enter"
-	      		clear_command_line();
 	      		run(command);
 	      		inicializar_command();
+	      		clear_command_line();
 	    	}
 	    	else if (c == '<'){ //if the user press "back"
 	     		remove_last_char_from_command();
@@ -103,15 +109,8 @@ void run (){
     case 'd':
       display_task(second_param);
       break;
-    case 'm':
-      display_merging_task(second_param);
-      break;
-    case 'i':
-      hide_task(second_param);
-      break;
     case 'c':{
       	clear_screen();
-      	clear_command_line();
       	break;
       }
     case 'k':
@@ -131,17 +130,21 @@ void add_char_to_command(char c){
 
 
 void help(){
+	//paso a la pantalla del kernel
+	mostrar_pantalla_entera(0);
+	clear_screen();
+	
 	mover_puntero(3,0);
 	printf("HELP: (comandos utiles)\n",VERDE_L);
-	printf("h: help\n",AZUL_L);
-	printf("l: show_all_tasks:\n",AZUL_L);
-	printf("p: show_running_tasks\n",AZUL_L);
-	printf("s: show_sleeping_tasks\n",AZUL_L);
-	printf("d: display_task x\n",AZUL_L);
-	printf("m: display_merging_task x\n",AZUL_L);
-	printf("i: hide_task x\n",AZUL_L);
-	printf("z: cargar_tarea x\n",AZUL_L);
-	printf("k: matar tarea x\n",AZUL_L);
+	printf("h: help(*)\n",AZUL_L);
+	printf("l: muestra todas las tareas disponibles(*)\n",AZUL_L);
+	printf("p: muestra todas las tareas en ejecucion(*)\n",AZUL_L);
+	printf("s: muestra las tareas que no se estan ejecutando(*)\n",AZUL_L);
+	printf("d x: mostrar la tarea x\n",AZUL_L);
+	printf("z x: inicia la tarea x\n",AZUL_L);
+	printf("k x: elimina de la ejecucion a la tarea x\n",AZUL_L);
+	printf("c: limpia la pantalla(*)\n",AZUL_L);
+	printf("(*) Estos comandos producen un cambio de pantalla a la del kernel", AZUL_L);
 
 }
 
@@ -151,38 +154,60 @@ void cargar_tarea(int id){
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
-		clear_info_line();
-
 		/*LO SIGUIENTE LO HAGO PARA RELLENAR LOS CAMPOS DE LA INFORMACION DE CADA TAREA,
 		Y ASI MANEJARME CON UN UNICO NUMERO DE TAREA A LA HORA DE CARGAR, MATAR Y MOSTRAR*/
 		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
 		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
+		tareas_en_memoria[id].activa = 1;
 		/*********************************************************************************/
 		
 		cargarTarea(tareas_en_memoria[id].eip);
-		mover_puntero(0,0);
+		clear_screen();
 		printf("Se ha cargado con exito la tarea ", COLOR_INFO);
 		printdword(id, COLOR_INFO);
 	}
 }
 
 void show_all(){
-	printf("l: show_all_tasks: ",COLOR_INFO);
+	//paso a la pantalla del kernel
+	mostrar_pantalla_entera(0);
+	clear_screen();
+	
+	mover_puntero(2,0);
+	printf("Las tareas disponibles en el sistema son: \n",COLOR_INFO);
+	printf("Tarea 1: Relojito rojo \n",COLOR_INFO);
+	printf("Tarea 2: Relojito celeste \n",COLOR_INFO);
 }
 
 void show_running_tasks(){
-  printf("p: show_running_tasks: ",COLOR_INFO);
+	//paso a la pantalla del kernel
+	mostrar_pantalla_entera(0);
+	clear_screen();
+	
+	mover_puntero(2,0);
+	printf("Tareas actualmente corriendo: \n",COLOR_INFO);
+	
+	word i;
+	for(i=1; i<TAREAS_EN_MEMORIA; i++){
+		if(tareas_en_memoria[i].activa == 1){
+			printf("Tarea ",COLOR_INFO);
+			printdword(i, COLOR_INFO);
+			printf("\n",0);
+		}
+	}
 }
 
 void show_sleeping_tasks(){
-  printf("s: show_sleeping_tasks ",COLOR_INFO);
+	//paso a la pantalla del kernel
+	mostrar_pantalla_entera(0);
+
+	printf("s: show_sleeping_tasks ",COLOR_INFO);
 }
 
 
 void display_task(int id){
 	
-	clear_info_line();
-	mover_puntero(0,0);
+	clear_screen();
 	
 	if (id == -1){
 		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
@@ -223,12 +248,17 @@ void hide_task(int id){
 
 
 void kill_task(int id){
-	clear_info_line();
-	mover_puntero(0,0);
+	clear_screen();
 	printf("k: Mataste a la tarea con id ", COLOR_INFO);
 	printdword(id,COLOR_INFO);
-	matarTarea(tareas_en_memoria[id].gdt_pos);
-	//TODO: por ahora queda así, pero se puede poner aca que si se mata a la tarea en pantalla, se pasa a mostrar la pantalla del kernel...
+	matarTarea(tareas_en_memoria[id].bcp_pos);
+	
+	tareas_en_memoria[id].activa = 0;
+	
+	if(tarea_en_pantalla == tareas_en_memoria[id].bcp_pos){
+		//paso a la pantalla del kernel
+		mostrar_pantalla_entera(0);
+	}
 }
 
 char extract_code(){
