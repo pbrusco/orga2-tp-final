@@ -106,10 +106,9 @@ void cargarTarea(dword eip){
 	//mapeo la pagina de video a la pagina de video de la tarea
 	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
 
-
 	// 3ro: crear una entrada de TSS e inicializarla
 	byte pos_TSS = buscar_TSS_vacia();
-	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, BASIC_EFLAGS, ((dword)pila) + TAM_PAG, ((dword)pila0) + TAM_PAG);
+	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, USER_EFLAGS, ((dword)pila) + TAM_PAG, ((dword)pila0) + TAM_PAG);
 
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla

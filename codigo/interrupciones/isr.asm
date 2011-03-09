@@ -3,6 +3,7 @@ BITS 32
 extern pic1_intr_end
 extern console
 extern switch_task
+extern exit
 
 %define DIRINIT 0x100000
 
@@ -11,7 +12,7 @@ extern switch_task
 ; TODO: Definir el resto de las ISR
 ; ----------------------------------------------------------------
 
-global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _isrA, _isrB, _isrC, _isrD, _isrE, _isrF, _isr10, _isr11, _isr12, _isr13, _isr20, _isr21
+global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _isrA, _isrB, _isrC, _isrD, _isrE, _isrF, _isr10, _isr11, _isr12, _isr13, _isr20, _isr21, _isr80
 
 ; definimos todos los mensajes de error que pueden ocurrir en el procesador
 	msgisr0: db 'Int 0h : #DE (Error de division)'
@@ -232,3 +233,14 @@ global _isr0, _isr1, _isr2, _isr3, _isr4, _isr5, _isr6, _isr7, _isr8, _isr9, _is
 		popad
 		sti								;habilito las interrupciones
 		iret								;vuelvo de la interrupcion
+		
+		
+	_isr80:
+		cli
+		pushad
+		
+		call exit
+		
+		popad
+		sti
+		iret

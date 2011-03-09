@@ -17,7 +17,8 @@
 #define DIR_DIRECTORIO 0x100000
 #define CANT_TAREAS 50
 
-#define BASIC_EFLAGS 0x202
+#define USER_EFLAGS 0x3202
+#define KERNEL_EFLAGS 0x202
 
 typedef unsigned char byte;
 typedef unsigned short word;
