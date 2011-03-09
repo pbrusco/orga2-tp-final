@@ -178,10 +178,6 @@ void mostrar_pantalla_entera(byte tarea_a_mostrar){
 	}
 }
 
-void cambiar_de_pantalla(byte bcpPos){
-	//tarea_a_mostrar = bcpPos;
-}
-
 void clear_command_line(){
 	setmem((byte*) DIR_INI_PANTALLA + 80*2*24, 0x00, 80*2);
 	cursor_consola = (word *) DIR_INI_COMMAND;

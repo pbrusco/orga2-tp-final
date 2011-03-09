@@ -24,6 +24,7 @@ void _isr12();
 void _isr13();
 void _isr20();
 void _isr21();
+void _isr80();
 
 
 #endif // __ISR_H__

@@ -75,16 +75,13 @@ byte buscar_entradaBCP(word id){
 }
 
 
-void cambiar_estado(word id, byte estado_nuevo){
+void cambiar_estado(word bpcPos, byte estado_nuevo){
 
-	byte busca = buscar_entradaBCP(id);
-	if(busca < CANT_TAREAS){
-		BCP[busca].estado = estado_nuevo;
-		if(estado_nuevo == MATAR){
-			BCP[BCP[busca].ant].sig = BCP[busca].sig;
-			BCP[BCP[busca].sig].ant = BCP[busca].ant;
-			cant_tareas_en_sistema--;
-		}
+	BCP[bpcPos].estado = estado_nuevo;
+	if(estado_nuevo == MATAR){
+		BCP[BCP[bpcPos].ant].sig = BCP[bpcPos].sig;
+		BCP[BCP[bpcPos].sig].ant = BCP[bpcPos].ant;
+		cant_tareas_en_sistema--;
 	}
 }
 
@@ -125,8 +122,8 @@ void cargarTarea(dword eip){
 
 
 
-void matarTarea(byte id){
-	cambiar_estado(id, MATAR);
+void matarTarea(byte bcpPos){
+	cambiar_estado(bcpPos, MATAR);
 }
 
 
@@ -174,6 +171,33 @@ void info_BCP(byte index){
 	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((dword) BCP[index].pantalla, GRIS_L | BRILLANTE); printf("\n",0);
 }
 
+
+void kill_app(word bcpPos){
+	
+	byte running = false;
+	
+	//solo mato a las tareas que estan corriendo o activas
+	if( (BCP[bcpPos].estado == CORRIENDO) || (BCP[bcpPos].estado == ACTIVO)){
+		
+		if(BCP[bcpPos].estado == CORRIENDO){
+			running = true;
+		}
+		matarTarea(bcpPos);
+		desaparecerTarea(bcpPos);
+		
+		info_BCP(bcpPos);
+		breakpoint();
+		
+		if(running){
+			switch_task();
+		}
+	}
+}
+
+void exit(){
+	matarTarea(tarea_actual);
+	switch_task();
+}
 
 
 void desaparecerTarea(byte bcpPos){
