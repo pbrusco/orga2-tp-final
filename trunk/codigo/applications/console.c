@@ -1,3 +1,4 @@
+#include "../tipos/tipos_basicos.h"
 #include "console.h"
 #include "../bcp/bcp.h"
 #include "../gdt/gdt.h"

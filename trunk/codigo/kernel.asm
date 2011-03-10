@@ -113,6 +113,7 @@ modo_protegido:
 
     ; Habilito las interrupciones
 	sti
+	
 
 	call kernel_infinito
 

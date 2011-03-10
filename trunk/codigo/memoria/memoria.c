@@ -155,7 +155,8 @@ extern Info_Tareas tareas_en_memoria[];
 extern char command[];
 
 
-extern idt_descriptor IDT_DESC;
+extern IDT_Descriptor IDT_DESC;
+extern IDT_Entry IDT[];
 
 extern word* puntero_pantalla;
 extern byte tarea_en_pantalla, tarea_a_mostrar;
@@ -210,11 +211,11 @@ void donde_esta_el_kernel(){
 	salto_de_linea();
 	printf("idt_fill: ",VERDE_L | BRILLANTE); printdword((dword) &idtFill, BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
-	printf("idt[0]: ",VERDE_L | BRILLANTE); printdword((dword) &idt[0], BASE16 | VERDE_L | BRILLANTE);
-	printf("      idt[255]: ",VERDE_L | BRILLANTE); printdword((dword) &idt[255], BASE16 | VERDE_L | BRILLANTE);
+	printf("idt[0]: ",VERDE_L | BRILLANTE); printdword((dword) &IDT[0], BASE16 | VERDE_L | BRILLANTE);
+	printf("      idt[255]: ",VERDE_L | BRILLANTE); printdword((dword) &IDT[255], BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
-	printf("_isr0: ",VERDE_L | BRILLANTE); printdword((dword) &_isr0 , BASE16 | VERDE_L | BRILLANTE);
-	printf("      _isr21: ",VERDE_L | BRILLANTE); printdword((dword) &_isr21 , BASE16 | VERDE_L | BRILLANTE);
+	printf("_INT0: ",VERDE_L | BRILLANTE); printdword((dword) &_INT0 , BASE16 | VERDE_L | BRILLANTE);
+	printf("      _INT80: ",VERDE_L | BRILLANTE); printdword((dword) &_INT80 , BASE16 | VERDE_L | BRILLANTE);
 	salto_de_linea();
 	printf("IDT_DESC: ",VERDE_L | BRILLANTE); printdword((dword) &IDT_DESC, BASE16 | VERDE_L | BRILLANTE);
 	

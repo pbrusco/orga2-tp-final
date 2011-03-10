@@ -3,6 +3,7 @@
 #include "../bcp/bcp.h"
 #include "../paginacion/paginacion.h"
 
+
 extern BCP_Entry BCP[];
 
 

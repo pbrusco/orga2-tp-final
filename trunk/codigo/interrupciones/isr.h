@@ -2,29 +2,30 @@
 #define __ISR_H__
 
 //Interrupt Service Routines
-void _isr0();
-void _isr1();
-void _isr2();
-void _isr3();
-void _isr4();
-void _isr5();
-void _isr6();
-void _isr7();
-void _isr8();
-void _isr9();
-void _isrA();
-void _isrB();
-void _isrC();
-void _isrD();
-void _isrE();
-void _isrF();
-void _isr10();
-void _isr11();
-void _isr12();
-void _isr13();
-void _isr20();
-void _isr21();
-void _isr80();
+void _INT0();
+void _INT1();
+void _INT2();
+void _INT3();
+void _INT4();
+void _INT5();
+void _INT6();
+void _INT7();
+void _INT8();
+void _INT9();
+void _INT10();
+void _INT11();
+void _INT12();
+void _INT13();
+void _INT14();
+void _INT15();
+void _INT16();
+void _INT17();
+void _INT18();
+void _INT19();
+
+void _INT32();
+void _INT33();
+void _INT80();
 
 
 #endif // __ISR_H__

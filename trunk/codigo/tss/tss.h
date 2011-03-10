@@ -1,8 +1,6 @@
 #ifndef __TSS_H__
 #define __TSS_H__
 
-#include "../tipos/tipos_basicos.h"
-
 // Task State Segment - Definicion de las TSSs.
 
 // Definicion de una TSS 

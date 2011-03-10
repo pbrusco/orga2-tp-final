@@ -1,4 +1,4 @@
-
+#include "../tipos/tipos_basicos.h"
 #include "tss.h"
 #include "../gdt/gdt.h"
 
