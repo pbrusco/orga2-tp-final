@@ -14,6 +14,7 @@ extern gdt_entry gdt_vector[];
 extern byte tarea_en_pantalla;
 extern byte tarea_a_mostrar;
 extern byte command[];
+extern Tss TSS[];
 
 //declaro el arreglo de BCP's
 BCP_Entry BCP[CANT_TAREAS];
@@ -206,7 +207,7 @@ void desaparecerTarea(byte bcpPos){
 	liberar_directorio(BCP[bcpPos].entrada_directorio);
 
 	//recupero la direccion de la tss
-	tss* task_tss = (tss*) ( ( ((dword) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
+	Tss* task_tss = (Tss*) ( ( ((dword) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
 				 ( (word) gdt_vector[BCP[bcpPos].pid].base1) );
 
 	//recupero la dir de la pila

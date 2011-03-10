@@ -38,7 +38,7 @@
 #define DIR_FIN_PANTALLA 0xB8FA0
 
 
-#include "../tipos/tipos_basicos.h" //TODO: ver porque no anda cuando lo pongo en el .c como en el resto de los archivos
+ //TODO: ver porque no anda cuando lo pongo en el .c como en el resto de los archivos
 
 
 //FUNCIONES DE DEBUGGING

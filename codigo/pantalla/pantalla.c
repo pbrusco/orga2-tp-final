@@ -1,8 +1,8 @@
+#include "../tipos/tipos_basicos.h"
 #include "pantalla.h"
-#include "../memoria/memoria.h"
 #include "../bcp/bcp.h"
 #include "../paginacion/paginacion.h"
-
+#include "../memoria/memoria.h"
 
 extern BCP_Entry BCP[];
 

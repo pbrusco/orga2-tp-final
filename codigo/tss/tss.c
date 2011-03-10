@@ -3,8 +3,12 @@
 #include "../gdt/gdt.h"
 
 
+// Arreglo de TSSs
+Tss TSS[CANT_TAREAS];
+
+
 void crear_TSS(byte pos, dword CR3, dword EIP, dword EFLAGS, dword pila, dword ESP0){
-	tss* entry = &TSS[pos];
+	Tss* entry = &TSS[pos];
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
 	entry->eip = EIP;
@@ -46,6 +50,6 @@ byte buscar_TSS_vacia(){
 }
 
 
-void vaciar_TSS(tss* tss_task){
+void vaciar_TSS(Tss* tss_task){
 	tss_task->cr3 = 0;
 }

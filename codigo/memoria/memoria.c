@@ -153,6 +153,7 @@ void cpmem(byte* from, byte* to, dword cant){
 
 extern Info_Tareas tareas_en_memoria[];
 extern char command[];
+extern Tss TSS[];
 
 
 extern IDT_Descriptor IDT_DESC;
