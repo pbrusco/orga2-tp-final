@@ -14,8 +14,8 @@ extern gdt_entry gdt_vector[];
 
 #define TAREAS_EN_MEMORIA 3
 
-Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{	
-						
+Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
+
 						(Info_Tareas) {(word) 0, (byte) 0, (byte) 5},
 						(Info_Tareas) 	{(word) 0x2000,//eip
 								 (byte) 0,//bcp
@@ -26,21 +26,21 @@ Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
 								 (byte) 0,//gdt
 								}
 							};
-					
+
 char command[TAM_COMMAND];
 byte command_position = 0;
 
 
 void console(short int tecla) {
-	
+
 	dword cr3_actual;
 	dword cr3_kernel = DIR_DIRECTORIO;
-	
+
 	//guardo el CR3 de la tarea actualmente ejecutandose
 	get_cr3(cr3_actual);
 	//seteo como CR3 al del kernel, para que se pueda acceder a toda la memoria
 	set_cr3(cr3_kernel);
-	
+
 
 	char c = getChar(tecla & 0x00FF);
 
@@ -63,7 +63,7 @@ void console(short int tecla) {
 		      	agregarc(c, COLOR_PROMPT);//TODO: que agregue el caracter a la linea de comando
 	    	}
   	}
-  	
+
   	//vuelvo a setear el CR3 como estaba antes de llamar a esta funcion
   	set_cr3(cr3_actual);
 }
@@ -115,7 +115,7 @@ void run (){
       }
     case 'k':
     	kill_task(second_param);
-    	break;    	
+    	break;
     }
 
 }
@@ -133,7 +133,7 @@ void help(){
 	//paso a la pantalla del kernel
 	mostrar_pantalla_entera(0);
 	clear_screen();
-	
+
 	mover_puntero(3,0);
 	printf("HELP: (comandos utiles)\n",VERDE_L);
 	printf("h: help(*)\n",AZUL_L);
@@ -149,7 +149,7 @@ void help(){
 }
 
 void cargar_tarea(int id){
-	if(id == 0){
+ if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
@@ -159,7 +159,7 @@ void cargar_tarea(int id){
 		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
 		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
 		/*********************************************************************************/
-		
+
 		cargarTarea(tareas_en_memoria[id].eip);
 		clear_screen();
 		printf("Se ha cargado con exito la tarea ", COLOR_INFO);
@@ -171,7 +171,7 @@ void show_all(){
 	//paso a la pantalla del kernel
 	mostrar_pantalla_entera(0);
 	clear_screen();
-	
+
 	mover_puntero(2,0);
 	printf("Las tareas disponibles en el sistema son: \n",COLOR_INFO);
 	printf("Tarea 1: Relojito rojo \n",COLOR_INFO);
@@ -182,10 +182,10 @@ void show_running_tasks(){
 	//paso a la pantalla del kernel
 	mostrar_pantalla_entera(0);
 	clear_screen();
-	
+
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
-	
+
 	word i = 6;
 	while( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
 		printdword(i, COLOR_INFO); printf("\n", 0);
@@ -202,11 +202,11 @@ void show_sleeping_tasks(){
 
 
 void display_task(int id){
-	
+
 	clear_screen();
-	
-	if (id == -1){
-		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
+
+	if (id >= TAREAS_EN_MEMORIA ){
+		printf("ERROR!! tarea inexistente",COLOR_INFO);
 	}
 	else{
 		if(BCP[tareas_en_memoria[id].bcp_pos].estado != MUERTO){
@@ -221,7 +221,7 @@ void display_task(int id){
 }
 
 void display_merging_task(int id){
-  if (id == -1){
+  if (id >= TAREAS_EN_MEMORIA ){
     printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
   }
   else
@@ -232,7 +232,7 @@ void display_merging_task(int id){
 }
 
 void hide_task(int id){
-  if (id == -1){
+  if (id >= TAREAS_EN_MEMORIA ){
     printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
   }
   else
@@ -244,15 +244,21 @@ void hide_task(int id){
 
 
 void kill_task(int id){
-	clear_screen();
-	printf("k: Mataste a la tarea con id ", COLOR_INFO);
-	printdword(id,COLOR_INFO);
-	matarTarea(tareas_en_memoria[id].bcp_pos);
-	
-	
-	if(tarea_en_pantalla == tareas_en_memoria[id].bcp_pos){
-		//paso a la pantalla del kernel
-		mostrar_pantalla_entera(0);
+	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
+		mover_puntero(0,0);
+		printf("No existe tal tarea (0 es el kernel, pero no se mata!)", COLOR_INFO);
+	}
+	else{
+	  clear_screen();
+	  printf("k: Mataste a la tarea con id ", COLOR_INFO);
+	  printdword(id,COLOR_INFO);
+	  matarTarea(tareas_en_memoria[id].bcp_pos);
+
+
+	  if(tarea_en_pantalla == tareas_en_memoria[id].bcp_pos){
+		  //paso a la pantalla del kernel
+		  mostrar_pantalla_entera(0);
+	  }
 	}
 }
 
@@ -262,12 +268,16 @@ char extract_code(){
 
 int extract_number(){
   short i;
+  int n;
   for(i = 0;i<100;i++){
     if (command[i] == ' ') {
-      return char2num(command[i+1]);
+      n = char2num(command[i+1]);
+      if (n>0 && n<50){
+        return n;
+      }
     }
   }
-  return -1;
+  return 101;
 
 }
 
