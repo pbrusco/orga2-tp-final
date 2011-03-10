@@ -7,7 +7,7 @@ main:
 
 	next_clock:
 		inc DWORD [contador]
-		cmp DWORD [contador], 0xFFFFFF
+		cmp DWORD [contador], 0xFFFF
 		je salir
 		mov ah, 3
 		mov ebx, [isrnumero]
@@ -23,6 +23,7 @@ main:
 			jmp next_clock
 
 	salir:
+		mov DWORD [contador], 0
 		int 0x80
 		
 	isrnumero: dd 0x00000000

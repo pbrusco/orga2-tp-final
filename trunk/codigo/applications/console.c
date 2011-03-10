@@ -209,7 +209,7 @@ void display_task(int id){
 		printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
 	}
 	else{
-		if(BCP[id].estado != MUERTO){
+		if(BCP[tareas_en_memoria[id].bcp_pos].estado != MUERTO){
 			printf("d: display_task ", COLOR_INFO);
 			printdword(id,COLOR_INFO);
 			mostrar_pantalla_entera(tareas_en_memoria[id].bcp_pos);
