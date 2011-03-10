@@ -8,7 +8,7 @@ void contarMemoria()
 	dword dato = 0x12345678;
 
 	*dir = dato;
-	
+
 	// Mientras el puntero sea menor que ?? y el contenido de la direccion apuntada sea la marca que se estableció previamente, recorro la memoria poniendo en cero la posición actual y marcando con el dato la posición siguiente.
 	while (((dword) dir < (32*MB)) &&  *dir == dato)
 	{
@@ -16,12 +16,12 @@ void contarMemoria()
 		dir += 1024;
 		*dir = dato;
 	}
-	
-	// Una vez fuera del ciclo, el puntero dir apunta al total de la memoria (en bytes). 
-	
-	// Calculo cuanto es la memoria total en MB 
+
+	// Una vez fuera del ciclo, el puntero dir apunta al total de la memoria (en bytes).
+
+	// Calculo cuanto es la memoria total en MB
 	memoria_total = ((dword) dir) / (1*MB);
-	
+
 	// Calculo el total de páginas libres calculando el total de páginas y excluyendo la cantidad de páginas ocupadas por el kernel.
 	paginas_libres = ( (memoria_total * MB) - (2*MB) ) / TAM_PAG ;
 }
@@ -34,16 +34,16 @@ void llenarBitmap()
 
 	// Calculo donde arranca el bitmap, justo debajo de las tablas de paginas
 	dir_init_bitmap = (byte *) DIR_DIRECTORIO + (offset_tablas * TAM_PAG);
-	
+
 	// Calculo donde termina el bitmap (ultima dir valida del bitmap)
 	dir_end_bitmap = (byte *) (((dword) dir_init_bitmap) + ((((memoria_total * MB) / TAM_PAG)/8) - 1));
 
 	// Calculo cuantas páginas ocupa el kernel dividiendo la dirección donde termina por el tamaño de una página. Luego, calculo cuantos bytes representa esa cantidad dividiendo por 8.
 	int pag_ocupadas = ((DIR_KERNEL_END) / TAM_PAG)/8;
-	
+
 	// Puntero auxiliar que apunta al comienzo del bitmap
 	byte* bitmap = dir_init_bitmap;
-	
+
 	// Ciclo que marca con un 1 en el Bitmap las páginas ocupadas.
 	while(0 < pag_ocupadas)
 	{
@@ -61,7 +61,7 @@ void llenarBitmap()
 }
 
 
-dword* pidoPagina() 
+dword* pidoPagina()
 {
 	byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);//comienzo del bitmap + offset ocupado
 	byte libre;
@@ -74,32 +74,32 @@ dword* pidoPagina()
 		contador_paginas = contador_paginas + 8;
 	}
 
-	if(bitmap_dir <= dir_end_bitmap) 
+	if(bitmap_dir <= dir_end_bitmap)
 	{
 		libre = *bitmap_dir;
-		 
+
 		int i;
-		for(i = 0;i<8;i++) 
+		for(i = 0;i<8;i++)
 		{
-			if ((libre & 1) == 0) 
+			if ((libre & 1) == 0)
 			{
 				var = contador_paginas + i;
 				*bitmap_dir = *bitmap_dir | (1 << i); //Se actualiza el BIT correspondiente a la pagina obtenida
-				
+
 				//actualizo la cant de paginas libres
-				paginas_libres--;	
+				paginas_libres--;
 				return (dword *) (var*4*1024);
 			}
 			libre = libre >> 1;
 		}
 	}
-	
+
 	return 0;
 }
 
 
 void liberoPagina(dword* pagina){
-	
+
 	if( ((dword) pagina) >= 2*MB){
 		//me guardo el numero de la pagina que se quiere liberar, comenzando a contar desde los 2MB
 		dword numero_de_pagina = (((dword) pagina) / TAM_PAG) - ( (dword) (2*MB / TAM_PAG) );
@@ -109,14 +109,14 @@ void liberoPagina(dword* pagina){
 
 		//muevo el puntero a donde corresponde y me fijo que pagina dentro de ese puntero debo liberar
 		bitmap_dir += numero_de_pagina/8;
-		numero_de_pagina = numero_de_pagina - (8*(numero_de_pagina/8));	
+		numero_de_pagina = numero_de_pagina - (8*(numero_de_pagina/8));
 
 		byte mascara = 0x01;
 		mascara = mascara << numero_de_pagina;
 
 		//actualizo el valor del bitmap, liberando la pagina
 		*bitmap_dir = *bitmap_dir & (mascara ^ 0xFF); // el operador ^ es el XOR, con FF invierto todos los bits
-	
+
 		//actualizo la cant de paginas libres
 		paginas_libres++;
 	}
@@ -166,7 +166,7 @@ void cpmem(byte* from, byte* to, dword cant)
 
 extern char command[];
 extern char levanto;
-extern idt_descriptor IDT_DESC;
+//extern idt_descriptor IDT_DESC;
 extern word* puntero_pantalla;
 extern switch_reg salto;
 extern char teclado[];
@@ -174,7 +174,7 @@ extern gdt_entry gdt_vector[];
 
 
 void donde_esta_el_kernel(){
-	mover_puntero(0,0);
+	/*mover_puntero(0,0);
 	printf("                                          ",0,0, 0);
 	mover_puntero(1,0);
 	printf("                                          ",0,0, 0);
@@ -213,7 +213,7 @@ void donde_esta_el_kernel(){
 	mover_puntero(14,0);
 	printf("mapear_pagina: ",2,VERDE_L | BRILLANTE, (dword) &mapear_pagina);
 	mover_puntero(15,0);
-	printf("printf: ",2,VERDE_L | BRILLANTE, (dword) &printf);		
+	printf("printf: ",2,VERDE_L | BRILLANTE, (dword) &printf);
 	mover_puntero(16,0);
 	printf("puntero_pantalla: ",2,VERDE_L | BRILLANTE, (dword) &puntero_pantalla);
 	mover_puntero(17,0);
@@ -229,6 +229,7 @@ void donde_esta_el_kernel(){
 	printf("      TSS[49]: ",2,VERDE_L | BRILLANTE, (dword) &TSS[49]);
 	mover_puntero(22,0);
 	printf("crear_TSS: ",2,VERDE_L | BRILLANTE, (dword) &crear_TSS);
+*/
 }
 
 
@@ -276,7 +277,7 @@ void crear_heap(Heap* heap_dir, dword cant_bytes){
 //si es un proceso de usuario, limitar la cant_bytes a un 2% del total de la memoria.
 
 	dword primer_entrada = 0x7FFFFFF & cant_bytes; //por las dudas es a lo sumo 2^15-1
-	
+
 	*heap_dir = (Heap){
 					(dword) primer_entrada,
 					(Entry_Heap *) (((dword) heap_dir) + sizeof(Heap)),
@@ -290,40 +291,40 @@ void* pedir_memoria(Heap* heap_dir, dword cant_bytes){
 	Entry_Heap* aux;
 	void* res = NULL;
 	dword resto;
-	
+
 	// si hay espacio para el pedido
 	if(heap_dir->bytes_disponibles >= cant_bytes){
-		
+
 		// me fijo en que entrada del heap entra el pedido
 		aux = devolverDondeEntre(heap_dir, cant_bytes);
-		
+
 		// si encontró espacio
 		if(aux != NULL){
 			resto = *aux - cant_bytes;
-			
+
 			//marco como ocupado
 			*aux = *aux | 0x80000000;
-			
+
 			//si lo que sobra no alcanza para agregar una entry_heap
 			if(resto < 5){
 				aux =  (Entry_Heap *) (((dword) aux) + 4); //avanzo al byte luego del entry_heap
 			}
 			else{//si puedo agregar otra entry_heap a continuacion
-				
+
 				//paso al proximo entry_heap
 				aux = (Entry_Heap *) (((dword) aux) + 4 + cant_bytes);
-				
+
 				//lo marco como libre y le pongo la cant de bytes libres a continuacion
 				*aux = 0x7FFFFFFF & (resto-4);//notar que resto 4 por el tamaño que ocupa el entry_heap
-				
+
 				//si estoy apuntando al ultimo, corro al ultimo un lugar
 				if(aux == heap_dir->end)	heap_dir->end++;
 			}
-			
+
 			res	= (void *) aux;
-		}				
+		}
 	}
-	
+
 	return res;
 }
 
@@ -331,19 +332,19 @@ Entry_Heap* devolverDondeEntre(Heap* heap_dir, dword cant_bytes){
 
 	Entry_Heap *actual,*posible;
 	dword tam_actual, tam_posible, ocupado;
-	
-	actual = heap_dir->init;	
+
+	actual = heap_dir->init;
 	tam_actual = *actual & 0x7FFFFFFF;
-	
+
 	posible = actual;
 	tam_posible = tam_actual;
-	
-	do{	
+
+	do{
 		//actualizo el tamaño y el estado
 		tam_actual = *actual & 0x7FFFFFFF;
 		ocupado = *actual & 0x80000000; //  0 = libre;
 
-		if (ocupado == 0 && tam_actual > cant_bytes) 
+		if (ocupado == 0 && tam_actual > cant_bytes)
 		{
 			//si tengo un mejor candidato
 			if(tam_actual > tam_posible){
@@ -357,21 +358,22 @@ Entry_Heap* devolverDondeEntre(Heap* heap_dir, dword cant_bytes){
 			tam_posible = tam_actual;
 			actual = heap_dir->end;
 		}
-		
+
 		//si no llegue al final
 		if(actual != heap_dir->end){
 			//avanzo a la sig entrada
 			actual = (Entry_Heap *) ( ((dword) actual) + 4 + tam_actual);
 		}
-	
+
 	}while(actual != heap_dir->end);
-	
+
 	// si esta ocupado o no alcanza el lugar (aca entra solo si "posible" quedó apuntando al primer lugar del heap y no entra alli el pedido)
 	if( ((*posible & 0x80000000) != 0) || ((*posible & 0x7FFFFFFF) < cant_bytes) ) posible = NULL;
-	
+
 	return posible;
 }
 
 
 
 void liberar_memoria(Heap* heap_dir, void* dir){}
+
