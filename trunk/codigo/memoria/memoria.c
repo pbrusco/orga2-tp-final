@@ -1,42 +1,50 @@
 #include "../tipos/tipos_basicos.h"
 #include "memoria.h"
 
-void contarMemoria(){
-	//arranco suponiendo que el sistema cuenta con al menos 2 mb
+void contarMemoria()
+{
+	// Arranco suponiendo que el sistema cuenta con al menos 2 MB que es lo que ocupa el kernel. Si esto no fuese así, entonces el hardware no cumple con los requerimientos mínimos para correr el kernel.
 	dword *dir = (dword *) (0x2*MB);
 	dword dato = 0x12345678;
 
 	*dir = dato;
 	
-	while(( (dword) dir < (32*MB)) &&  *dir == dato){
+	// Mientras el puntero sea menor que ?? y el contenido de la direccion apuntada sea la marca que se estableció previamente, recorro la memoria poniendo en cero la posición actual y marcando con el dato la posición siguiente.
+	while (((dword) dir < (32*MB)) &&  *dir == dato)
+	{
 		*dir = 0;
 		dir += 1024;
 		*dir = dato;
 	}
-	//no se le suma 2 MB porque la direccion ya apunta al total de la memoria (en bytes)
+	
+	// Una vez fuera del ciclo, el puntero dir apunta al total de la memoria (en bytes). 
+	
+	// Calculo cuanto es la memoria total en MB 
 	memoria_total = ((dword) dir) / (1*MB);
 	
+	// Calculo el total de páginas libres calculando el total de páginas y excluyendo la cantidad de páginas ocupadas por el kernel.
 	paginas_libres = ( (memoria_total * MB) - (2*MB) ) / TAM_PAG ;
 }
 
 
-//Arma el bitmap al inicio. Marca como ocupados los lugares reservados para el kernel
-void llenarBitmap(){
-
-	//calculo cuantas paginas ocupa el directorio y las tablas de paginas del kernel
+void llenarBitmap()
+{
+	// Calculo cuantas paginas ocupa el directorio y las tablas de paginas del kernel
 	unsigned long long offset_tablas = (memoria_total / 4) + 1;
 
-	//calculo donde arranca el bitmap, justo debajo de las tablas de paginas
+	// Calculo donde arranca el bitmap, justo debajo de las tablas de paginas
 	dir_init_bitmap = (byte *) DIR_DIRECTORIO + (offset_tablas * TAM_PAG);
 	
-	//calculo donde termina el bitmap (ultima dir valida del bitmap)
-	dir_end_bitmap =  (byte *)   (((dword) dir_init_bitmap) + ((((memoria_total * MB) / TAM_PAG)/8) - 1));
+	// Calculo donde termina el bitmap (ultima dir valida del bitmap)
+	dir_end_bitmap = (byte *) (((dword) dir_init_bitmap) + ((((memoria_total * MB) / TAM_PAG)/8) - 1));
 
+	// Calculo cuantas páginas ocupa el kernel dividiendo la dirección donde termina por el tamaño de una página. Luego, calculo cuantos bytes representa esa cantidad dividiendo por 8.
 	int pag_ocupadas = ((DIR_KERNEL_END) / TAM_PAG)/8;
 	
+	// Puntero auxiliar que apunta al comienzo del bitmap
 	byte* bitmap = dir_init_bitmap;
 	
-	
+	// Ciclo que marca con un 1 en el Bitmap las páginas ocupadas.
 	while(0 < pag_ocupadas)
 	{
 		*bitmap = 0xFF;
@@ -44,6 +52,7 @@ void llenarBitmap(){
 		pag_ocupadas--;
 	}
 
+	// Ciclo que marca con 0 en el Bitmap las páginas libres.
 	while(bitmap <= dir_end_bitmap)
 	{
 		*bitmap = 0x00;
@@ -51,32 +60,34 @@ void llenarBitmap(){
 	}
 }
 
-//Devuelve un puntero a una pagina vacia, y la marca como ocupada en el bitmap
-dword* pidoPagina() {
 
+dword* pidoPagina() 
+{
 	byte* bitmap_dir = dir_init_bitmap + (((2*MB)/TAM_PAG)/8);//comienzo del bitmap + offset ocupado
 	byte libre;
 	dword contador_paginas = 512;//desde los 2 MB en adelante
 	dword var = 0;
 
-	while(bitmap_dir <= dir_end_bitmap && *bitmap_dir == 0xFF){
+	while(bitmap_dir <= dir_end_bitmap && *bitmap_dir == 0xFF)
+	{
 		bitmap_dir++;
 		contador_paginas = contador_paginas + 8;
 	}
 
-	if(bitmap_dir <= dir_end_bitmap) {
-
+	if(bitmap_dir <= dir_end_bitmap) 
+	{
 		libre = *bitmap_dir;
 		 
 		int i;
-		for(i = 0;i<8;i++) {
-			if ((libre & 1) == 0) {
+		for(i = 0;i<8;i++) 
+		{
+			if ((libre & 1) == 0) 
+			{
 				var = contador_paginas + i;
 				*bitmap_dir = *bitmap_dir | (1 << i); //Se actualiza el BIT correspondiente a la pagina obtenida
 				
 				//actualizo la cant de paginas libres
-				paginas_libres--;
-				
+				paginas_libres--;	
 				return (dword *) (var*4*1024);
 			}
 			libre = libre >> 1;
@@ -87,7 +98,6 @@ dword* pidoPagina() {
 }
 
 
-//Dada una dir de una pagina, la libera dentro del bitmap
 void liberoPagina(dword* pagina){
 	
 	if( ((dword) pagina) >= 2*MB){
@@ -113,8 +123,10 @@ void liberoPagina(dword* pagina){
 }
 
 
-void setmem(byte* dir, byte set, dword cant){
-	while(cant > 0){
+void setmem(byte* dir, byte set, dword cant)
+{
+	while(cant > 0)
+	{
 		*dir = set;
 		dir++;
 		cant--;
@@ -122,8 +134,10 @@ void setmem(byte* dir, byte set, dword cant){
 }
 
 
-void cpmem(byte* from, byte* to, dword cant){
-	while(cant > 0){
+void cpmem(byte* from, byte* to, dword cant)
+{
+	while(cant > 0)
+	{
 		*to = *from;
 		to++; from++;
 		cant--;
@@ -149,174 +163,72 @@ void cpmem(byte* from, byte* to, dword cant){
 #include "../pantalla/pantalla.h"
 #include "../teclado/teclado.h"
 #include "../applications/console.h"
-#include "../kernel/kernel.h"
 
-extern Info_Tareas tareas_en_memoria[];
 extern char command[];
-extern Tss TSS[];
-
-
-extern IDT_Descriptor IDT_DESC;
-extern IDT_Entry IDT[];
-
+extern char levanto;
+extern idt_descriptor IDT_DESC;
 extern word* puntero_pantalla;
-extern byte tarea_en_pantalla, tarea_a_mostrar;
-
 extern switch_reg salto;
 extern char teclado[];
 extern gdt_entry gdt_vector[];
 
 
 void donde_esta_el_kernel(){
-	
-	clear_screen();
-	//CONSOLE
-	printf("CONSOLA", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("consoleD: ",VERDE_L | BRILLANTE); printdword((dword) &console, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("extraerNumero: ",VERDE_L | BRILLANTE); printdword((dword) &extract_number, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("tareas_en_memoria_info(var): ",VERDE_L | BRILLANTE); printdword((dword) &tareas_en_memoria, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("command[0]: ",VERDE_L | BRILLANTE); printdword((dword) &command, BASE16 | VERDE_L | BRILLANTE);
-	printf("      command[99]: ",VERDE_L | BRILLANTE); printdword((dword) &command[99], BASE16 | VERDE_L | BRILLANTE);
-
-	//BCP
-	salto_de_linea();salto_de_linea();
-	printf("BCP", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("tarea_actual: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_actual, BASE16 | VERDE_L | BRILLANTE);	
-	salto_de_linea();
-	printf("cant_tareas_en_sistema: ",VERDE_L | BRILLANTE); printdword((dword) &cant_tareas_en_sistema, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("iniciar_BCP: ",VERDE_L | BRILLANTE); printdword((dword) &iniciar_BCP, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("desaparecerTarea: ",VERDE_L | BRILLANTE); printdword((dword) &desaparecerTarea, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	//GDT
-	salto_de_linea();salto_de_linea();
-	printf("GDT", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("gdt_vector[0]: ",VERDE_L | BRILLANTE); printdword((dword) &gdt_vector[0], BASE16 | VERDE_L | BRILLANTE);
-	printf("      gdt_vector[127]: ",VERDE_L | BRILLANTE); printdword((dword) &gdt_vector[127], BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("make_descriptor: ",VERDE_L | BRILLANTE); printdword((dword) &make_descriptor, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("borrar_gdt_entry: ",VERDE_L | BRILLANTE); printdword((dword) &borrar_gdt_entry, BASE16 | VERDE_L | BRILLANTE);
-	
-	//INTERRUPCIONES
-	salto_de_linea();salto_de_linea();
-	printf("INTERRUPCIONES", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("idt_fill: ",VERDE_L | BRILLANTE); printdword((dword) &idtFill, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("idt[0]: ",VERDE_L | BRILLANTE); printdword((dword) &IDT[0], BASE16 | VERDE_L | BRILLANTE);
-	printf("      idt[255]: ",VERDE_L | BRILLANTE); printdword((dword) &IDT[255], BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("_INT0: ",VERDE_L | BRILLANTE); printdword((dword) &_INT0 , BASE16 | VERDE_L | BRILLANTE);
-	printf("      _INT80: ",VERDE_L | BRILLANTE); printdword((dword) &_INT80 , BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("IDT_DESC: ",VERDE_L | BRILLANTE); printdword((dword) &IDT_DESC, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	breakpoint();
-	clear_screen();
-	
-	
-	//KERNEL
-	printf("KERNEL", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("kernel_infinito: ",VERDE_L | BRILLANTE); printdword((dword) &kernel_infinito, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("update_cursor: ",VERDE_L | BRILLANTE); printdword((dword) &update_cursor, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	
-	//MEMORIA
-	salto_de_linea();salto_de_linea();
-	printf("MEMORIA", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("memoria_total: ",VERDE_L | BRILLANTE); printdword((dword) &memoria_total, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("&dir_init_bitmap: ",VERDE_L | BRILLANTE); printdword((dword) &dir_init_bitmap, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("&dir_end_bitmap: ",VERDE_L | BRILLANTE); printdword((dword) &dir_end_bitmap, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("paginas_libres: ",VERDE_L | BRILLANTE); printdword((dword) &paginas_libres, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("dir_init_bitmap: ",VERDE_L | BRILLANTE); printdword((dword) dir_init_bitmap, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("dir_end_bitmap: ",VERDE_L | BRILLANTE); printdword((dword) dir_end_bitmap, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("contarMemoria: ",VERDE_L | BRILLANTE); printdword((dword) &contarMemoria, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("cpmem: ",VERDE_L | BRILLANTE); printdword((dword) &cpmem, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	
-	//PAGINACION
-	salto_de_linea();salto_de_linea();
-	printf("PAGINACION", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("mapear_tabla: ",VERDE_L | BRILLANTE); printdword((dword) &mapear_tabla, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("liberar_directorio: ",VERDE_L | BRILLANTE); printdword((dword) &liberar_directorio, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	
-	//PANTALLA
-	salto_de_linea();salto_de_linea();
-	printf("PANTALLA", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("puntero_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &puntero_pantalla, BASE16 | VERDE_L | BRILLANTE);	
-	salto_de_linea();
-	printf("tarea_en_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_en_pantalla, BASE16 | VERDE_L | BRILLANTE);
-/*	salto_de_linea();*/
-/*	printf("tarea_a_mostrar: ",VERDE_L | BRILLANTE); printdword((dword) &tarea_a_mostrar, BASE16 | VERDE_L | BRILLANTE);*/
-	salto_de_linea();
-	printf("avanzar_puntero: ",VERDE_L | BRILLANTE); printdword((dword) &avanzar_puntero, BASE16 | VERDE_L | BRILLANTE);
-/*	salto_de_linea();*/
-/*	printf("cambiar_de_pantalla: ",VERDE_L | BRILLANTE); printdword((dword) &cambiar_de_pantalla, BASE16 | VERDE_L | BRILLANTE);*/
-	
-	
-	breakpoint();
-	clear_screen();
-	
-	
-	//SCHEDULER
-	printf("SCHEDULER", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("salto: ",VERDE_L | BRILLANTE); printdword((dword) &salto, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("switch_task: ",VERDE_L | BRILLANTE); printdword((dword) &switch_task, BASE16 | VERDE_L | BRILLANTE);
-	
-	
-	
-	//TECLADO
-	salto_de_linea();salto_de_linea();
-	printf("TECLADO", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("teclado[0]: ",VERDE_L | BRILLANTE); printdword((dword) &teclado[0], BASE16 | VERDE_L | BRILLANTE);
-	printf("    teclado[126]: ",VERDE_L | BRILLANTE); printdword((dword) &teclado[126], BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("getChar: ",VERDE_L | BRILLANTE); printdword((dword) &getChar, BASE16 | VERDE_L | BRILLANTE);
-
-	
-	//TSS
-	salto_de_linea();salto_de_linea();
-	printf("TSS", ROJO_L | BRILLANTE);
-	salto_de_linea();
-	printf("TSS[0]: ",VERDE_L | BRILLANTE); printdword((dword) &TSS[0], BASE16 | VERDE_L | BRILLANTE);
-	printf("      TSS[49]: ",VERDE_L | BRILLANTE); printdword((dword) &TSS[49], BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("crear_TSS: ",VERDE_L | BRILLANTE); printdword((dword) &crear_TSS, BASE16 | VERDE_L | BRILLANTE);
-	salto_de_linea();
-	printf("vaciar_TSS: ",VERDE_L | BRILLANTE); printdword((dword) &vaciar_TSS, BASE16 | VERDE_L | BRILLANTE);
-	
-	breakpoint();
-	clear_screen();
+	mover_puntero(0,0);
+	printf("                                          ",0,0, 0);
+	mover_puntero(1,0);
+	printf("                                          ",0,0, 0);
+	mover_puntero(0,0);
+	printf("consoleD: ",2,VERDE_L | BRILLANTE, (dword) &console);
+	mover_puntero(1,0);
+	printf("extraerNumero: ",2,VERDE_L | BRILLANTE, (dword) &extract_number);
+	mover_puntero(2,0);
+	printf("command[0]: ",2,VERDE_L | BRILLANTE, (dword) &command);
+	printf("      command[99]: ",2,VERDE_L | BRILLANTE, (dword) &command);
+	mover_puntero(3,0);
+	printf("levanto(consola): ",2,VERDE_L | BRILLANTE, (dword) &levanto);
+	mover_puntero(4,0);
+	printf("tarea_actual: ",2,VERDE_L | BRILLANTE, (dword) &tarea_actual);
+	mover_puntero(5,0);
+	printf("cant_tareas_en_sistema: ",2,VERDE_L | BRILLANTE, (dword) &cant_tareas_en_sistema);
+	mover_puntero(6,0);
+	printf("gdt_vector[0]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector);
+	printf("      gdt_vector[127]: ",2,VERDE_L | BRILLANTE, (dword) &gdt_vector[127]);
+	mover_puntero(7,0);
+	printf("make_descriptor: ",2,VERDE_L | BRILLANTE, (dword) &make_descriptor);
+	mover_puntero(8,0);
+	printf("idt_fill: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idtFill);
+	mover_puntero(9,0);
+	printf("idt[0]: ",2,VERDE_L | BRILLANTE, (dword) (dword) &idt[0]);
+	printf("      idt[255]: ",2,VERDE_L | BRILLANTE, (dword) &idt[255]);
+	mover_puntero(10,0);
+	printf("_isr0: ",2,VERDE_L | BRILLANTE, (dword) &_isr0);
+	printf("      _isr21: ",2,VERDE_L | BRILLANTE, (dword) &_isr21);
+	mover_puntero(11,0);
+	printf("IDT_DESC: ",2,VERDE_L | BRILLANTE, (dword) &IDT_DESC);
+	mover_puntero(12,0);
+	printf("paginas_libres: ",2,VERDE_L | BRILLANTE, (dword) &paginas_libres);
+	mover_puntero(13,0);
+	printf("pidoPagina: ",2,VERDE_L | BRILLANTE, (dword) &pidoPagina);
+	mover_puntero(14,0);
+	printf("mapear_pagina: ",2,VERDE_L | BRILLANTE, (dword) &mapear_pagina);
+	mover_puntero(15,0);
+	printf("printf: ",2,VERDE_L | BRILLANTE, (dword) &printf);		
+	mover_puntero(16,0);
+	printf("puntero_pantalla: ",2,VERDE_L | BRILLANTE, (dword) &puntero_pantalla);
+	mover_puntero(17,0);
+	printf("salto: ",2,VERDE_L | BRILLANTE, (dword) &salto);
+	mover_puntero(18,0);
+	printf("switch_task: ",2,VERDE_L | BRILLANTE, (dword) &switch_task);
+	mover_puntero(19,0);
+	printf("teclado: ",2,VERDE_L | BRILLANTE, (dword) teclado);
+	mover_puntero(20,0);
+	printf("getChar: ",2,VERDE_L | BRILLANTE, (dword) &getChar);
+	mover_puntero(21,0);
+	printf("TSS[0]: ",2,VERDE_L | BRILLANTE, (dword) &TSS);
+	printf("      TSS[49]: ",2,VERDE_L | BRILLANTE, (dword) &TSS[49]);
+	mover_puntero(22,0);
+	printf("crear_TSS: ",2,VERDE_L | BRILLANTE, (dword) &crear_TSS);
 }
 
 
