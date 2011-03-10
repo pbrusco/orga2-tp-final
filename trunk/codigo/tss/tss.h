@@ -43,16 +43,13 @@ typedef struct str_tss {
 	unsigned short  unused10;
 	unsigned short  dtrap;
 	unsigned short  iomap;//1KB+64bytes
-} __attribute__((__packed__, aligned (8))) tss;
-
-
-// Arreglo de TSSs
-tss TSS[CANT_TAREAS];
+} __attribute__((__packed__, aligned (8))) Tss;
 
 
 /* Funciones */
+
 void crear_TSS(byte entrada, dword CR3, dword EIP, dword EFLAGS, dword pila, dword);
 byte buscar_TSS_vacia();
-void vaciar_TSS(tss*);
+void vaciar_TSS(Tss*);
 
 #endif //__TSS_H__ 
