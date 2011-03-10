@@ -1,0 +1,178 @@
+\documentclass[11pt, a4paper]{article}
+
+% Configuración de márgenes de las páginas
+	\usepackage{a4wide}
+
+% Paquete de acentos para Linux
+	\usepackage[utf8]{inputenc}
+
+% Paquete de acentos para windows
+%	\usepackage[latin1]{inputenc}
+
+% Paquete para reconocer la separación en sílabas en español
+	\usepackage[spanish]{babel}
+
+% Paquetes especiales para el TP
+	\usepackage{./otros/caratula}
+	\usepackage{./otros/algo2symb}
+	\usepackage{./otros/shortlst}
+	\usepackage[lined]{./otros/algorithm2e}
+	\usepackage{amssymb}			%simbolos matematicos
+	\usepackage{pdfpages}
+	
+	
+% Paquete para incluir hypervinculos
+	\usepackage{color}
+	\usepackage{url}
+	\definecolor{lnk}{rgb}{0,0,0.4}
+	\usepackage[colorlinks=true,linkcolor=lnk,citecolor=blue,urlcolor=blue]{hyperref}
+
+% Paquete para armar índices
+	\usepackage{makeidx}
+	\makeindex
+
+% Más espacio entre líneas
+	\parskip=1.5pt
+
+% Comandos personalizados
+	\newcommand{\nat}{\ensuremath{\mathbb{N}}}
+	\newcommand{\entero}{\ensuremath{\mathbb{Z}}}
+	\newcommand{\real}{\ensuremath{\mathbb{R}}}
+	\newcommand{\tab}{\hspace{1em}}
+	
+\begin{document}
+
+% Carátula
+	\titulo{Trabajo Práctico Final}
+	\fecha{Marzo de 2010}
+	\materia{Organización del Computador II}
+	\integrante{Bianchi, Mariano}{92/08}{marianobianchi08@gmail.com}
+	\integrante{Brusco, Pablo}{527/08}{pablo.brusco@gmail.com}
+	\integrante{Di Pietro, Carlos Augusto Lyon}{126/08}{cdipietro@dc.uba.ar}
+	\maketitle
+
+% Índice
+\small
+\newpage \printindex \tableofcontents
+\normalsize
+\newpage
+
+% Cuerpo del informe
+\section{Introducción}
+\paragraph{}
+El presente trabajo final surge como una continuación del tercer trabájo práctico de la materia en el segundo cuatrimestre de 2009. Aquél trabajo consistía en implementar un sistema minimal que permitiese correr concurrentemente dos tareas. Concretamente, dicho sistema consitía en un bootloader que se encargaba de cargar a memoria un kernel simplificado que incluía los binarios de las tareas en cuestión, junto con todas las estructuras necesarias para que dichas tareas pudieran ser ejecutadas (GDT, Directorio de Tablas de Páginas, una Tabla de Páginas para cada tarea, etc.). Luego, el kernel simplemente debía encargarse de activar el \textit{Gate A20}, pasar el procesador a modo protegido, activar el sistema de paginación, y poner a correr las tareas llamadas ``Pintor'' y ``Traductor'', las cuales alternaba mediante una interrupción del timer.
+
+\paragraph{}
+Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. El principal aspecto que lo diferencia es el hecho de que las tareas no se encuentran ya cargadas en memoria de manera estática, sino deben ser cargadas de manera dinámica y puestas en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas siendo lanzadas.\\
+En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir capaz de ejecutar varias tareas alternadamente dando la ilusión de simultaneidad) que puede lanzar procesos de forma dinámica con tan solo cargar tareas de memoria y creando las estructuras necesarias para que estas puedan ejecutarse en un procesador de arquitectura Intel-x86.
+
+		
+\section{Instrucciones de uso}
+\paragraph{}
+Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
+\begin{itemize}
+	\item Bla.
+	\item Bla2.
+\end{itemize}
+
+
+\section{Implementación}
+	\subsection{Descripción General}
+	El código fuente que implementa el kernel se entrega junto con este informe en un sorpote digital y se ubica en la carpeta \texttt{codigo}. Dentro de la misma los archivos se organizan de la siguiente manera:
+	\begin{center}
+		\begin{shortitemize}
+			\setlength{\shortitemwidth}{200pt}
+			\item Memoria
+			\item Scheduler
+			\item GDT - Global Descriptor Table
+			\item Periféricos
+			\item Paginación				
+			\item Shell
+			\item TSS - Task State
+			\item Macros
+			\item BCP - Block Control Process
+			\item Almacenamiento
+			\item Interrupciones							
+			\item Kernel
+		\end{shortitemize}
+	\end{center}		
+
+	\paragraph{}
+	Esta distribución no es arbitraria, sino que responde a la modularización con la cual se encaró el diseño y desarrollo del kernel aquí presentado. Así, cada directorio contiene el código fuente uno o más de los módulos que integran al kernel, cada uno de los cuales fue desarrollado de forma incremental y testeado individualmente.
+	
+	\paragraph{}
+	En la sección \ref{modulos}, se procederá a explicar en detalle cada uno de estos módulos a fin de poder comprender con claridad todas las partes que componen al kernel elaborado. Una vez concluída esa explicación, en la sección siguiente (\ref{kernel}), se detallará de qué forma el kernel agrupa y hace uso de todos estos módulos a fin de dar como resultado un sistema \textit{multitasking} con un \textit{scheduler} dinámico capaz de levantar tareas de memoria y alternarlas por medio de una política de reemplazo \textit{Round Robin}.
+	
+	\paragraph{}
+	Seguidamente, se expone cómo está constituído el \textit{Mapa de memoria} del sistema, así como también el porqué de su elección.
+	
+	\subsection{Mapa de Memoria}
+	\paragraph{}
+	Previo a la escritura del código de los módulos mencionados en la sección anterior, a sabiendas de que el sistema utilizaría la paginación como forma de direccionar a memoria, se procedió a establecer un mapa de memoria que permitiese ubicar las estructuras críticas e indispensables del sistema de manera inequívoca. La opción elegida fue realizar un \textit{identity mapping} de las páginas a los frames de memoria, fijando algunos de ellos para uso exclusivo del kernel o de otras estructuras como la \textit{GDT}, las \textit{TSS} o el \textit{Bitmap}.
+	
+	\paragraph{}
+	La imagen que sigue muestrá como estan mapeadas y ocupadas las páginas de memoria en el sistema:
+	\begin{center}
+		\includegraphics[scale=0.80]{./otros/mapa_memoria.pdf}
+	\end{center}
+	
+	\subsection{Módulos}
+	\label{modulos}
+		\subsubsection{Memoria}
+			\paragraph{}
+			El módulo de \textbf{Memoria} es el encargado de brindarle al kernel las herramientas para contabilizar y administrar la memoria del sistema.
+			
+			\paragraph{}
+			Básicamente, la idea empleada para administrar la memoria es la utilización de un \textit{Bitmap}, el cual tenga tantos bits como páginas haya en el sistema. Luego, cada página ocupada se representa en el \textit{Bitmap} poniendo un ``1'' en el bit asociado a dicha página, mientras que las páginas libres se representan con un ``0''.
+			
+			\paragraph{}
+			Para implementar el \textit{Bitmap}, se define el siguiente grupo de variables globales
+
+			\begin{itemize}
+				\item \texttt{memoria\_total:} Variable global en la cual se almacena la cantidad de Megabytes de memoria con la que cuenta el sistema.
+				\item \texttt{paginas\_libres:} Variable global que contabiliza el número de páginas libres de memoria en el sistema.
+				\item \texttt{dir\_init\_bitmap:} Puntero a la dirección 0x???, que es la posición donde se inicia el \textit{Bitmap} para administrar las páginas de memoria.
+				\item \texttt{dir\_end\_bitmap:} Puntero a la dirección 0x??, que es la última dirección válida del \textit{Bitmap}.
+			\end{itemize}
+			
+			Así como también el siguiente grupo de funciones:
+			
+			\begin{itemize}
+				\item \texttt{contarMemoria:} 
+				\item \texttt{llenarBitmap:}
+				\item \texttt{pidoPagina:}
+				\item \texttt{liberoPagina:}
+				\item \texttt{setmem:}
+				\item \texttt{cpmem:}
+			\end{itemize}
+
+		\subsubsection{Global Descriptor Table (GDT)}
+		\subsubsection{Paginación}
+		\subsubsection{TSS}
+		\subsubsection{Process Contro Block (BCP) }
+		\subsubsection{Interrupciones}
+		\subsubsection{Scheduller}
+		\subsubsection{Periféricos}
+		\subsubsection{Shell}
+		\subsubsection{Macros}
+		\subsubsection{Almacenamiento}
+	\subsection{Ensamblando el Kernel}
+	\label{kernel}	
+		\begin{itemize}
+			\item Habilitar Gate A20
+			\item Inicializar la GDT y el GDT\_desc
+			\item Copiar GDT\_desc a lgdt
+			\item Habilitar bit PE de CR0
+			\item Jmp 0x08:modo\_protegido
+			\item Pasaje a modo protegido
+			\item Actualizar selectores
+			\item Inicializar la pila
+			\item Contar memoria disponible
+			\item Crear estructuras de paginación
+			\item Cargar en CR3 la direccion del Directorio de Tablas de Páginas
+			\item Habilitar bit PG de CR0
+			\item Inicializar Bitmap
+			\item Pasaje a paginación
+		\end{itemize}
+	
+\end{document}

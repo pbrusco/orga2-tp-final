@@ -2,32 +2,57 @@
 #define __MM__
 
 /* MEMORIA BASICA */
-
-//variables globales
-
-dword memoria_total;//en MB
-byte *dir_init_bitmap;//debajo de las tablas de paginas del kernel
-byte *dir_end_bitmap;//ultima dir valida del bitmap
-dword paginas_libres;
+/*================*/
 
 
-#define DIR_KERNEL_END 0x200000 //hasta los 2 MB reservados para el kernel
+/* Constantes */
+/*------------*/
+#define DIR_KERNEL_END 0x200000 	// Hasta los 2 MB reservados para el kernel.
 #define DIR_BASE_MALLOC 0XE7000000
 
 
-// funciones
+/* Variables globales */
+/*--------------------*/
+dword memoria_total;		// Tamaño en MB de toda la memoria del sistema.
+dword paginas_libres;		// Cantidad de páginas libres en la memoria del sistema.
+byte *dir_init_bitmap;		// Puntero al inicio del Bitmap de memoria.
+byte *dir_end_bitmap;		// Puntero a la ultima dirección válida del Bitmap de memoria.
 
+
+/* Funciones */
+/*-----------*/
+
+//~ Cuenta la cantidad de MB de memoria en el sistema y registra la cantidad de páginas libres.
 void contarMemoria();
 
+//~ Inicializa el Bitmap de memoria marcando como ocupadas las páginas utilizadas por el kernel.
 void llenarBitmap();
+
+//~ Devuelve un puntero a una pagina libre, y la marca como ocupada en el Bitmap.
 dword* pidoPagina();
+
+//~ Dada un puntero a una pagina, la marca como libera dentro del Bitmap.
 void liberoPagina(dword *);
 
-// setea las posiciones de memoria desde dir hasta dir+cant con lo indicado en set
+//~ Setea las posiciones de memoria desde "dir" hasta "dir"+"cant" con lo indicado en set.
 void setmem(byte* dir, byte set, dword cant);
 
-// copia el contenido de la memoria de from a to, la cantidad de bytes que indique cant
+// Copia "cant" byetes desde la posición de memoria "from" hacia la posiciób "to".
 void cpmem(byte* from, byte* to, dword cant);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -49,15 +74,6 @@ void donde_esta_el_kernel();
  0x
 
 */
-
-
-
-
-
-
-
-
-
 
 
 
@@ -96,7 +112,6 @@ Entry_Heap* devolverDondeEntre(Heap* heap_dir, dword cant_bytes);
 Libera la memoria utilizada en dir (si es que estaba en uso) y une los espacios contiguos libres en la estructura que aparecen al liberar dir.
 */
 void liberar_memoria(Heap* heap_dir, void* dir);
-
 
 
 #endif
