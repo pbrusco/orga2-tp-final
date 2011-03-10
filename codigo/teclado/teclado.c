@@ -1,4 +1,5 @@
 #include "teclado.h"
+#include "../tipos/tipos_basicos.h"
 #include "../pantalla/pantalla.h"
 
 
