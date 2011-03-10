@@ -1,3 +1,4 @@
+#include "../tipos/tipos_basicos.h"
 #include "scheduler.h"
 #include "../bcp/bcp.h"
 #include "../pantalla/pantalla.h"

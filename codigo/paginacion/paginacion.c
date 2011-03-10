@@ -97,22 +97,21 @@ void iniciar_paginacion_kernel(){
 void liberar_directorio(dword* dir_entry){
 	
 	//declaro variables que voy a usar para indexar las tablas y el directorio
-	word indice_d = 0;
+	word indice_d;
 	word indice_t;
 	dword* table_entry;
 	
 	//para todas las entradas del directorio
-	for(indice_d; indice_d < 1024;indice_d++){
+	for(indice_d = 0; indice_d < 1024;indice_d++){
 		
 		//si la tabla de pagina esta presente
 		if( (*dir_entry & 1) == PRESENT ){
 	
 			//inicio variables
-			indice_t = 0;
 			table_entry = (dword*) (*dir_entry & 0xFFFFF000);
 			
 			//para cada entrada de la tabla
-			for(indice_t; indice_t < 1024;indice_t++){
+			for(indice_t = 0; indice_t < 1024;indice_t++){
 				
 				//si la pagina esta mapeada
 				if( (*table_entry & 1) == PRESENT ){

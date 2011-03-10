@@ -3,8 +3,6 @@
 
 #define TAM_COMMAND 80
 
-#include "../tipos/tipos_basicos.h"
-
 void cargar_tarea(int); //recibe la posicion de la tarea a cargar dentro de "tareas_en_memoria"
 
 void console(short int key);

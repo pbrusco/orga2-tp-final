@@ -1,9 +1,6 @@
 #ifndef __KERNEL__
 #define __KERNEL__
 
-#include "../tipos/tipos_basicos.h"
-
-
 /* TODO: Esta función debería hacer todo lo que se hace en "kernel.asm" desde que se mueve la pila hasta que se llega al "jmp $", reemplazando este ultimo por un llamado a la funcion "kernel_infinito" */
 void kernel_init();
 

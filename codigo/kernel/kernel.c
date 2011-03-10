@@ -1,3 +1,4 @@
+#include "../tipos/tipos_basicos.h"
 #include "kernel.h"
 #include "../bcp/bcp.h"
 #include "../pantalla/pantalla.h"
@@ -20,7 +21,7 @@ void kernel_infinito(){
 
 	byte aMatar;
 
-	while(true){
+	while(TRUE){
 	
 		// 1ero: busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();

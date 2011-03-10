@@ -6,7 +6,7 @@
 #define NULL    0
 #define TRUE    1
 #define FALSE   0
-#define OK		0
+#define OK	0
 
 #define MB 0x100000
 #define KB 0x400
@@ -17,17 +17,22 @@
 #define DIR_DIRECTORIO 0x100000
 #define CANT_TAREAS 50
 
+//FLAGS
 #define USER_EFLAGS 0x3202
 #define KERNEL_EFLAGS 0x202
 
+//SELECTORES DE SEGMENTOS
+#define KERNEL_CS 0x08
+#define KERNEL_DS 0x10
+#define USER_CS 0x18
+#define USER_DS 0x20
+
+
+//TIPOS BASICOS
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int dword;
 typedef unsigned long long qword;
-
-//booleanos
-#define true 1
-#define false 0
 
 
 

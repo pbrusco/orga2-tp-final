@@ -1,9 +1,6 @@
 #ifndef __PANTALLA__
 #define __PANTALLA__
 
-#include "../tipos/tipos_basicos.h"
-
-
 // el byte de atributos es asi
 // 7(parpadeo), 654(fondo), 3(brillante), 210(letra)
 
@@ -41,27 +38,39 @@
 #define DIR_FIN_PANTALLA 0xB8FA0
 
 
+#include "../tipos/tipos_basicos.h" //TODO: ver porque no anda cuando lo pongo en el .c como en el resto de los archivos
+
+
 //FUNCIONES DE DEBUGGING
 
 /*Avanza el puntero de la pantalla un caracter.*/
 void avanzar_puntero();
+
 /*Retrocede el puntero de la pantalla un caracter.*/
 void retroceder_puntero();
+
 /*Mueve el puntero de la pantalla hasta fila y columna.*/
 void mover_puntero(byte fila, byte columna);
+
 /*Avanza el puntero de la pantalla una fila.*/
 void salto_de_linea();
+
 /*printf la vamos a usar sólo para imprimir caracteres.*/
 void printf(const char *frase, const byte atrib);
+
 /*printdword se usará para ver valores de variables.
 Recibe como parámetros la dword a imprimir y los atributos de escritura (el byte alto es la base a usar y el bajo son los atributos de impresion, como el color, brillo, etc)*/
 void printdword(const dword var, const word atr);
+
 /*Escribe un caracter en la pantalla*/
 void putc(char c, byte atrib);
+
 /*Borra el ultimo caracter de la pantalla*/
 void borrarc();
+
 /*Deja en buffer un string que representa al numero pasado en "n" escrito en base "base".*/
 void num2char(dword n, byte* buffer, dword base);
+
 /*Limpia la pantalla.*/
 void clear_screen();
 

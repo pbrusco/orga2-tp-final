@@ -1,3 +1,4 @@
+#include "../tipos/tipos_basicos.h"
 #include "bcp.h"
 #include "../gdt/gdt.h"
 #include "../tss/tss.h"
@@ -8,7 +9,7 @@
 #include "../scheduler/scheduler.h"
 #include "../pantalla/pantalla.h"
 
-extern idt_entry idt[];
+extern IDT_Entry IDT[];
 extern gdt_entry gdt_vector[];
 extern byte tarea_en_pantalla;
 extern byte tarea_a_mostrar;
@@ -173,13 +174,13 @@ void info_BCP(byte index){
 
 void kill_app(word bcpPos){
 	
-	byte running = false;
+	byte running = FALSE;
 	
 	//solo mato a las tareas que estan corriendo o activas
 	if( (BCP[bcpPos].estado == CORRIENDO) || (BCP[bcpPos].estado == ACTIVO)){
 		
 		if(BCP[bcpPos].estado == CORRIENDO){
-			running = true;
+			running = TRUE;
 		}
 		matarTarea(bcpPos);
 		desaparecerTarea(bcpPos);

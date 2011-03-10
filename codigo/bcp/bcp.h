@@ -1,8 +1,6 @@
 #ifndef __BCP__
 #define __BCP__
 
-#include "../tipos/tipos_basicos.h"
-
 
 typedef struct BCP_Entry_s{
 	word pid;			//indice de la tarea en el gdt_vector
