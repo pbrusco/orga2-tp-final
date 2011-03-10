@@ -16,7 +16,7 @@ void show_running_tasks();
 void show_sleeping_tasks();
 
 void display_task(int id); //recibe la posicion de la tarea a mostrar dentro de "tareas_en_memoria"
-
+void cargar_tarea_y_mostrar(int id);
 void display_merging_task(int id);
 void hide_task(int id);
 void clear_screen();
