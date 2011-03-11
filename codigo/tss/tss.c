@@ -7,7 +7,7 @@
 Tss TSS[CANT_TAREAS];
 
 
-void crear_TSS(byte pos, dword CR3, dword EIP, dword EFLAGS, dword pila, dword ESP0){
+void crear_TSS(uint8 pos, uint32 CR3, uint32 EIP, uint32 EFLAGS, uint32 pila, uint32 ESP0){
 	Tss* entry = &TSS[pos];
 	entry->cr3 = CR3;
 	entry->eflags = EFLAGS;
@@ -28,12 +28,12 @@ void crear_TSS(byte pos, dword CR3, dword EIP, dword EFLAGS, dword pila, dword E
 }
 
 
-byte buscar_TSS_vacia(){
+uint8 buscar_TSS_vacia(){
 	//voy a tomar como TSS vacia aquella cuyo cr3 sea igual a 0
 
 	//recordar que devuelve algo igual o mayor que CANT_TAREAS si no hay ningun lugar disponible
-	word res = CANT_TAREAS;
-	word i = 0;
+	uint16 res = CANT_TAREAS;
+	uint16 i = 0;
 	
 	while(i < CANT_TAREAS){
 		if(TSS[i].cr3 == 0){

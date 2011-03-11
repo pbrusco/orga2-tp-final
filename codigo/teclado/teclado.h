@@ -2,7 +2,7 @@
 #define __TECLADO_H__
 
 
-char getChar(short codigo);
+int8 getChar(int16 codigo);
 
 
 #endif

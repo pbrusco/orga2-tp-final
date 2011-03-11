@@ -11,10 +11,14 @@
 
 extern IDT_Entry IDT[];
 extern gdt_entry gdt_vector[];
-extern byte tarea_en_pantalla;
-extern byte tarea_a_mostrar;
-extern byte command[];
+extern uint8 tarea_en_pantalla;
+extern uint8 command[];
 extern Tss TSS[];
+
+
+//variables globales
+uint8 tarea_actual;
+uint8 cant_tareas_en_sistema;
 
 //declaro el arreglo de BCP's
 BCP_Entry BCP[CANT_TAREAS];
@@ -28,21 +32,21 @@ void iniciar_BCP(){
 	//datos del kernel
 	BCP[0].pid = 5;
 	BCP[0].estado = ACTIVO;
-	BCP[0].entrada_directorio = (dword *) DIR_DIRECTORIO;
+	BCP[0].entrada_directorio = (uint32 *) DIR_DIRECTORIO;
 	BCP[0].sig = BCP[0].ant = 0;
-	BCP[0].pantalla = (word *) 0xB9000;//TODO: agregar al mapa de memoria
+	BCP[0].pantalla = (uint16 *) 0xB9000;//TODO: agregar al mapa de memoria
 }
 
 void iniciar_tss_kernel(){
-    byte tssVacia = buscar_TSS_vacia();
+    uint8 tssVacia = buscar_TSS_vacia();
     crear_TSS(tssVacia, DIR_DIRECTORIO, 0, 0, 0, 0);
-    gdt_vector[buscar_entradaGDT_vacia()] = make_descriptor((dword) &TSS[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+    gdt_vector[buscar_entradaGDT_vacia()] = make_descriptor((uint32) &TSS[tssVacia], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_0 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 }
 
 
 // LLAMAR SIEMPRE Y CUANDO YA SE HAYA EJECUTADO "iniciar_BCP"
-void crear_entradaBCP(dword id, byte estado, dword* ent_directorio, word* video){
-	word entrada = buscar_entradaBCP_vacia();
+void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* video){
+	uint16 entrada = buscar_entradaBCP_vacia();
 	BCP[entrada].pid = id;
 	BCP[entrada].estado = ACTIVO;
 	BCP[entrada].pantalla = video;
@@ -55,9 +59,9 @@ void crear_entradaBCP(dword id, byte estado, dword* ent_directorio, word* video)
 }
 
 
-word buscar_entradaBCP_vacia(){
+uint16 buscar_entradaBCP_vacia(){
 
-	word vacia = 1;
+	uint16 vacia = 1;
 
 	while( (BCP[vacia].estado != MUERTO) && (vacia < CANT_TAREAS) ){
 		vacia++;
@@ -68,16 +72,16 @@ word buscar_entradaBCP_vacia(){
 		return vacia;
 }
 
-byte buscar_entradaBCP(word id){
-	byte busca = 0;
-	while( (BCP[(byte) busca].pid != id) && (busca < CANT_TAREAS) ){
+uint8 buscar_entradaBCP(uint16 id){
+	uint8 busca = 0;
+	while( (BCP[(uint8) busca].pid != id) && (busca < CANT_TAREAS) ){
 		busca++;
 	}
 	return busca;
 }
 
 
-void cambiar_estado(word bpcPos, byte estado_nuevo){
+void cambiar_estado(uint16 bpcPos, uint8 estado_nuevo){
 
 	BCP[bpcPos].estado = estado_nuevo;
 	if(estado_nuevo == MATAR){
@@ -88,34 +92,34 @@ void cambiar_estado(word bpcPos, byte estado_nuevo){
 }
 
 
-void cargarTarea(dword eip){
+void cargarTarea(uint32 eip){
 
 	// 1ro: averiguar direccion de la tarea y tamaño (en bytes). Por ahora OBSOLETO
 
 
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
-	dword *directorio = pidoPagina();
-	dword *pila = pidoPagina();
-	dword *pila0 = pidoPagina();
-	word *video = (word *) pidoPagina();
+	uint32 *directorio = pidoPagina();
+	uint32 *pila = pidoPagina();
+	uint32 *pila0 = pidoPagina();
+	uint16 *video = (uint16 *) pidoPagina();
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
 	mapear_pagina(directorio, eip, eip, PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) pila, (dword) pila, PRESENT | WRITE | USUARIO);
-	mapear_pagina(directorio, (dword) pila0, (dword) pila0, PRESENT | WRITE | SUPERVISOR);
+	mapear_pagina(directorio, (uint32) pila, (uint32) pila, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (uint32) pila0, (uint32) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
-	mapear_pagina(directorio, (dword) 0xB8000, (dword) video, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, (uint32) 0xB8000, (uint32) video, PRESENT | WRITE | USUARIO);
 
 	// 3ro: crear una entrada de TSS e inicializarla
-	byte pos_TSS = buscar_TSS_vacia();
-	crear_TSS(pos_TSS, (dword) directorio, (dword) eip, USER_EFLAGS, ((dword)pila) + TAM_PAG, ((dword)pila0) + TAM_PAG);
+	uint8 pos_TSS = buscar_TSS_vacia();
+	crear_TSS(pos_TSS, (uint32) directorio, (uint32) eip, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
 
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
-	word pid = buscar_entradaGDT_vacia();
-	gdt_vector[pid] = make_descriptor((dword) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
+	uint16 pid = buscar_entradaGDT_vacia();
+	gdt_vector[pid] = make_descriptor((uint32) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
 	// 5to: crear entrada de BCP e inicializarla
 	crear_entradaBCP(pid, ACTIVO, directorio, video);
@@ -123,22 +127,22 @@ void cargarTarea(dword eip){
 
 
 
-void matarTarea(byte bcpPos){
+void matarTarea(uint8 bcpPos){
 	cambiar_estado(bcpPos, MATAR);
 }
 
 
 
-void mapeo_paginas_default(dword* directorio){
+void mapeo_paginas_default(uint32* directorio){
 	
 	//pagina en donde empieza el codigo del kernel
-	dword kernel_init = ((dword) &make_descriptor) & 0xFFFFF000;
+	uint32 kernel_init = ((uint32) &make_descriptor) & 0xFFFFF000;
 	
 	//pagina siguiente a la pagina donde termina el kernel
-	dword kernel_end = ( ((dword) &command[99]) & 0xFFFFF000) + TAM_PAG;
+	uint32 kernel_end = ( ((uint32) &command[99]) & 0xFFFFF000) + TAM_PAG;
 	
 	//mapeo la pagina en donde esta la estructura de la GDT
-	mapear_pagina(directorio, (dword) gdt_vector, (dword) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
+	mapear_pagina(directorio, (uint32) gdt_vector, (uint32) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
 	
 	//mapeo todas las paginas en donde se encuentra el kernel
 	while(kernel_init != kernel_end){
@@ -150,9 +154,9 @@ void mapeo_paginas_default(dword* directorio){
 
 
 
-byte buscar_entradaBCP_matar(){
+uint8 buscar_entradaBCP_matar(){
 
-	byte res = 0;
+	uint8 res = 0;
 	while( (res < CANT_TAREAS) && (BCP[res].estado != MATAR) ){
 		res++;
 	}
@@ -161,21 +165,21 @@ byte buscar_entradaBCP_matar(){
 }
 
 
-void info_BCP(byte index){
+void info_BCP(uint8 index){
 	mover_puntero(10,0);
 	printf("Entrada BCP: ", CELESTE_L); printdword(index, CELESTE_L); printf("\n",0);
 	printf("pid: ", GRIS_L | BRILLANTE); printdword(BCP[index].pid, GRIS_L | BRILLANTE); printf("\n",0);
 	printf("estado: ", GRIS_L | BRILLANTE); printdword(BCP[index].estado, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("directorio: ", GRIS_L | BRILLANTE); printdword((dword) BCP[index].entrada_directorio, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("directorio: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].entrada_directorio, GRIS_L | BRILLANTE); printf("\n",0);
 	printf("siguiente: ", GRIS_L | BRILLANTE); printdword(BCP[index].sig, GRIS_L | BRILLANTE); printf("\n",0);
 	printf("anterior: ", GRIS_L | BRILLANTE); printdword(BCP[index].ant, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((dword) BCP[index].pantalla, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].pantalla, GRIS_L | BRILLANTE); printf("\n",0);
 }
 
 
-void kill_app(word bcpPos){
+void kill_app(uint16 bcpPos){
 	
-	byte running = FALSE;
+	uint8 running = FALSE;
 	
 	//solo mato a las tareas que estan corriendo o activas
 	if( (BCP[bcpPos].estado == CORRIENDO) || (BCP[bcpPos].estado == ACTIVO)){
@@ -201,25 +205,25 @@ void exit(){
 }
 
 
-void desaparecerTarea(byte bcpPos){
+void desaparecerTarea(uint8 bcpPos){
 
 	//pongo en 0 y libero las paginas que se pidieron para el directorio y las tablas de pagina
 	liberar_directorio(BCP[bcpPos].entrada_directorio);
 
 	//recupero la direccion de la tss
-	Tss* task_tss = (Tss*) ( ( ((dword) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
-				 ( (word) gdt_vector[BCP[bcpPos].pid].base1) );
+	Tss* task_tss = (Tss*) ( ( ((uint32) gdt_vector[BCP[bcpPos].pid].base2) << 16 ) |\
+				 ( (uint16) gdt_vector[BCP[bcpPos].pid].base1) );
 
 	//recupero la dir de la pila
-	byte* task_pila = (byte*) (task_tss->ebp & 0xFFFFF000);
+	uint8* task_pila = (uint8*) (task_tss->ebp & 0xFFFFF000);
 
 	//pongo en 0 y libero pagina de la pila
 	setmem(task_pila,0x00,TAM_PAG);
-	liberoPagina((dword*) task_pila);
+	liberoPagina((uint32*) task_pila);
 
 	//pongo en 0 y libero pagina del video
-	setmem((byte*) BCP[bcpPos].pantalla,0x00,80*24*2);
-	liberoPagina((dword*) BCP[bcpPos].pantalla);
+	setmem((uint8*) BCP[bcpPos].pantalla,0x00,80*24*2);
+	liberoPagina((uint32*) BCP[bcpPos].pantalla);
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);

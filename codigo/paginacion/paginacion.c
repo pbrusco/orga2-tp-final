@@ -3,18 +3,18 @@
 #include "../memoria/memoria.h"
 #include "../pantalla/pantalla.h"
 
-extern dword memoria_total;
+extern uint32 memoria_total;
 
 
 // directorio_entry es la direccion de la entrada de directorio a la cual corresponde la dir_tabla
-void mapear_tabla (dword *directorio_entry, dword dir_tabla, word atributos){
+void mapear_tabla (uint32 *directorio_entry, uint32 dir_tabla, uint16 atributos){
 	*directorio_entry = (dir_tabla & 0xFFFFF000) | (atributos & 0x00000FFF);
 }
 
 // entry es la direccion del directorio
-void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atributos){
+void mapear_pagina(uint32 *entry, uint32 dir_virtual, uint32 dir_real, uint16 atributos){
 	
-	dword offset = 0;
+	uint32 offset = 0;
 	
 	//muevo el puntero del directorio a la entrada del directorio que corresponda
 	offset = dir_virtual / OFFSET_TABLA;
@@ -22,9 +22,9 @@ void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atribut
 	
 	//me fijo si la tabla esta presente o no, y si no lo esta agrego una tabla de pagina
 	//notar que esto no se usa para la paginacion del kernel
-	if( (*entry & 0x00000001) != (dword) PRESENT){
-		dword* tabla = pidoPagina();
-		mapear_tabla(entry, (dword) tabla, atributos);
+	if( (*entry & 0x00000001) != (uint32) PRESENT){
+		uint32* tabla = pidoPagina();
+		mapear_tabla(entry, (uint32) tabla, atributos);
 	}
 	
 	//si tengo que hacer una escritura y no tengo permisos para escribir, cambio los permisos
@@ -33,7 +33,7 @@ void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atribut
 	}
 	
 	//muevo el puntero a la tabla que corresponda
-	entry = (dword *) ( (*entry) & 0xFFFFF000);
+	entry = (uint32 *) ( (*entry) & 0xFFFFF000);
 	
 	//muevo el puntero a la entrada de tabla que corresponda
 	offset = dir_virtual / OFFSET_TABLA;
@@ -45,16 +45,16 @@ void mapear_pagina(dword *entry, dword dir_virtual, dword dir_real, word atribut
 }
 
 
-dword obtener_mapeo(dword *directorio, dword dir_virtual){
+uint32 obtener_mapeo(uint32 *directorio, uint32 dir_virtual){
 	
-	dword offset = 0;
+	uint32 offset = 0;
 	
 	//muevo el puntero del directorio a la entrada del directorio que corresponda
 	offset = dir_virtual / OFFSET_TABLA;
 	directorio += offset;
 	
 	//muevo el puntero a la tabla que corresponda
-	directorio = (dword *) ( (*directorio) & 0xFFFFF000);
+	directorio = (uint32 *) ( (*directorio) & 0xFFFFF000);
 	
 	//muevo el puntero a la entrada de tabla que corresponda
 	dir_virtual = dir_virtual - (offset * OFFSET_TABLA);
@@ -66,12 +66,12 @@ dword obtener_mapeo(dword *directorio, dword dir_virtual){
 
 
 void iniciar_paginacion_kernel(){
-	dword *dir_entry = (dword *) DIR_DIRECTORIO;
-	dword tabla_entry = (DIR_DIRECTORIO + 0x1000);
-	dword dir_virtual_y_real = 0;
+	uint32 *dir_entry = (uint32 *) DIR_DIRECTORIO;
+	uint32 tabla_entry = (DIR_DIRECTORIO + 0x1000);
+	uint32 dir_virtual_y_real = 0;
 	
-	dword cant_entradas_directorio = memoria_total / 4;//4MB por entrada de directorio
-	dword cant_entradas_tabla;
+	uint32 cant_entradas_directorio = memoria_total / 4;//4MB por entrada de directorio
+	uint32 cant_entradas_tabla;
 	
 	while(cant_entradas_directorio > 0){
 	
@@ -81,7 +81,7 @@ void iniciar_paginacion_kernel(){
 		
 		while(cant_entradas_tabla > 0){
 			//mapeo las tablas a paginas fisicas con identity mapping
-			mapear_pagina((dword *) DIR_DIRECTORIO, dir_virtual_y_real, dir_virtual_y_real, SUPERVISOR | WRITE | PRESENT);
+			mapear_pagina((uint32 *) DIR_DIRECTORIO, dir_virtual_y_real, dir_virtual_y_real, SUPERVISOR | WRITE | PRESENT);
 			cant_entradas_tabla--;
 			dir_virtual_y_real += 0x1000;
 		}
@@ -94,12 +94,12 @@ void iniciar_paginacion_kernel(){
 }
 
 
-void liberar_directorio(dword* dir_entry){
+void liberar_directorio(uint32* dir_entry){
 	
 	//declaro variables que voy a usar para indexar las tablas y el directorio
-	word indice_d;
-	word indice_t;
-	dword* table_entry;
+	uint16 indice_d;
+	uint16 indice_t;
+	uint32* table_entry;
 	
 	//para todas las entradas del directorio
 	for(indice_d = 0; indice_d < 1024;indice_d++){
@@ -108,7 +108,7 @@ void liberar_directorio(dword* dir_entry){
 		if( (*dir_entry & 1) == PRESENT ){
 	
 			//inicio variables
-			table_entry = (dword*) (*dir_entry & 0xFFFFF000);
+			table_entry = (uint32*) (*dir_entry & 0xFFFFF000);
 			
 			//para cada entrada de la tabla
 			for(indice_t = 0; indice_t < 1024;indice_t++){
@@ -118,22 +118,22 @@ void liberar_directorio(dword* dir_entry){
 
 					//limpio y libero la pagina, siempre que la misma este por encima de los 2MB
 					if(*table_entry >= 2*MB){
-						setmem((byte*) (*table_entry & 0xFFFFF000), 0x00, TAM_PAG);
-						liberoPagina((dword*) *table_entry);
+						setmem((uint8*) (*table_entry & 0xFFFFF000), 0x00, TAM_PAG);
+						liberoPagina((uint32*) *table_entry);
 					}
 				}
 				table_entry++;
 			}
 			
 			//luego de liberar y limpiar todo, limpio y libero la pagina usada para la tabla
-			setmem((byte*) (*dir_entry & 0xFFFFF000), 0x00, TAM_PAG);
-			liberoPagina((dword*) (*dir_entry & 0xFFFFF000));
+			setmem((uint8*) (*dir_entry & 0xFFFFF000), 0x00, TAM_PAG);
+			liberoPagina((uint32*) (*dir_entry & 0xFFFFF000));
 		}
 		dir_entry++;
 	}
 	
 	//una vez limpias y libres todas las paginas y las tablas, limpio y libero el directorio
-	dir_entry -= 1024;//notar que luego del for, queda apuntando al primer dword de la siguiente pagina
-	setmem((byte*) dir_entry, 0x00, TAM_PAG);
+	dir_entry -= 1024;//notar que luego del for, queda apuntando al primer uint32 de la siguiente pagina
+	setmem((uint8*) dir_entry, 0x00, TAM_PAG);
 	liberoPagina(dir_entry);
 }

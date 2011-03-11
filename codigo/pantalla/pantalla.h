@@ -39,8 +39,6 @@
 
 
 
- //TODO: ver porque no anda cuando lo pongo en el .c como en el resto de los archivos
-
 
 //FUNCIONES DE DEBUGGING
 
@@ -51,26 +49,26 @@ void avanzar_puntero();
 void retroceder_puntero();
 
 /*Mueve el puntero de la pantalla hasta fila y columna.*/
-void mover_puntero(byte fila, byte columna);
+void mover_puntero(uint8 fila, uint8 columna);
 
 /*Avanza el puntero de la pantalla una fila.*/
 void salto_de_linea();
 
 /*printf la vamos a usar sólo para imprimir caracteres.*/
-void printf(const char *frase, const byte atrib);
+void printf(const int8 *frase, const uint8 atrib);
 
 /*printdword se usará para ver valores de variables.
-Recibe como parámetros la dword a imprimir y los atributos de escritura (el byte alto es la base a usar y el bajo son los atributos de impresion, como el color, brillo, etc)*/
-void printdword(const dword var, const word atr);
+Recibe como parámetros la dword a imprimir y los atributos de escritura (el uint8 alto es la base a usar y el bajo son los atributos de impresion, como el color, brillo, etc)*/
+void printdword(const uint32 var, const uint16 atr);
 
 /*Escribe un caracter en la pantalla*/
-void putc(char c, byte atrib);
+void putc(int8 c, uint8 atrib);
 
 /*Borra el ultimo caracter de la pantalla*/
 void borrarc();
 
 /*Deja en buffer un string que representa al numero pasado en "n" escrito en base "base".*/
-void num2char(dword n, byte* buffer, dword base);
+void num2char(uint32 n, uint8* buffer, uint32 base);
 
 /*Limpia la pantalla.*/
 void clear_screen();
@@ -87,7 +85,7 @@ void clear_screen();
 /*La idea es copiar 23 renglones enteros de la tarea "pid". Recordar que la pantalla será de 80*23, de manera de dejarle el ultimo "renglon" para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
 IMPORTANTE: ESTA FUNCION DEBE SER LLAMADA UNICAMENTE POR EL KERNEL, YA QUE ES EL UNICO QUE PUEDE VER Y MODIFICAR EL DIRECTORIO Y LAS TABLAS DE PAGINAS DE TODAS LAS TAREAS.
 */
-void mostrar_pantalla_entera(byte bcpPos);
+void mostrar_pantalla_entera(uint8 bcpPos);
 
 
 /*limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado*/
@@ -100,7 +98,7 @@ void clear_info_line();
 void removerc();
 
 /*Escribe un caracter en la linea de comandos*/
-void agregarc(byte letra, byte atrib);
+void agregarc(uint8 letra, uint8 atrib);
 
 
 /*
@@ -115,8 +113,8 @@ IDEA PARA LAS PANTALLAS:
 
 
 
-int char2num(char c);
-char num2char2(const int n);
+int32 char2num(int8 c);
+int8 num2char2(const int32 n);
 
 
 

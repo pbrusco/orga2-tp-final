@@ -10,37 +10,37 @@ extern BCP_Entry BCP[];
 /********************************************************************\
 ****************VARIABLES Y FUNCIONES DE DEBUGGING*******************\
 *********************************************************************/
-word *puntero_pantalla = (word*) DIR_INI_PANTALLA;
+uint16 *puntero_pantalla = (uint16*) DIR_INI_PANTALLA;
 
 
 void avanzar_puntero(){
 	puntero_pantalla++;
-	if( (dword) puntero_pantalla >= DIR_FIN_PANTALLA )
-		puntero_pantalla = (word *) DIR_INI_PANTALLA;
+	if( (uint32) puntero_pantalla >= DIR_FIN_PANTALLA )
+		puntero_pantalla = (uint16 *) DIR_INI_PANTALLA;
 }
 
 void retroceder_puntero(){
 	puntero_pantalla--;
-	if( (dword) puntero_pantalla < DIR_INI_PANTALLA )
-		puntero_pantalla = (word *) DIR_FIN_PANTALLA;
+	if( (uint32) puntero_pantalla < DIR_INI_PANTALLA )
+		puntero_pantalla = (uint16 *) DIR_FIN_PANTALLA;
 }
 
-void mover_puntero(byte fila, byte columna){
-	puntero_pantalla = (word *) (DIR_INI_PANTALLA + (80*2*fila) + (columna*2));
+void mover_puntero(uint8 fila, uint8 columna){
+	puntero_pantalla = (uint16 *) (DIR_INI_PANTALLA + (80*2*fila) + (columna*2));
 }
 
 void salto_de_linea(){
-	byte fila_actual = (((dword) puntero_pantalla) % DIR_INI_PANTALLA) / 160;
-	puntero_pantalla = (word*) (DIR_INI_PANTALLA + 160*(fila_actual+1));
-	if( ((dword) puntero_pantalla) >= DIR_FIN_PANTALLA){
-		puntero_pantalla = (word *) DIR_INI_PANTALLA;
+	uint8 fila_actual = (((uint32) puntero_pantalla) % DIR_INI_PANTALLA) / 160;
+	puntero_pantalla = (uint16*) (DIR_INI_PANTALLA + 160*(fila_actual+1));
+	if( ((uint32) puntero_pantalla) >= DIR_FIN_PANTALLA){
+		puntero_pantalla = (uint16 *) DIR_INI_PANTALLA;
 	}
 		
 }
 
-void printf(const char *frase, const byte atrib){
+void printf(const int8 *frase, const uint8 atrib){
 
-	char c = *frase;
+	int8 c = *frase;
 
 	while(c != '\0') {
 		if(c != '\n')
@@ -49,14 +49,14 @@ void printf(const char *frase, const byte atrib){
 			salto_de_linea();
 		
 		frase++;
-		c = (byte) *frase;
+		c = (uint8) *frase;
 	}
 }
 
-void printdword(const dword var, const word atr){
+void printdword(const uint32 var, const uint16 atr){
 		
 		//recupero la base
-		byte base = (byte) (atr >> 8);
+		uint8 base = (uint8) (atr >> 8);
 		
 		//si la base es cero, pongo por default base 10
 		if(base == 0){
@@ -64,35 +64,35 @@ void printdword(const dword var, const word atr){
 		}
 		
 		//recupero los atributos de impresion
-		byte atrib = (byte) (atr & 0x00FF);
+		uint8 atrib = (uint8) (atr & 0x00FF);
 		
 		//aca guardo los digitos
-		byte buffer[12];
+		uint8 buffer[12];
 		
 		num2char(var, buffer, base);
-		byte i=0;
+		uint8 i=0;
 		while(buffer[i] != '\0') {
 		 	putc(buffer[i], atrib);
 			i++;
 		}
 }
 
-void putc(char c, byte atrib){
-	*puntero_pantalla = ( ((word) atrib) << 8 ) | ( (word) c );
+void putc(int8 c, uint8 atrib){
+	*puntero_pantalla = ( ((uint16) atrib) << 8 ) | ( (uint16) c );
 	avanzar_puntero();
 }
 
 
 void borrarc(){
 	retroceder_puntero();
-	*puntero_pantalla = ( (word) ' ' );
+	*puntero_pantalla = ( (uint16) ' ' );
 }
 
 
-void num2char(dword n, byte* buffer, dword base){
+void num2char(uint32 n, uint8* buffer, uint32 base){
 
-	byte digits[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-	word i = 0;
+	uint8 digits[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	uint16 i = 0;
 
 	//genera los digitos al reves
 	do {
@@ -104,10 +104,10 @@ void num2char(dword n, byte* buffer, dword base){
 	i--;
 
 	//reverse buffer
-	word size = i + 1;
-	word j=0;
+	uint16 size = i + 1;
+	uint16 j=0;
 	while(j < size/2) {
-		byte tmp = buffer[i];
+		uint8 tmp = buffer[i];
 		buffer[i] = buffer[j];
 		buffer[j] = tmp;
 		j++;
@@ -116,12 +116,12 @@ void num2char(dword n, byte* buffer, dword base){
 }
 
 void clear_screen(){
-	puntero_pantalla = (word *) DIR_INI_PANTALLA;
-	while( (dword) puntero_pantalla != DIR_FIN_PANTALLA){
+	puntero_pantalla = (uint16 *) DIR_INI_PANTALLA;
+	while( (uint32) puntero_pantalla != DIR_FIN_PANTALLA){
 		*puntero_pantalla = 0x0000;
 		puntero_pantalla++;
 	}
-	puntero_pantalla = (word *) DIR_INI_PANTALLA;
+	puntero_pantalla = (uint16 *) DIR_INI_PANTALLA;
 }
 
 
@@ -130,17 +130,17 @@ void clear_screen(){
 *********************************************************************/
 
 //esta variable contiene el indice de la BCP de la tarea que se está viendo por pantalla
-byte tarea_en_pantalla;//, tarea_a_mostrar;
+uint8 tarea_en_pantalla;//, tarea_a_mostrar;
 
 //este es el puntero que se va a usar para la consola
-word* cursor_consola = (word*) (DIR_INI_PANTALLA + 80*2*24 + 4);
+uint16* cursor_consola = (uint16*) (DIR_INI_PANTALLA + 80*2*24 + 4);
 
 //este puntero se va a usar para mostrar informacion
-word* cursor_informacion = (word*) DIR_INI_PANTALLA;
+uint16* cursor_informacion = (uint16*) DIR_INI_PANTALLA;
 
-char* prompt = "$>";
+int8* prompt = "$>";
 
-void mostrar_pantalla_entera(byte tarea_a_mostrar){
+void mostrar_pantalla_entera(uint8 tarea_a_mostrar){
 
 	//si tengo que cambiar la pantalla
 	if(tarea_en_pantalla != tarea_a_mostrar){
@@ -148,14 +148,14 @@ void mostrar_pantalla_entera(byte tarea_a_mostrar){
 		//si la tarea en pantalla no esta muerta
 		if(BCP[tarea_en_pantalla].estado != MUERTO){
 			//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
-			cpmem((byte*) ( DIR_INI_PANTALLA + (80*2) ),
-			 		(byte*) ( ((dword) BCP[tarea_en_pantalla].pantalla) + (80*2)),
+			cpmem((uint8*) ( DIR_INI_PANTALLA + (80*2) ),
+			 		(uint8*) ( ((uint32) BCP[tarea_en_pantalla].pantalla) + (80*2)),
 			 		TAM_PANTALLA_TAREA);
 		}
 		
 		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(	(byte*) (((dword) BCP[tarea_a_mostrar].pantalla) + 80*2),
-			(byte*) (DIR_INI_PANTALLA + (80*2)),
+		cpmem(	(uint8*) (((uint32) BCP[tarea_a_mostrar].pantalla) + 80*2),
+			(uint8*) (DIR_INI_PANTALLA + (80*2)),
 			TAM_PANTALLA_TAREA);
 
 		
@@ -164,7 +164,7 @@ void mostrar_pantalla_entera(byte tarea_a_mostrar){
 			//remapeo la pagina de video de la tarea a donde le corresponde escribir
 			mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
 					DIR_INI_PANTALLA,
-					(dword) BCP[tarea_en_pantalla].pantalla,
+					(uint32) BCP[tarea_en_pantalla].pantalla,
 					USUARIO | WRITE | PRESENT);
 		}
 		
@@ -180,38 +180,38 @@ void mostrar_pantalla_entera(byte tarea_a_mostrar){
 }
 
 void clear_command_line(){
-	setmem((byte*) DIR_INI_PANTALLA + 80*2*24, 0x00, 80*2);
-	cursor_consola = (word *) DIR_INI_COMMAND;
+	setmem((uint8*) DIR_INI_PANTALLA + 80*2*24, 0x00, 80*2);
+	cursor_consola = (uint16 *) DIR_INI_COMMAND;
 	mover_puntero(24,0);
 	printf(prompt, COLOR_PROMPT);
 }
 
 
 void clear_info_line(){
-	setmem((byte*) DIR_INI_PANTALLA, 0x00, 80*2);
-	cursor_informacion = (word*) DIR_INI_PANTALLA;
+	setmem((uint8*) DIR_INI_PANTALLA, 0x00, 80*2);
+	cursor_informacion = (uint16*) DIR_INI_PANTALLA;
 }
 
 
 void removerc(){
 	//si no esta el cursor al lado del prompt
-	if( ((dword)cursor_consola) != DIR_INI_COMMAND ){
+	if( ((uint32)cursor_consola) != DIR_INI_COMMAND ){
 		cursor_consola--;
 		*cursor_consola = 0x0000;
 	}
 }
 
 
-void agregarc(byte letra, byte atrib){
+void agregarc(uint8 letra, uint8 atrib){
 	//si NO se llenó linea en la que estoy intentando escribir
-	if(   ( ((dword) cursor_consola) != (DIR_FIN_PANTALLA) )   ){
-		*cursor_consola = ( ((word) atrib) << 8 ) | ( (word) letra );
+	if(   ( ((uint32) cursor_consola) != (DIR_FIN_PANTALLA) )   ){
+		*cursor_consola = ( ((uint16) atrib) << 8 ) | ( (uint16) letra );
 		cursor_consola++;
 	}
 }
 
 
-char num2char2(const int n){
+int8 num2char2(const int32 n){
 
 switch(n){
     case 0:
@@ -240,7 +240,7 @@ switch(n){
 
 }
 
-int char2num(char c){
+int32 char2num(int8 c){
 
   switch(c){
     case '0':

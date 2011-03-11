@@ -39,11 +39,11 @@ entrada de tabla de pagina:
 #define SUPERVISOR	0x0
 #define USUARIO		0x4
 
-void mapear_tabla (dword *directorio, dword dir_tabla, word atributos);
-void mapear_pagina(dword *directorio, dword dir_virtual, dword dir_real, word atributos);
+void mapear_tabla (uint32 *directorio, uint32 dir_tabla, uint16 atributos);
+void mapear_pagina(uint32 *directorio, uint32 dir_virtual, uint32 dir_real, uint16 atributos);
 
 // Dado un directorio y una dirección virtual, devuelve a qué página física está mapeada y sus atributos
-dword obtener_mapeo(dword *directorio, dword dir_virtual);
+uint32 obtener_mapeo(uint32 *directorio, uint32 dir_virtual);
 
 #define OFFSET_TABLA 0X400000
 #define OFFSET_PAGINA 0X1000
@@ -52,7 +52,7 @@ dword obtener_mapeo(dword *directorio, dword dir_virtual);
 void iniciar_paginacion_kernel();
 
 //funcion que dada la direccion de un directorio pone en cero (o NO presente) todas las tablas y paginas mapeadas y libera las paginas utilizadas para contenerlas
-void liberar_directorio(dword* dir_entry);
+void liberar_directorio(uint32* dir_entry);
 
 
 #endif

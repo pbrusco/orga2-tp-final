@@ -4,6 +4,7 @@
 #include "../pantalla/pantalla.h"
 
 extern BCP_Entry BCP[];
+extern uint8 tarea_actual;
 
 // este registro lo voy a usar para hacer el "jmp" para cambiar de tarea
 switch_reg salto;

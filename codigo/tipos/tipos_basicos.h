@@ -28,13 +28,17 @@
 #define USER_DS 0x20
 
 
-//TIPOS BASICOS
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int dword;
-typedef unsigned long long qword;
+//TIPOS SIGNADOS
+typedef char int8;
+typedef short int int16;
+typedef int int32;
+typedef long long int int64;
 
-
+//TIPOS SIN SIGNO
+typedef unsigned char uint8;
+typedef unsigned short int uint16;
+typedef unsigned int uint32;
+typedef unsigned long long int uint64;
 
 
 //definicion de estados posibles para las tareas en la BCP

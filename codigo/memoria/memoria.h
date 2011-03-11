@@ -13,10 +13,10 @@
 
 /* Variables globales */
 /*--------------------*/
-dword memoria_total;		// Tamaño en MB de toda la memoria del sistema.
-dword paginas_libres;		// Cantidad de páginas libres en la memoria del sistema.
-byte *dir_init_bitmap;		// Puntero al inicio del Bitmap de memoria.
-byte *dir_end_bitmap;		// Puntero a la ultima dirección válida del Bitmap de memoria.
+uint32 memoria_total;		// Tamaño en MB de toda la memoria del sistema.
+uint32 paginas_libres;		// Cantidad de páginas libres en la memoria del sistema.
+uint8 *dir_init_bitmap;		// Puntero al inicio del Bitmap de memoria.
+uint8 *dir_end_bitmap;		// Puntero a la ultima dirección válida del Bitmap de memoria.
 
 
 /* Funciones */
@@ -29,16 +29,16 @@ void contarMemoria();
 void llenarBitmap();
 
 //~ Devuelve un puntero a una pagina libre, y la marca como ocupada en el Bitmap.
-dword* pidoPagina();
+uint32* pidoPagina();
 
 //~ Dada un puntero a una pagina, la marca como libera dentro del Bitmap.
-void liberoPagina(dword *);
+void liberoPagina(uint32 *);
 
 //~ Setea las posiciones de memoria desde "dir" hasta "dir"+"cant" con lo indicado en set.
-void setmem(byte* dir, byte set, dword cant);
+void setmem(uint8* dir, uint8 set, uint32 cant);
 
 // Copia "cant" byetes desde la posición de memoria "from" hacia la posiciób "to".
-void cpmem(byte* from, byte* to, dword cant);
+void cpmem(uint8* from, uint8* to, uint32 cant);
 
 
 
@@ -79,10 +79,10 @@ void donde_esta_el_kernel();
 
 /* MEMORIA AVANZADA (es un artilugio mucho muy complejo) */
 
-typedef dword Entry_Heap;
+typedef uint32 Entry_Heap;
 
 typedef struct Heap_s{
-	dword bytes_disponibles;
+	uint32 bytes_disponibles;
 	Entry_Heap* init; 
 	Entry_Heap* end;
 } __attribute__((__packed__, aligned (8))) Heap;
@@ -94,7 +94,7 @@ Debería ejecutarse la primera vez que una tarea hace un malloc, en cuyo caso, l
 Ponemos un limite para la cantidad de bytes maximos que se le dan a un proceso? 2% de la memoria total les parece?
 
 */
-void crear_heap(Heap* heap_dir, dword cant_bytes);
+void crear_heap(Heap* heap_dir, uint32 cant_bytes);
 
 
 /*
@@ -102,10 +102,10 @@ Precondicion: ya debe existir un Heap.
 Si hay algún error o no hay suficiente espacio, devuelve 0.
 cant_bytes no puede exceder los 2 GB (2^31 - 1 como maximo)
 */
-void* pedir_memoria(Heap* heap_dir, dword cant_bytes);
+void* pedir_memoria(Heap* heap_dir, uint32 cant_bytes);
 
 //auxiliar de "pedir_memoria"
-Entry_Heap* devolverDondeEntre(Heap* heap_dir, dword cant_bytes);
+Entry_Heap* devolverDondeEntre(Heap* heap_dir, uint32 cant_bytes);
 
 
 /* Precondicion: ya debe existir un Heap.

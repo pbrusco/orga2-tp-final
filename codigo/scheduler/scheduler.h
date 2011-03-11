@@ -3,8 +3,8 @@
 
 
 typedef struct switch_reg_s{
-	dword offset;
-	word selector;
+	uint32 offset;
+	uint16 selector;
 } __attribute__((__packed__, aligned (8))) switch_reg; 
 
 
