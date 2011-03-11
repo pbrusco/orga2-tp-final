@@ -8,33 +8,33 @@
 #include "../memoria/memoria.h"
 
 extern BCP_Entry BCP[];
-extern word* cursor_consola, cursor_informacion;
-extern byte tarea_a_mostrar, tarea_en_pantalla;
+extern uint16* cursor_consola, cursor_informacion;
+extern uint8 tarea_a_mostrar, tarea_en_pantalla;
 extern gdt_entry gdt_vector[];
 
 #define TAREAS_EN_MEMORIA 3
 
 Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
 
-						(Info_Tareas) {(word) 0, (byte) 0, (byte) 5},
-						(Info_Tareas) 	{(word) 0x2000,//eip
-								 (byte) 0,//bcp
-								 (byte) 0,//gdt
+						(Info_Tareas) {(uint16) 0, (uint8) 0, (uint8) 5},
+						(Info_Tareas) 	{(uint16) 0x2000,//eip
+								 (uint8) 0,//bcp
+								 (uint8) 0,//gdt
 								},
-						(Info_Tareas) 	{(word) 0x2040,//eip
-								 (byte) 0,//bcp
-								 (byte) 0,//gdt
+						(Info_Tareas) 	{(uint16) 0x2040,//eip
+								 (uint8) 0,//bcp
+								 (uint8) 0,//gdt
 								}
 							};
 
-char command[TAM_COMMAND];
-byte command_position = 0;
+int8 command[TAM_COMMAND];
+uint8 command_position = 0;
 
 
-void console(short int tecla) {
+void console(int16 tecla) {
 
-	dword cr3_actual;
-	dword cr3_kernel = DIR_DIRECTORIO;
+	uint32 cr3_actual;
+	uint32 cr3_kernel = DIR_DIRECTORIO;
 
 	//guardo el CR3 de la tarea actualmente ejecutandose
 	get_cr3(cr3_actual);
@@ -42,7 +42,7 @@ void console(short int tecla) {
 	set_cr3(cr3_kernel);
 
 
-	char c = getChar(tecla & 0x00FF);
+	int8 c = getChar(tecla & 0x00FF);
 
 	//si el codigo indica que se presiono una tecla
 	if(c < 0x80){
@@ -70,7 +70,7 @@ void console(short int tecla) {
 
 
 void inicializar_command(){
-	short e;
+	int16 e;
 	for (e = 0; e<TAM_COMMAND; e++){
 		command[e] = '?';
 	}
@@ -86,8 +86,8 @@ void remove_last_char_from_command(){
 
 
 void run (){
-  char first_word = extract_code(command);
-  int second_param = extract_number(command);
+  int8 first_word = extract_code(command);
+  int32 second_param = extract_number(command);
 
 
   switch(first_word){
@@ -124,7 +124,7 @@ void run (){
 }
 
 
-void add_char_to_command(char c){
+void add_char_to_command(int8 c){
 	if(command_position < TAM_COMMAND){
 		command[command_position] = c;
 		command_position++;
@@ -152,7 +152,7 @@ void help(){
 
 }
 
-void cargar_tarea(int id){
+void cargar_tarea(int32 id){
  if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
@@ -170,7 +170,7 @@ void cargar_tarea(int id){
 	}
 }
 
-void cargar_tarea_y_mostrar(int id){
+void cargar_tarea_y_mostrar(int32 id){
  if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
@@ -204,7 +204,7 @@ void show_running_tasks(){
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
 
-	word i = 6;
+	uint16 i = 6;
 	while( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
 		printdword(i, COLOR_INFO); printf("\n", 0);
 		i++;
@@ -219,7 +219,7 @@ void show_sleeping_tasks(){
 }
 
 
-void display_task(int id){
+void display_task(int32 id){
 
 	clear_screen();
 
@@ -238,7 +238,7 @@ void display_task(int id){
 	}
 }
 
-void display_merging_task(int id){
+void display_merging_task(int32 id){
   if (id >= TAREAS_EN_MEMORIA ){
     printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
   }
@@ -249,7 +249,7 @@ void display_merging_task(int id){
   }
 }
 
-void hide_task(int id){
+void hide_task(int32 id){
   if (id >= TAREAS_EN_MEMORIA ){
     printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
   }
@@ -261,7 +261,7 @@ void hide_task(int id){
 }
 
 
-void kill_task(int id){
+void kill_task(int32 id){
 	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea (0 es el kernel, pero no se mata!)", COLOR_INFO);
@@ -280,13 +280,13 @@ void kill_task(int id){
 	}
 }
 
-char extract_code(){
+int8 extract_code(){
   return command[0];
 }
 
-int extract_number(){
-  short i;
-  int n;
+int32 extract_number(){
+  int16 i;
+  int32 n;
   for(i = 0;i<100;i++){
     if (command[i] == ' ') {
       n = char2num(command[i+1]);

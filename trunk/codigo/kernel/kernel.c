@@ -5,7 +5,7 @@
 #include "../applications/console.h"
 
 extern BCP_Entry BCP[];
-extern word* cursor_consola;
+extern uint16* cursor_consola;
 
 void kernel_infinito(){
 
@@ -19,7 +19,7 @@ void kernel_infinito(){
 	inicializar_command();
 	
 
-	byte aMatar;
+	uint8 aMatar;
 
 	while(TRUE){
 	
@@ -38,14 +38,14 @@ void kernel_infinito(){
 
 
 // esto lo puse por si a alguno le interesa
-void update_cursor(int row, int col){
-	unsigned short position=(row*80) + col;
+void update_cursor(int32 row, int32 col){
+	uint16 position=(row*80) + col;
 
 	// cursor LOW port to vga INDEX register
 	outb(0x3D4, 0x0F);
-	outb(0x3D5, (unsigned char)(position&0xFF));
+	outb(0x3D5, (uint8)(position&0xFF));
 	// cursor HIGH port to vga INDEX register
 	outb(0x3D4, 0x0E);
-	outb(0x3D5, (unsigned char )((position>>8)&0xFF));
+	outb(0x3D5, (uint8)((position>>8)&0xFF));
 }
 

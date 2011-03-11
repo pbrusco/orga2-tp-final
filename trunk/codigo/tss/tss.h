@@ -5,51 +5,51 @@
 
 // Definicion de una TSS 
 typedef struct str_tss {
-	unsigned short ptl;
-	unsigned short  unused0;
-	unsigned int esp0;
-	unsigned short  ss0;
-	unsigned short  unused1;
-	unsigned int esp1;
-	unsigned short  ss1;
-	unsigned short  unused2;
-	unsigned int esp2;
-	unsigned short  ss2;
-	unsigned short  unused3;
-	unsigned int cr3;//265bytes
-	unsigned int eip;
-	unsigned int eflags;
-	unsigned int eax;
-	unsigned int ecx;
-	unsigned int edx;
-	unsigned int ebx;
-	unsigned int esp;
-	unsigned int ebp;//512bytes
-	unsigned int esi;
-	unsigned int edi;
-	unsigned short  es;
-	unsigned short  unused4;
-	unsigned short  cs;
-	unsigned short  unused5;
-	unsigned short  ss;
-	unsigned short  unused6;
-	unsigned short  ds;
-	unsigned short  unused7;
-	unsigned short  fs;
-	unsigned short  unused8;
-	unsigned short  gs;
-	unsigned short  unused9;//1KB
-	unsigned short  ldt;
-	unsigned short  unused10;
-	unsigned short  dtrap;
-	unsigned short  iomap;//1KB+64bytes
+	uint16 ptl;
+	uint16  unused0;
+	uint32 esp0;
+	uint16  ss0;
+	uint16  unused1;
+	uint32 esp1;
+	uint16  ss1;
+	uint16  unused2;
+	uint32 esp2;
+	uint16  ss2;
+	uint16  unused3;
+	uint32 cr3;//265bytes
+	uint32 eip;
+	uint32 eflags;
+	uint32 eax;
+	uint32 ecx;
+	uint32 edx;
+	uint32 ebx;
+	uint32 esp;
+	uint32 ebp;//512bytes
+	uint32 esi;
+	uint32 edi;
+	uint16  es;
+	uint16  unused4;
+	uint16  cs;
+	uint16  unused5;
+	uint16  ss;
+	uint16  unused6;
+	uint16  ds;
+	uint16  unused7;
+	uint16  fs;
+	uint16  unused8;
+	uint16  gs;
+	uint16  unused9;//1KB
+	uint16  ldt;
+	uint16  unused10;
+	uint16  dtrap;
+	uint16  iomap;//1KB+64bytes
 } __attribute__((__packed__, aligned (8))) Tss;
 
 
 /* Funciones */
 
-void crear_TSS(byte entrada, dword CR3, dword EIP, dword EFLAGS, dword pila, dword);
-byte buscar_TSS_vacia();
+void crear_TSS(uint8 entrada, uint32 CR3, uint32 EIP, uint32 EFLAGS, uint32 pila, uint32);
+uint8 buscar_TSS_vacia();
 void vaciar_TSS(Tss*);
 
 #endif //__TSS_H__ 

@@ -11,6 +11,6 @@ void kernel_infinito();
 
 
 //esta funcion mueve el cursor que titila en la pantalla
-void update_cursor(int row, int col);
+void update_cursor(int32 row, int32 col);
 
 #endif 

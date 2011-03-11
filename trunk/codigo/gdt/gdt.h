@@ -52,26 +52,26 @@
 
 //Tipo Registro de GDT 
 typedef struct gdt_desc {
-	word limite;
-	dword base;
+	uint16 limite;
+	uint32 base;
 } __attribute__((__packed__)) gdt_desc;
 
 //Tipo Segmento Descriptor de GDT
 typedef struct gdt_entry {
-	word limite1;		// Limite 0:15
-	word base1;			// Base 0:15
-	byte base2;			// Base 16:23
-	byte atr1;			// Presente (1 bit), DPL (2 bits),Sistema(1bit), Tipo (4bits)
-	byte atr2;			// Granularidad (1 bit), D/B (1 bit), 64bit_code (0), Available (1bit), Limite 16:19 (4 bits) 
-	byte base3;			// Base  24:31
+	uint16 limite1;		// Limite 0:15
+	uint16 base1;			// Base 0:15
+	uint8 base2;			// Base 16:23
+	uint8 atr1;			// Presente (1 bit), DPL (2 bits),Sistema(1bit), Tipo (4bits)
+	uint8 atr2;			// Granularidad (1 bit), D/B (1 bit), 64bit_code (0), Available (1bit), Limite 16:19 (4 bits) 
+	uint8 base3;			// Base  24:31
 } __attribute__((__packed__, aligned (8))) gdt_entry;
 
 
 	
 //funciones para modificar/manipular la GDT 
-gdt_entry make_descriptor(dword base, dword limite, byte atr1, byte atr2);
-word buscar_entradaGDT_vacia();
-void borrar_gdt_entry(word i);
+gdt_entry make_descriptor(uint32 base, uint32 limite, uint8 atr1, uint8 atr2);
+uint16 buscar_entradaGDT_vacia();
+void borrar_gdt_entry(uint16 i);
 
 
 
