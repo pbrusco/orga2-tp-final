@@ -16,14 +16,16 @@ extern gdt_entry gdt_vector[];
 
 Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
 
-						(Info_Tareas) {(uint16) 0, (uint8) 0, (uint8) 5},
-						(Info_Tareas) 	{(uint16) 0x2000,//eip
-								 (uint8) 0,//bcp
-								 (uint8) 0,//gdt
+						(Info_Tareas) {(uint32) 0, (uint32) 0, "kernel"},
+						(Info_Tareas) 	{
+								(uint32) 0x2000,//eip
+								(uint32) 67,//tam
+								(int8*) "relojito_rojo",//nombre
 								},
-						(Info_Tareas) 	{(uint16) 0x2040,//eip
-								 (uint8) 0,//bcp
-								 (uint8) 0,//gdt
+						(Info_Tareas) 	{
+								(uint32) 0x2043,//eip
+								(uint32) 103,//tam
+								(int8*) "relojito_celeste",//nombre
 								}
 							};
 
@@ -153,19 +155,16 @@ void help(){
 }
 
 void cargar_tarea(int32 id){
- if(id == 0 || id >= TAREAS_EN_MEMORIA ){
-		mover_puntero(0,0);
+	clear_info_line();
+	mover_puntero(0,0);
+ 	
+ 	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
+		
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
-		/*LO SIGUIENTE LO HAGO PARA RELLENAR LOS CAMPOS DE LA INFORMACION DE CADA TAREA,
-		Y ASI MANEJARME CON UN UNICO NUMERO DE TAREA A LA HORA DE CARGAR, MATAR Y MOSTRAR*/
-		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
-		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
-		/*********************************************************************************/
-
-		cargarTarea(tareas_en_memoria[id].eip);
-    printf("Se ha cargado con exito la tarea ", COLOR_INFO);
+		cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
+   	 	printf("Se ha cargado con exito la tarea ", COLOR_INFO);
 		printdword(id, COLOR_INFO);
 	}
 }
@@ -176,11 +175,8 @@ void cargar_tarea_y_mostrar(int32 id){
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
-		tareas_en_memoria[id].bcp_pos = buscar_entradaBCP_vacia();
-		tareas_en_memoria[id].gdt_pos = buscar_entradaGDT_vacia();
-
-		cargarTarea(tareas_en_memoria[id].eip);
-    display_task(id);
+		cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
+    	display_task(id);
 
 	}
 }
@@ -203,10 +199,17 @@ void show_running_tasks(){
 
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
-
+	printf("\tNombre\t|\tPID\n",COLOR_INFO);
+	
 	uint16 i = 6;
-	while( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
-		printdword(i, COLOR_INFO); printf("\n", 0);
+	uint8 bcpPos;
+	while( i < (6+CANT_TAREAS) ){
+		if( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
+			bcpPos = buscar_entradaBCP(i);
+			printf(BCP[bcpPos].nombre, COLOR_INFO);
+			printf("	|	", COLOR_INFO);
+			printdword(i, COLOR_INFO); printf("\n", 0);
+		}
 		i++;
 	}
 }
@@ -220,20 +223,23 @@ void show_sleeping_tasks(){
 
 
 void display_task(int32 id){
-
+	//recordar que "id" es el indice en la gdt del segmento tss de una tarea
+	
 	clear_screen();
 
-	if (id >= TAREAS_EN_MEMORIA ){
+	//si no está presente la tarea
+	if ( (gdt_vector[id].atr1 & PRESENTE) != PRESENTE ){
 		printf("ERROR!! tarea inexistente",COLOR_INFO);
 	}
 	else{
-		if(BCP[tareas_en_memoria[id].bcp_pos].estado != MUERTO){
+		uint8 bcpPos = buscar_entradaBCP(id);
+		if(BCP[bcpPos].estado != MUERTO){
 			printf("mostrando tarea ", COLOR_INFO);
 			printdword(id,COLOR_INFO);
-			mostrar_pantalla_entera(tareas_en_memoria[id].bcp_pos);
+			mostrar_pantalla_entera(bcpPos);
 		}
 		else{
-			printf("ERROR: No existe tal tarea", COLOR_INFO);
+			printf("ERROR: No existe tal tarea", COLOR_INFO);//TODO: esto creo que esta demás
 		}
 	}
 }
@@ -261,24 +267,21 @@ void hide_task(int32 id){
 }
 
 
-void kill_task(int32 id){
-	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
-		mover_puntero(0,0);
+void kill_task(int32 id){//recordar que id es el indice en la gdt del segmento tss de una tarea
+	mover_puntero(0,0);
+	if( (gdt_vector[id].atr1 & PRESENTE) != PRESENTE ){
 		printf("No existe tal tarea (0 es el kernel, pero no se mata!)", COLOR_INFO);
 	}
 	else{
 	  clear_screen();
 	  printf("k: Mataste a la tarea con id ", COLOR_INFO);
 	  printdword(id,COLOR_INFO);
-	  matarTarea(tareas_en_memoria[id].bcp_pos);
+	  matarTarea(id);//recordar que "id" es la posicion en la GDT del segmento tss de una tarea
 
-
-	  if(tarea_en_pantalla == tareas_en_memoria[id].bcp_pos){
-		  //paso a la pantalla del kernel
-		  mostrar_pantalla_entera(0);
-	  }
 	}
 }
+
+//TODO: estas funciones, no podrian hacerse mejor? digo, que levanten cualquier codigo y cualquier numero
 
 int8 extract_code(){
   return command[0];
@@ -295,7 +298,7 @@ int32 extract_number(){
       }
     }
   }
-  return 101;
+  return 101;//TODO: POR QUE?
 
 }
 

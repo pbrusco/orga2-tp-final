@@ -9,6 +9,7 @@ typedef struct BCP_Entry_s{
 	uint8 sig;			//siguiente tarea para el round robin scheduler
 	uint8 ant;			//anterior tarea para el round robin scheduler
 	uint16 *pantalla;			//puntero a la pagina destinada al video de la tarea
+	int8* nombre;
 } __attribute__((__packed__, aligned (8))) BCP_Entry;
 
 
@@ -21,12 +22,12 @@ void iniciar_BCP();
 uint16 buscar_entradaBCP_vacia();
 
 // llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
-void crear_entradaBCP(uint32 pid, uint8 estado, uint32* entrada_directorio, uint16 *pantalla);
+void crear_entradaBCP(uint32 pid, uint8 estado, uint32* entrada_directorio, uint16 *pantalla, int8* name);
 
 // cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
-void cambiar_estado(uint16 pid, uint8 estado_nuevo);
+void cambiar_estado(uint16 bcpPos, uint8 estado_nuevo);
 
-// devuelve la posicion en la BCP de la tarea "id"
+// devuelve la posicion en la BCP de la tarea "id". Recordar que "id" es la posicion de la entrada tss de la tarea en la gdt
 uint8 buscar_entradaBCP(uint16 id);
 
 // devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT_TAREAS
@@ -36,10 +37,10 @@ uint8 buscar_entradaBCP_matar();
 void info_BCP(uint8 index);
 
 // carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
-void cargarTarea(uint32 eip);
+void cargarTarea(uint32 eip, uint32 tam, int8* name);
 
 // Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla.
-// El param "id" es la posicion en la BCP de la tarea que se quiere eliminar.
+// El param "id" es la posicion en la GDT del segmento TSS de la tarea que se quiere eliminar.
 void matarTarea(uint8 id);
 
 

@@ -1,10 +1,10 @@
-ORG 0x2040
+ORG 0x2000
 BITS 32
-
 
 main:
 ; Funcion para dibujar el reloj.
-
+		xchg bx, bx
+		mov ecx, 0xB8500
 	next_clock:
 		inc DWORD [contador]
 		cmp DWORD [contador], 0xFFFF
@@ -18,7 +18,7 @@ main:
 		.ok:
 			add ebx, isrmessage1
 			mov al, [ebx]
-			mov [0xb8500], ax
+			mov [ecx], ax
 			inc DWORD [isrnumero]
 			jmp next_clock
 

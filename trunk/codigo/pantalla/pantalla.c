@@ -43,11 +43,18 @@ void printf(const int8 *frase, const uint8 atrib){
 	int8 c = *frase;
 
 	while(c != '\0') {
-		if(c != '\n')
-			putc(c, atrib);
-		else
+		if(c == '\n'){
 			salto_de_linea();
-		
+		}
+		else if(c == '\t'){
+			putc(' ', atrib);
+			putc(' ', atrib);
+			putc(' ', atrib);
+			putc(' ', atrib);
+		}
+		else{
+			putc(c, atrib);
+		}
 		frase++;
 		c = (uint8) *frase;
 	}
