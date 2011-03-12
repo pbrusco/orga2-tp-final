@@ -159,9 +159,9 @@ void cargar_tarea(int32 id){
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
-		cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
-   	 	printf("Se ha cargado con exito la tarea ", COLOR_INFO);
-		printdword(id, COLOR_INFO);
+		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
+   	 	printf("Se ha cargado con exito la tarea, PID: ", COLOR_INFO);
+		printdword(pid, COLOR_INFO);
 	}
 }
 
@@ -171,8 +171,8 @@ void cargar_tarea_y_mostrar(int32 id){
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
-		cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
-    	display_task(id);
+		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
+    	display_task(pid);
 
 	}
 }
