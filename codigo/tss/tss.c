@@ -1,6 +1,8 @@
 #include "../tipos/tipos_basicos.h"
 #include "tss.h"
 #include "../gdt/gdt.h"
+#include "../pantalla/pantalla.h"
+
 
 
 // Arreglo de TSSs
@@ -21,7 +23,7 @@ void crear_TSS(uint8 pos, uint32 CR3, uint32 EIP, uint32 EFLAGS, uint32 pila, ui
 	entry->esp = pila;
 	entry->ebp = pila;
 	//TODO: ver el valor que debe ir en los selectores
-	
+
 	entry->ss0 = 0x10;
 	entry->esp0 = ESP0;
 	entry->iomap = 0xFFFF;
@@ -34,15 +36,15 @@ uint8 buscar_TSS_vacia(){
 	//recordar que devuelve algo igual o mayor que CANT_TAREAS si no hay ningun lugar disponible
 	uint16 res = CANT_TAREAS;
 	uint16 i = 0;
-	
+
 	while(i < CANT_TAREAS){
 		if(TSS[i].cr3 == 0){
 			res = i;
 			i = CANT_TAREAS;
 		}
-		i++;	
+		i++;
 	}
-	
+
 	if(res == CANT_TAREAS)
 		return -1;
 	else
@@ -50,6 +52,23 @@ uint8 buscar_TSS_vacia(){
 }
 
 
+void info_TSS()
+{
+  mover_puntero(20,1);
+  int i = 0;
+  printf("TSS:",VERDE_L);
+
+  while(i < CANT_TAREAS){
+		 printdword(TSS[i].eip,AZUL_L|BASE16);
+		 printdword(TSS[i].esp,ROJO_L|BASE16);
+		 printdword(TSS[i].ebp,NARANJA_L|BASE16);
+		 printdword(i,VERDE_L);
+		 printf(",",AZUL_L);
+		  i++;
+	  }
+
+}
 void vaciar_TSS(Tss* tss_task){
 	tss_task->cr3 = 0;
 }
+

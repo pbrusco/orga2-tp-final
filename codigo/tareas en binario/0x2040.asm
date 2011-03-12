@@ -3,7 +3,7 @@ BITS 32
 
 main:
 ; Funcion para dibujar el reloj.
- ;xchg bx,bx
+
 	next_clock:
 
 		inc DWORD [contador]

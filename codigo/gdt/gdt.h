@@ -30,7 +30,7 @@
 #define READ_GDT        1 << 1
 #define ACCESED         1 << 0
 
-//Valores del campo SISTEMA del Segmento Descriptor de GDT 
+//Valores del campo SISTEMA del Segmento Descriptor de GDT
 #define LDT             2
 #define TASK_GATE       5
 
@@ -50,7 +50,7 @@
 //otras constantes
 #define TAM_TSS         0x67
 
-//Tipo Registro de GDT 
+//Tipo Registro de GDT
 typedef struct gdt_desc {
 	uint16 limite;
 	uint32 base;
@@ -62,17 +62,18 @@ typedef struct gdt_entry {
 	uint16 base1;			// Base 0:15
 	uint8 base2;			// Base 16:23
 	uint8 atr1;			// Presente (1 bit), DPL (2 bits),Sistema(1bit), Tipo (4bits)
-	uint8 atr2;			// Granularidad (1 bit), D/B (1 bit), 64bit_code (0), Available (1bit), Limite 16:19 (4 bits) 
+	uint8 atr2;			// Granularidad (1 bit), D/B (1 bit), 64bit_code (0), Available (1bit), Limite 16:19 (4 bits)
 	uint8 base3;			// Base  24:31
 } __attribute__((__packed__, aligned (8))) gdt_entry;
 
 
-	
-//funciones para modificar/manipular la GDT 
+
+//funciones para modificar/manipular la GDT
 gdt_entry make_descriptor(uint32 base, uint32 limite, uint8 atr1, uint8 atr2);
 uint16 buscar_entradaGDT_vacia();
 void borrar_gdt_entry(uint16 i);
-
+void info_GDT();
 
 
 #endif //__GDT_H__
+
