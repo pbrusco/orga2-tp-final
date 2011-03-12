@@ -35,7 +35,7 @@ void salto_de_linea(){
 	if( ((uint32) puntero_pantalla) >= DIR_FIN_PANTALLA){
 		puntero_pantalla = (uint16 *) DIR_INI_PANTALLA;
 	}
-		
+
 }
 
 void printf(const int8 *frase, const uint8 atrib){
@@ -61,21 +61,21 @@ void printf(const int8 *frase, const uint8 atrib){
 }
 
 void printdword(const uint32 var, const uint16 atr){
-		
+
 		//recupero la base
 		uint8 base = (uint8) (atr >> 8);
-		
+
 		//si la base es cero, pongo por default base 10
 		if(base == 0){
 			base = 10;
 		}
-		
+
 		//recupero los atributos de impresion
 		uint8 atrib = (uint8) (atr & 0x00FF);
-		
+
 		//aca guardo los digitos
 		uint8 buffer[12];
-		
+
 		num2char(var, buffer, base);
 		uint8 i=0;
 		while(buffer[i] != '\0') {
@@ -137,7 +137,7 @@ void clear_screen(){
 *********************************************************************/
 
 //esta variable contiene el indice de la BCP de la tarea que se está viendo por pantalla
-uint8 tarea_en_pantalla;//, tarea_a_mostrar;
+uint8 tarea_en_pantalla, tarea_a_mostrar;
 
 //este es el puntero que se va a usar para la consola
 uint16* cursor_consola = (uint16*) (DIR_INI_PANTALLA + 80*2*24 + 4);
@@ -147,43 +147,49 @@ uint16* cursor_informacion = (uint16*) DIR_INI_PANTALLA;
 
 int8* prompt = "$>";
 
-void mostrar_pantalla_entera(uint8 tarea_a_mostrar){
 
-	//si tengo que cambiar la pantalla
-	if(tarea_en_pantalla != tarea_a_mostrar){
+void cambiar_pantalla(uint8 pid){
+  tarea_a_mostrar = pid;
+  mostrar_pantalla_entera();
+}
+
+void mostrar_pantalla_entera(){
+
+  uint8 bcp_tarea_en_pantalla = buscar_entradaBCP(tarea_en_pantalla);
+  uint8 bcp_tarea_a_mostrar = buscar_entradaBCP(tarea_a_mostrar);
 
 		//si la tarea en pantalla no esta muerta
-		if(BCP[tarea_en_pantalla].estado != MUERTO){
-			//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
-			cpmem((uint8*) ( DIR_INI_PANTALLA + (80*2) ),
-			 		(uint8*) ( ((uint32) BCP[tarea_en_pantalla].pantalla) + (80*2)),
-			 		TAM_PANTALLA_TAREA);
-		}
-		
-		//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
-		cpmem(	(uint8*) (((uint32) BCP[tarea_a_mostrar].pantalla) + 80*2),
-			(uint8*) (DIR_INI_PANTALLA + (80*2)),
-			TAM_PANTALLA_TAREA);
+	if(BCP[bcp_tarea_en_pantalla].estado != MUERTO){
+		//copio la pantalla a donde debe escribir realmente la tarea_en_pantalla
+		cpmem((uint8*) ( DIR_INI_PANTALLA + (80*2) ),
+		 		(uint8*) ( ((uint32) BCP[bcp_tarea_en_pantalla].pantalla) + (80*2)),
+		 		TAM_PANTALLA_TAREA);
+  }
 
-		
-		//si la tarea en pantalla NO es el KERNEL
-		if(tarea_en_pantalla != 0){
-			//remapeo la pagina de video de la tarea a donde le corresponde escribir
-			mapear_pagina(	BCP[tarea_en_pantalla].entrada_directorio,
-					DIR_INI_PANTALLA,
-					(uint32) BCP[tarea_en_pantalla].pantalla,
-					USUARIO | WRITE | PRESENT);
-		}
-		
-		//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
-		mapear_pagina(	BCP[tarea_a_mostrar].entrada_directorio,
+	//copio la pagina de video de la "tarea_a_mostrar" a la pantalla
+	cpmem(	(uint8*) (((uint32) BCP[bcp_tarea_a_mostrar].pantalla) + 80*2),
+		(uint8*) (DIR_INI_PANTALLA + (80*2)),
+		TAM_PANTALLA_TAREA);
+
+
+	//si la tarea en pantalla NO es el KERNEL
+	if(tarea_en_pantalla != 5){
+		//remapeo la pagina de video de la tarea a donde le corresponde escribir
+		mapear_pagina(	BCP[bcp_tarea_en_pantalla].entrada_directorio,
 				DIR_INI_PANTALLA,
-				DIR_INI_PANTALLA,
+				(uint32) BCP[bcp_tarea_en_pantalla].pantalla,
 				USUARIO | WRITE | PRESENT);
-
-		//actualizo la variable "tarea_en_pantalla"
-		tarea_en_pantalla = tarea_a_mostrar;
 	}
+
+	//remapeo la pagina de video de la "tarea_a_mostrar" a la pantalla
+	mapear_pagina(	BCP[bcp_tarea_a_mostrar].entrada_directorio,
+			DIR_INI_PANTALLA,
+			DIR_INI_PANTALLA,
+			USUARIO | WRITE | PRESENT);
+
+	//actualizo la variable "tarea_en_pantalla"
+	tarea_en_pantalla = tarea_a_mostrar;
+
 }
 
 void clear_command_line(){
@@ -274,7 +280,4 @@ int32 char2num(int8 c){
     return -1;
 
 }
-
-
-
 

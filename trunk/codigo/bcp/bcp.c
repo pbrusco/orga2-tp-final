@@ -11,7 +11,7 @@
 
 extern IDT_Entry IDT[];
 extern gdt_entry gdt_vector[];
-extern uint8 tarea_en_pantalla;
+extern uint8 tarea_en_pantalla,tarea_a_mostrar;
 extern uint8 command[];
 extern Tss TSS[];
 
@@ -27,7 +27,8 @@ void iniciar_BCP(){
 	//variables globales
 	tarea_actual = 0;
 	cant_tareas_en_sistema = 1;
-	tarea_en_pantalla = 0;
+	tarea_en_pantalla = 5;
+	tarea_a_mostrar = 5;
 
 	//datos del kernel
 	BCP[0].pid = 5;
@@ -222,8 +223,11 @@ void kill_app(uint16 bcpPos){
 
 
 void exit(){
+	mover_puntero(3,3);
+  printf("TERMINE!!",AZUL_L);
 	matarTarea(BCP[tarea_actual].pid);
 	switch_task();
+
 }
 
 

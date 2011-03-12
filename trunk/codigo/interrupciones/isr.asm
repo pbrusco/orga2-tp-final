@@ -66,7 +66,7 @@ _INT%1:
 	_INT33:
 		cli								;deshabilito interrupciones
 		pushad
-		
+
 		xor eax,eax
 		in al,0x60							;levanto el byte proveniente del teclado
 		push ax
@@ -74,7 +74,7 @@ _INT%1:
 		add esp,2
 		mov al, 0x20
 		out 0x20, al							;aviso al pic que se atendio la interrupcion
-			
+
 		popad
 		sti								;habilito las interrupciones
 		iret								;vuelvo de la interrupcion
@@ -89,6 +89,4 @@ _INT%1:
 		call exit
 		sti
 		iret
-		
-		
 
