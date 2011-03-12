@@ -1,4 +1,4 @@
-ORG 0x2000
+ORG 0x0
 BITS 32
 
 
@@ -9,9 +9,9 @@ main:
 		mov ah, 4
 		mov ebx, [isrnumero]
 		cmp ebx, 0x4
-		jl .ok		
+		jl .ok
 		mov DWORD [isrnumero], 0x0
-		jmp next_clock	
+		jmp next_clock
 		.ok:
 			add ebx, isrmessage1
 			mov al, [ebx]
@@ -26,3 +26,4 @@ main:
 	isrmessage4: db '\'
 
 TIMES 0x200 - ($ - $$) db 0x00
+

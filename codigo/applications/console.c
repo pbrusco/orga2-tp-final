@@ -151,6 +151,7 @@ void help(){
 
 void cargar_tarea(int32 id){
 	cargar_mostrando(id,'n');
+
 }
 
 void cargar_tarea_y_mostrar(int32 id){
@@ -167,6 +168,13 @@ void cargar_mostrando(int32 id,char mostrar){
 	else{
 
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
+		printf("Tarea ", COLOR_INFO);
+		printdword(id,COLOR_INFO);
+		printf(" cargada con exito PID: ", COLOR_INFO);
+		printdword(pid,COLOR_INFO);
+		printf("\n", COLOR_INFO);
+
+
 		  if (mostrar == 'y'){
     	  display_task(pid);
       }
@@ -208,10 +216,6 @@ void show_running_tasks(){
 }
 
 void display_task(int32 pid){
-
-
-
-
 	//si no está presente la tarea
 	if ( (gdt_vector[pid].atr1 & PRESENTE) != PRESENTE || pid < 5){
 
@@ -229,14 +233,7 @@ void display_task(int32 pid){
 }
 
 void display_merging_task(int32 id){
-  if (id >= TAREAS_EN_MEMORIA ){
-    printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
-  }
-  else
-  {
-    printf("m: display_merging_task ",COLOR_INFO);
-    printdword(id,COLOR_INFO);
-  }
+
 }
 
 void hide_task(int32 id){

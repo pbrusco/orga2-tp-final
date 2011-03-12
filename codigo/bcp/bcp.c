@@ -102,6 +102,7 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 	// 1ro: copiar codigo de la tarea a una pagina nueva
 	uint32* eip_fisico = pidoPagina();
+
 	cpmem((uint8*) dir_tarea, (uint8*) eip_fisico, tam);
 
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
@@ -116,7 +117,7 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 	/*ESTO LO HACEMOS ASI ARBITRARIAMENTE. TODAS LAS TAREAS SE COMPILAN PONIENDO LA DIRECTIVA "ORG 0x2000".
 	  POR ESTO MISMO, EL EIP SE PONE POR DEFECTO EN 0X2000*/
-	mapear_pagina(directorio, 0x2000, (uint32) eip_fisico, PRESENT | WRITE | USUARIO);
+	mapear_pagina(directorio, 0x0, (uint32) eip_fisico, PRESENT | WRITE | USUARIO);
 	/****************************************************************************************************/
 
 	mapear_pagina(directorio, (uint32) pila, (uint32) pila, PRESENT | WRITE | USUARIO);
@@ -132,7 +133,7 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 	// 3ro: crear una entrada de TSS e inicializarla
 	uint8 pos_TSS = buscar_TSS_vacia();
 	setmem((uint8*) &TSS[pos_TSS], 0x00, TAM_TSS);
-	crear_TSS(pos_TSS, (uint32) directorio, 0x2000, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
+	crear_TSS(pos_TSS, (uint32) directorio, 0x0, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
 
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
