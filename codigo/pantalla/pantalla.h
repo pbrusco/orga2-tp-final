@@ -85,8 +85,8 @@ void clear_screen();
 /*La idea es copiar 23 renglones enteros de la tarea "pid". Recordar que la pantalla será de 80*23, de manera de dejarle el ultimo "renglon" para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
 IMPORTANTE: ESTA FUNCION DEBE SER LLAMADA UNICAMENTE POR EL KERNEL, YA QUE ES EL UNICO QUE PUEDE VER Y MODIFICAR EL DIRECTORIO Y LAS TABLAS DE PAGINAS DE TODAS LAS TAREAS.
 */
-void mostrar_pantalla_entera(uint8 bcpPos);
-
+void mostrar_pantalla_entera();
+void cambiar_pantalla(uint8 pid);
 
 /*limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado*/
 void clear_command_line();

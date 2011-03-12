@@ -7,6 +7,7 @@
 
 extern BCP_Entry BCP[];
 extern uint16* cursor_consola;
+extern uint8 tarea_en_pantalla,tarea_a_mostrar;
 
 void kernel_infinito(){
 
@@ -15,14 +16,14 @@ void kernel_infinito(){
 
 	//inicio el prompt
 	clear_command_line();
-	
+
 	//inicio el interprete de comandos
 	inicializar_command();
 
 	uint8 aMatar;
 
 	while(TRUE){
-	
+
 		// 1ero: busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();
 
@@ -32,6 +33,11 @@ void kernel_infinito(){
 			desaparecerTarea(aMatar);
 			//TODO: ver si se puede hacer algo con "kill_app", que tira un error "codigo de operacion invalido"
 			//cuando se la llama desde console (creo que cuando se la llama desde el contexto de la tarea)
+		}
+		if(tarea_a_mostrar != tarea_en_pantalla){
+
+		  mostrar_pantalla_entera();
+
 		}
 	}
 }

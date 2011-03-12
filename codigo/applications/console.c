@@ -88,6 +88,7 @@ void remove_last_char_from_command(){
 
 
 void run (){
+	cambiar_pantalla(5);
   int8 first_word = extract_code(command);
   int32 second_param = extract_number(command);
   clear_screen();
@@ -131,7 +132,7 @@ void add_char_to_command(int8 c){
 
 void help(){
 	//paso a la pantalla del kernel
-	mostrar_pantalla_entera(0);
+
 	clear_screen();
 
 	mover_puntero(3,0);
@@ -165,12 +166,15 @@ void cargar_tarea(int32 id){
 }
 
 void cargar_tarea_y_mostrar(int32 id){
+
  if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea", COLOR_INFO);
 		show_all();
 	}
 	else{
+
+
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
     	display_task(pid);
 
@@ -179,7 +183,7 @@ void cargar_tarea_y_mostrar(int32 id){
 
 void show_all(){
 	//paso a la pantalla del kernel
-	mostrar_pantalla_entera(0);
+
 
 
 	mover_puntero(2,0);
@@ -191,7 +195,7 @@ void show_all(){
 
 void show_running_tasks(){
 	//paso a la pantalla del kernel
-	mostrar_pantalla_entera(0);
+
 
 
 	mover_puntero(2,0);
@@ -211,28 +215,24 @@ void show_running_tasks(){
 	}
 }
 
-void display_task(int32 id){
-	//recordar que "id" es el indice en la gdt del segmento tss de una tarea
+void display_task(int32 pid){
+
 
 
 
 	//si no está presente la tarea
-	if ( (gdt_vector[id].atr1 & PRESENTE) != PRESENTE ){
+	if ( (gdt_vector[pid].atr1 & PRESENTE) != PRESENTE || pid < 5){
+
 		printf("ERROR!! tarea inexistente",COLOR_INFO);
 		show_running_tasks();
 
+
 	}
 	else{
-		uint8 bcpPos = buscar_entradaBCP(id);
-		if(BCP[bcpPos].estado != MUERTO){
-			printf("mostrando tarea ", COLOR_INFO);
-			printdword(id,COLOR_INFO);
-			mostrar_pantalla_entera(bcpPos);
-		}
-		else{
-			printf("ERROR: No existe tal tarea", COLOR_INFO);//TODO: esto creo que esta demás
-			show_running_tasks();
-		}
+		printf("mostrando tarea ", COLOR_INFO);
+		printdword(pid,COLOR_INFO);
+
+		cambiar_pantalla(pid);
 	}
 }
 
