@@ -63,7 +63,7 @@
 El presente trabajo final surge como una continuación del tercer trabájo práctico de la materia en el segundo cuatrimestre de 2009. Aquél trabajo consistía en implementar un sistema minimal que permitiese correr concurrentemente dos tareas. Concretamente, dicho sistema consitía en un bootloader que se encargaba de cargar a memoria un kernel simplificado que incluía los binarios de las tareas en cuestión, junto con todas las estructuras necesarias para que dichas tareas pudieran ser ejecutadas (GDT, Directorio de Tablas de Páginas, una Tabla de Páginas para cada tarea, etc.). Luego, el kernel simplemente debía encargarse de activar el \textit{Gate A20}, pasar el procesador a modo protegido, activar el sistema de paginación, y poner a correr las tareas llamadas ``Pintor'' y ``Traductor'', las cuales alternaba mediante una interrupción del timer.
 
 \paragraph{}
-Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. El principal aspecto que lo diferencia es el hecho de que las tareas no se encuentran ya cargadas en memoria de manera estática, sino deben ser cargadas de manera dinámica y puestas en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas siendo lanzadas.\\
+Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. El principal aspecto que lo diferencia es el hecho de que las tareas no se encuentran ya cargadas en memoria de manera estática, sino deben ser cargadas de manera dinámica y puestas en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas van siendo lanzadas.\\
 En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir capaz de ejecutar varias tareas alternadamente dando la ilusión de simultaneidad) que puede lanzar procesos de forma dinámica con tan solo cargar tareas de memoria y creando las estructuras necesarias para que estas puedan ejecutarse en un procesador de arquitectura Intel-x86.
 
 		
@@ -115,7 +115,7 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 	
 	\subsection{Mapa de Memoria}
 	\paragraph{}
-	Previo a la escritura del código de los módulos mencionados en la sección anterior, a sabiendas de que el sistema utilizaría la paginación como forma de direccionar a memoria, se procedió a establecer un mapa de memoria que permitiese ubicar las estructuras críticas e indispensables del sistema de manera inequívoca. La opción elegida fue realizar un \textit{identity mapping} de las páginas a los frames de memoria, fijando algunos de ellos para uso exclusivo del kernel o de otras estructuras como la \textit{GDT}, las \textit{TSS} o el \textit{Bitmap}.
+	Previo a la escritura del código de los módulos mencionados en la sección anterior, a sabiendas de que el sistema utilizaría la paginación como forma de direccionar a memoria, se procedió a establecer un mapa de memoria que permitiese ubicar las estructuras críticas e indispensables del sistema de manera inequívoca. La opción elegida fue realizar un \textit{identity mapping} de las páginas (todas ellas de 4 KB) a los frames de memoria, fijando algunos de ellos para uso exclusivo del kernel o de otras estructuras como la \textit{GDT}, las \textit{TSS} o el \textit{Bitmap}.
 	
 	\paragraph{}
 	La imagen que sigue muestrá como estan mapeadas y ocupadas las páginas de memoria en el sistema:
@@ -130,27 +130,28 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			El módulo de \textbf{Memoria} es el encargado de brindarle al kernel las herramientas para contabilizar y administrar la memoria del sistema.
 			
 			\paragraph{}
-			Básicamente, la idea empleada para administrar la memoria es la utilización de un \textit{Bitmap}, el cual tenga tantos bits como páginas haya en el sistema. Luego, cada página ocupada se representa en el \textit{Bitmap} poniendo un ``1'' en el bit asociado a dicha página, mientras que las páginas libres se representan con un ``0''.
+			Básicamente, la idea empleada para administrar consiste en contabilizar la cantidad de bytes con los que cuenta la memoria, luego determinar cuántas páginas de 4 KB hay en la memoria del sistema y luego plasmar esta información en un \textit{Bitmap}. El \textit{Bitmap} no es más que una porción de memoria en donde hay tantos bits como páginas haya en el sistema. Luego, cada página ocupada se representa en el \textit{Bitmap} poniendo un ``1'' en el bit asociado a dicha página, mientras que las páginas libres se representan con un ``0''.
 			
 			\paragraph{}
-			Para implementar el \textit{Bitmap}, se define el siguiente grupo de variables globales
-
+			En líneas generales la interfaz de este módulo puede ser caracterizada de la siguiente manera:
 			\begin{itemize}
-				\item \texttt{memoria\_total:} Variable global en la cual se almacena la cantidad de Megabytes de memoria con la que cuenta el sistema.
-				\item \texttt{paginas\_libres:} Variable global que contabiliza el número de páginas libres de memoria en el sistema.
-				\item \texttt{dir\_init\_bitmap:} Puntero a la dirección 0x???, que es la posición donde se inicia el \textit{Bitmap} para administrar las páginas de memoria.
-				\item \texttt{dir\_end\_bitmap:} Puntero a la dirección 0x??, que es la última dirección válida del \textit{Bitmap}.
-			\end{itemize}
-			
-			Así como también el siguiente grupo de funciones:
-			
-			\begin{itemize}
-				\item \texttt{contarMemoria:} 
-				\item \texttt{llenarBitmap:}
-				\item \texttt{pidoPagina:}
-				\item \texttt{liberoPagina:}
-				\item \texttt{setmem:}
-				\item \texttt{cpmem:}
+				\item Variables Globales:
+				\begin{itemize}
+					\item \texttt{memoria\_total:} Variable global en la cual se almacena la cantidad de Megabytes de memoria con la que cuenta el sistema.
+					\item \texttt{paginas\_libres:} Variable global que contabiliza el número de páginas libres de memoria en el sistema.
+					\item \texttt{dir\_init\_bitmap:} Puntero a la dirección 0x???, que es la posición donde se inicia el \textit{Bitmap} para administrar las páginas de memoria.
+					\item \texttt{dir\_end\_bitmap:} Puntero a la dirección 0x??, que es la última dirección válida del \textit{Bitmap}.
+				\end{itemize}
+				
+				\item Funciones:
+				\begin{itemize}
+					\item \texttt{contarMemoria:} Función que se encarga de contar cuántos MB de memoria hay en el sistema guardando dicho valor en la variable \texttt{memoria\_total}. Asímismo, determina el número de frames de 4 KB que puede haber en la memoria del sistema y almacena dicho valor en la variable \texttt{paginas\_libres}.
+					\item \texttt{llenarBitmap:} Función que a partir de la posición apuntada por \texttt{dir\_init\_bitmap} marca poniendo en ``1'' todos los bits correspondientes a las páginas de memoria utilizadas por el kernel y luego pone en ``0'' a las restantes.
+					\item \texttt{pidoPagina:} Función que devuelve un puntero a la primer posición de memoria de una pagina libre, y previo a ello, la marca como ocupada en el Bitmap poniendo en ``1'' el bit correspondiente a dicha página.
+					\item \texttt{liberoPagina:} Función que dado un puntero a una posicion de memoria, determina en qué página de memoria se alberga dicha posición y luego pone en ``0'' el bit correspondiente a esa página para así marcarla como libre.
+					\item \texttt{setmem:} Función que dado un puntero a una posición de memoria y dos valores enteros \textit{set} y \textit{cant}, pone el valor de \textit{set} en \textit{cant} bytes desde la posición de memoria apuntada por el puntero en adelante.
+					\item \texttt{cpmem:} Función que dados dos punteros a posiciones de memoria y un valor entero \textit{cant}, copia el valor de \textit{cant} bytes desde la posición de memoria apuntada por el primer puntero en adelante, hacia los \textit{cant} bytes de memoria desde la posición de memoria apuntada por el por el segundo puntero en adelante.
+				\end{itemize}
 			\end{itemize}
 
 		\subsubsection{Global Descriptor Table (GDT)}
