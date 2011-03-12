@@ -90,7 +90,7 @@ void remove_last_char_from_command(){
 void run (){
   int8 first_word = extract_code(command);
   int32 second_param = extract_number(command);
-
+  clear_screen();
 
   switch(first_word){
     case 'z':
@@ -98,9 +98,6 @@ void run (){
       break;
     case 'v':
       cargar_tarea_y_mostrar(second_param);
-      break;
-    case 'h':
-      help();
       break;
     case 'l':
       show_all();
@@ -111,15 +108,16 @@ void run (){
     case 'd':
       display_task(second_param);
       break;
-    case 'c':{
-      	clear_screen();
+    case 'c':
+       	clear_screen();
       	break;
-      }
     case 'k':
     	kill_task(second_param);
     	break;
+    default:
+      help();
+      break;
     }
-
 }
 
 
@@ -138,25 +136,26 @@ void help(){
 
 	mover_puntero(3,0);
 	printf("HELP: (comandos utiles)\n",VERDE_L);
-	printf("h: help(*)\n",AZUL_L);
-	printf("l: muestra todas las tareas disponibles(*)\n",AZUL_L);
-	printf("p: muestra todas las tareas en ejecucion(*)\n",AZUL_L);
+	printf("h: help\n",AZUL_L);
+	printf("l: muestra todas las tareas disponibles\n",AZUL_L);
+	printf("p: muestra todas las tareas en ejecucion\n",AZUL_L);
 	printf("v x: carga y muestra la tarea x\n",AZUL_L);
 	printf("d x: mostrar la tarea x\n",AZUL_L);
 	printf("z x: inicia la tarea x\n",AZUL_L);
 	printf("k x: elimina de la ejecucion a la tarea x\n",AZUL_L);
 	printf("c: limpia la pantalla(*)\n",AZUL_L);
-	printf("(*) Estos comandos producen un cambio de pantalla a la del kernel", AZUL_L);
+
 
 }
 
 void cargar_tarea(int32 id){
+
 	clear_info_line();
 	mover_puntero(0,0);
 
  	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
-
-		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
+		printf("No existe tal tarea", COLOR_INFO);
+  	show_all();
 	}
 	else{
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
@@ -168,7 +167,8 @@ void cargar_tarea(int32 id){
 void cargar_tarea_y_mostrar(int32 id){
  if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
-		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
+		printf("No existe tal tarea", COLOR_INFO);
+		show_all();
 	}
 	else{
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
@@ -180,10 +180,11 @@ void cargar_tarea_y_mostrar(int32 id){
 void show_all(){
 	//paso a la pantalla del kernel
 	mostrar_pantalla_entera(0);
-	clear_screen();
+
 
 	mover_puntero(2,0);
 	printf("Las tareas disponibles en el sistema son: \n",COLOR_INFO);
+	printf("Tarea 0: Kernel \t \\\\ no tan disponible ;) \n",COLOR_INFO);
 	printf("Tarea 1: Relojito rojo \n",COLOR_INFO);
 	printf("Tarea 2: Relojito celeste \n",COLOR_INFO);
 }
@@ -191,13 +192,13 @@ void show_all(){
 void show_running_tasks(){
 	//paso a la pantalla del kernel
 	mostrar_pantalla_entera(0);
-	clear_screen();
+
 
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
-	printf("\tNombre\t|\tPID\n",COLOR_INFO);
+	printf("Nombre\t|\tPID\n",COLOR_INFO);
 
-	uint16 i = 6;
+	uint16 i = 5;
 	uint8 bcpPos;
 	while( i < (6+CANT_TAREAS) ){
 		if( (gdt_vector[i].atr1 & PRESENTE) == PRESENTE ){
@@ -213,11 +214,13 @@ void show_running_tasks(){
 void display_task(int32 id){
 	//recordar que "id" es el indice en la gdt del segmento tss de una tarea
 
-	clear_screen();
+
 
 	//si no está presente la tarea
 	if ( (gdt_vector[id].atr1 & PRESENTE) != PRESENTE ){
 		printf("ERROR!! tarea inexistente",COLOR_INFO);
+		show_running_tasks();
+
 	}
 	else{
 		uint8 bcpPos = buscar_entradaBCP(id);
@@ -228,6 +231,7 @@ void display_task(int32 id){
 		}
 		else{
 			printf("ERROR: No existe tal tarea", COLOR_INFO);//TODO: esto creo que esta demás
+			show_running_tasks();
 		}
 	}
 }
@@ -258,10 +262,15 @@ void hide_task(int32 id){
 void kill_task(int32 id){//recordar que id es el indice en la gdt del segmento tss de una tarea
 	mover_puntero(0,0);
 	if( (gdt_vector[id].atr1 & PRESENTE) != PRESENTE ){
-		printf("No existe tal tarea (0 es el kernel, pero no se mata!)", COLOR_INFO);
+		printf("No existe tal tarea", COLOR_INFO);
+		show_running_tasks();
+	}
+	else if( id <= 5){
+	  printf("No mates al kernel!!", COLOR_INFO);
+    show_running_tasks();
 	}
 	else{
-	  clear_screen();
+
 	  printf("k: Mataste a la tarea con id ", COLOR_INFO);
 	  printdword(id,COLOR_INFO);
 	  matarTarea(id);//recordar que "id" es la posicion en la GDT del segmento tss de una tarea
@@ -278,15 +287,23 @@ int8 extract_code(){
 int32 extract_number(){
   int16 i;
   int32 n;
-  for(i = 0;i<100;i++){
-    if (command[i] == ' ') {
-      n = char2num(command[i+1]);
-      if (n>0 && n<50){
-        return n;
+  for(i = 0;i<TAM_COMMAND;i++){
+    n = char2num(command[i+1]);
+      if (n>0 && n<10){
+        return convert_to_number(i+1);
       }
-    }
-  }
-  return 101;//TODO: POR QUE?
 
+  }
+  return 101;
+}
+
+int32 convert_to_number(int16 pos){
+  int32 res = 0;
+  while(char2num(command[pos]) >= 0 && char2num(command[pos]) <= 9){
+    res = res*10;
+    res = res + char2num(command[pos]);
+    pos++;
+  }
+  return res;
 }
 

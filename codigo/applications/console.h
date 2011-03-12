@@ -24,7 +24,7 @@ void send_error_message();
 int8 extract_code();
 int32 extract_number();
 void remove_last_char_from_command();
-
+int32 convert_to_number(int16 pos);
 void kill_task(int32 id); //recibe la posicion de la tarea a matar dentro de "tareas_en_memoria"
 
 
