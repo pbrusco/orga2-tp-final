@@ -3,6 +3,7 @@
 #include "../bcp/bcp.h"
 #include "../pantalla/pantalla.h"
 #include "../applications/console.h"
+#include "../scheduler/scheduler.h"
 
 extern BCP_Entry BCP[];
 extern uint16* cursor_consola;
@@ -17,7 +18,6 @@ void kernel_infinito(){
 	
 	//inicio el interprete de comandos
 	inicializar_command();
-	
 
 	uint8 aMatar;
 

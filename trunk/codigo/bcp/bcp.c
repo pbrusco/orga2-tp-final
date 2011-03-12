@@ -130,6 +130,7 @@ void cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 	// 3ro: crear una entrada de TSS e inicializarla
 	uint8 pos_TSS = buscar_TSS_vacia();
+	setmem((uint8*) &TSS[pos_TSS], 0x00, TAM_TSS);
 	crear_TSS(pos_TSS, (uint32) directorio, 0x2000, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
 
 
@@ -219,7 +220,6 @@ void kill_app(uint16 bcpPos){
 
 
 void exit(){
-/*	breakpoint();*/
 	matarTarea(BCP[tarea_actual].pid);
 	switch_task();
 }
@@ -240,6 +240,13 @@ void desaparecerTarea(uint8 bcpPos){
 	//pongo en 0 y libero pagina de la pila
 	setmem(task_pila,0x00,TAM_PAG);
 	liberoPagina((uint32*) task_pila);
+	
+	//recupero la pila0 de la tarea
+	uint8* task_pila0 = (uint8*) (task_tss->esp0 & 0xFFFFF000);
+
+	//pongo en 0 y libero pagina de la pila
+	setmem(task_pila0,0x00,TAM_PAG);
+	liberoPagina((uint32*) task_pila0);
 
 	//pongo en 0 y libero pagina del video
 	setmem((uint8*) BCP[bcpPos].pantalla,0x00,80*24*2);
@@ -247,7 +254,6 @@ void desaparecerTarea(uint8 bcpPos){
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);
-	setmem((uint8*) task_tss, 0x00, TAM_TSS);
 
 	//libero la entrada de GDT
 	gdt_vector[BCP[bcpPos].pid] = make_descriptor(0,0,0,0);

@@ -3,7 +3,6 @@ BITS 32
 
 main:
 ; Funcion para dibujar el reloj.
-		mov ecx, 0xB8500
 	next_clock:
 		inc DWORD [contador]
 		cmp DWORD [contador], 0xFFFF
@@ -17,7 +16,7 @@ main:
 		.ok:
 			add ebx, isrmessage1
 			mov al, [ebx]
-			mov [ecx], ax
+			mov [0xB8500], ax
 			inc DWORD [isrnumero]
 			jmp next_clock
 

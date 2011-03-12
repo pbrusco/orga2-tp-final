@@ -87,7 +87,8 @@ _INT%1:
 		cli
 		pushad
 		call exit
-		popad
 		sti
 		iret
+		
+		
 

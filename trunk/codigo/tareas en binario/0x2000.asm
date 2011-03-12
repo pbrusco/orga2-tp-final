@@ -4,7 +4,7 @@ BITS 32
 
 main:
 ; Funcion para dibujar el reloj.
-
+	;xchg bx, bx
 	next_clock:
 		mov ah, 4
 		mov ebx, [isrnumero]
