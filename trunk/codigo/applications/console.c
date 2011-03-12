@@ -19,12 +19,12 @@ Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
 						(Info_Tareas) {(uint32) 0, (uint32) 0, "kernel"},
 						(Info_Tareas) 	{
 								(uint32) 0x2000,//eip
-								(uint32) 67,//tam
+								(uint32) 512,//tam
 								(int8*) "relojito_rojo",//nombre
 								},
 						(Info_Tareas) 	{
-								(uint32) 0x2043,//eip
-								(uint32) 103,//tam
+								(uint32) 0x2000 + 512,//eip
+								(uint32) 512,//tam
 								(int8*) "relojito_celeste",//nombre
 								}
 							};
