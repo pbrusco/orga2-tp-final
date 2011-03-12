@@ -3,7 +3,6 @@ BITS 32
 
 main:
 ; Funcion para dibujar el reloj.
-		xchg bx, bx
 		mov ecx, 0xB8500
 	next_clock:
 		inc DWORD [contador]
@@ -33,4 +32,4 @@ main:
 	isrmessage4: db '\'
 	contador: dd 0
 
-;TIMES 0x1000 - ($ - $$) db 0x00
+TIMES 0x200 - ($ - $$) db 0x00

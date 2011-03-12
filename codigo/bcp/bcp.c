@@ -219,7 +219,7 @@ void kill_app(uint16 bcpPos){
 
 
 void exit(){
-	breakpoint();
+/*	breakpoint();*/
 	matarTarea(BCP[tarea_actual].pid);
 	switch_task();
 }
@@ -247,6 +247,7 @@ void desaparecerTarea(uint8 bcpPos){
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);
+	setmem((uint8*) task_tss, 0x00, TAM_TSS);
 
 	//libero la entrada de GDT
 	gdt_vector[BCP[bcpPos].pid] = make_descriptor(0,0,0,0);

@@ -25,16 +25,11 @@ void kernel_infinito(){
 	
 		// 1ero: busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();
-		mover_puntero(2,0);
-		printdword(aMatar, COLOR_INFO);
+
 
 		//si hay alguna, la hago desaparecer
 		if(aMatar != CANT_TAREAS){
-			info_BCP(aMatar);
-			breakpoint();
 			desaparecerTarea(aMatar);
-			info_BCP(aMatar);
-			breakpoint();
 			//TODO: ver si se puede hacer algo con "kill_app", que tira un error "codigo de operacion invalido"
 			//cuando se la llama desde console (creo que cuando se la llama desde el contexto de la tarea)
 		}
