@@ -34,11 +34,7 @@ void kernel_infinito(){
 			//TODO: ver si se puede hacer algo con "kill_app", que tira un error "codigo de operacion invalido"
 			//cuando se la llama desde console (creo que cuando se la llama desde el contexto de la tarea)
 		}
-		if(tarea_a_mostrar != tarea_en_pantalla){
 
-		  mostrar_pantalla_entera();
-
-		}
 	}
 }
 
