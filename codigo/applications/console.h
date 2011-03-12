@@ -13,14 +13,14 @@ void inicializar_command();
 void help();
 void show_all();
 void show_running_tasks();
-void cargar_mostrando(int32 id,char mostrar);
+
 
 void display_task(int32 id); //recibe la posicion de la tarea a mostrar dentro de "tareas_en_memoria"
 void cargar_tarea_y_mostrar(int32 id);
-void display_merging_task(int32 id);
-void hide_task(int32 id);
+
+
 void clear_screen();
-void send_error_message();
+
 int8 extract_code();
 int32 extract_number();
 void remove_last_char_from_command();
