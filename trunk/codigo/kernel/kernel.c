@@ -8,6 +8,7 @@
 extern BCP_Entry BCP[];
 extern uint16* cursor_consola;
 extern uint8 tarea_en_pantalla,tarea_a_mostrar;
+extern uint16* puntero_pantalla;
 
 void kernel_infinito(){
 
@@ -22,9 +23,12 @@ void kernel_infinito(){
 
 	uint8 aMatar;
 
+
+
+
 	while(TRUE){
 
-		// 1ero: busco si hay alguna tarea para matar
+		//1ero: busco si hay alguna tarea para matar
 		aMatar = buscar_entradaBCP_matar();
 
 

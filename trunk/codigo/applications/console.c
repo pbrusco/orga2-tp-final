@@ -16,7 +16,7 @@ extern gdt_entry gdt_vector[];
 
 Info_Tareas tareas_en_memoria[TAREAS_EN_MEMORIA] = 	{
 
-						(Info_Tareas) {(uint32) 0, (uint32) 0, "kernel"},
+						(Info_Tareas) {(uint32) 0, (uint32) 0, "kernel (magico)"},
 						(Info_Tareas) 	{
 								(uint32) 0x2000,//eip
 								(uint32) 512,//tam
@@ -55,14 +55,13 @@ void console(int16 tecla) {
 	    	}
 	    	else if (c == '<'){ //if the user press "back"
 	     		remove_last_char_from_command();
-			removerc();
-		}
-	    	else if (c == '!'){//TODO: PARA QUE ES ESTO?????
+			    removerc();
+		    }
+	    	else if (c == '!'){ //if error key.
 	    	}
 	    	else{
-	      		// TODO: esto creo que va a estar demás >> if (command[0] == '?'){clear_screen();}
-			add_char_to_command(c);
-		      	agregarc(c, COLOR_PROMPT);//TODO: que agregue el caracter a la linea de comando
+  	      add_char_to_command(c);
+	      	agregarc(c, COLOR_PROMPT);
 	    	}
   	}
 
@@ -94,9 +93,6 @@ void run(){
   clear_screen();
 
   switch(first_word){
-    case 'z':
-      cargar_tarea(second_param);
-      break;
     case 'v':
       cargar_tarea_y_mostrar(second_param);
       break;
@@ -137,28 +133,16 @@ void help(){
 
 	mover_puntero(3,0);
 	printf("HELP: (comandos utiles)\n",VERDE_L);
-	printf("h: help\n",AZUL_L);
 	printf("l: muestra todas las tareas disponibles\n",AZUL_L);
 	printf("p: muestra todas las tareas en ejecucion\n",AZUL_L);
 	printf("v x: carga y muestra la tarea x\n",AZUL_L);
-	printf("d x: mostrar la tarea x\n",AZUL_L);
-	printf("z x: inicia la tarea x\n",AZUL_L);
-	printf("k x: elimina de la ejecucion a la tarea x\n",AZUL_L);
-	printf("c: limpia la pantalla(*)\n",AZUL_L);
-
-
+	printf("d pid: mostrar la tarea con el pid indicado\n",AZUL_L);
+	printf("k pid: elimina de la ejecucion a la tarea con el pid indicado\n",AZUL_L);
+	printf("c: limpia la pantalla\n",AZUL_L);
 }
 
-void cargar_tarea(int32 id){
-	cargar_mostrando(id,'n');
-
-}
 
 void cargar_tarea_y_mostrar(int32 id){
-  cargar_mostrando(id,'y');
-}
-
-void cargar_mostrando(int32 id,char mostrar){
 
    if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
@@ -166,26 +150,18 @@ void cargar_mostrando(int32 id,char mostrar){
 		show_all();
 	}
 	else{
-
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
 		printf("Tarea ", COLOR_INFO);
 		printdword(id,COLOR_INFO);
 		printf(" cargada con exito PID: ", COLOR_INFO);
 		printdword(pid,COLOR_INFO);
 		printf("\n", COLOR_INFO);
-
-
-		  if (mostrar == 'y'){
-    	  display_task(pid);
-      }
+	  display_task(pid);
 	}
 }
 
+
 void show_all(){
-	//paso a la pantalla del kernel
-
-
-
 	mover_puntero(2,0);
 	printf("Las tareas disponibles en el sistema son: \n",COLOR_INFO);
 	printf("Tarea 0: Kernel \t \\\\ no tan disponible ;) \n",COLOR_INFO);
@@ -194,10 +170,6 @@ void show_all(){
 }
 
 void show_running_tasks(){
-	//paso a la pantalla del kernel
-
-
-
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
 	printf("Nombre\t|\tPID\n",COLOR_INFO);
@@ -217,9 +189,9 @@ void show_running_tasks(){
 
 void display_task(int32 pid){
 	//si no está presente la tarea
-	if ( (gdt_vector[pid].atr1 & PRESENTE) != PRESENTE || pid < 5){
+	if ( (gdt_vector[pid].atr1 & PRESENTE) != PRESENTE || pid <= 5){
 
-		printf("ERROR!! tarea inexistente",COLOR_INFO);
+		printf("ERROR!! tarea inexistente u oculta",COLOR_INFO);
 		show_running_tasks();
 
 
@@ -230,21 +202,6 @@ void display_task(int32 pid){
 
 		cambiar_pantalla(pid);
 	}
-}
-
-void display_merging_task(int32 id){
-
-}
-
-void hide_task(int32 id){
-  if (id >= TAREAS_EN_MEMORIA ){
-    printf("ERROR!! Fijate el parametro vistes",COLOR_INFO);
-  }
-  else
-  {
-    printf("i: hide_task ",COLOR_INFO);
-    printdword(id,COLOR_INFO);
-  }
 }
 
 
