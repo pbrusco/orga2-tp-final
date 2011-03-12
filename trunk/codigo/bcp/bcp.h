@@ -37,7 +37,7 @@ uint8 buscar_entradaBCP_matar();
 void info_BCP(uint8 index);
 
 // carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
-void cargarTarea(uint32 eip, uint32 tam, int8* name);
+uint16 cargarTarea(uint32 eip, uint32 tam, int8* name);
 
 // Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla.
 // El param "id" es la posicion en la GDT del segmento TSS de la tarea que se quiere eliminar.

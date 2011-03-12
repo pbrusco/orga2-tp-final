@@ -53,7 +53,7 @@ void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* v
 	BCP[entrada].pantalla = video;
 	BCP[entrada].entrada_directorio = ent_directorio;
 	BCP[entrada].nombre = name;
-	
+
 	BCP[entrada].ant = BCP[tarea_actual].ant;
 	BCP[entrada].sig = tarea_actual;
 	BCP[BCP[tarea_actual].ant].sig = entrada;
@@ -95,14 +95,14 @@ void cambiar_estado(uint16 bpcPos, uint8 estado_nuevo){
 }
 
 
-void cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
+uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
-	
+
 
 	// 1ro: copiar codigo de la tarea a una pagina nueva
 	uint32* eip_fisico = pidoPagina();
 	cpmem((uint8*) dir_tarea, (uint8*) eip_fisico, tam);
-	
+
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
 	uint32 *directorio = pidoPagina();
@@ -112,12 +112,12 @@ void cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
-	
+
 	/*ESTO LO HACEMOS ASI ARBITRARIAMENTE. TODAS LAS TAREAS SE COMPILAN PONIENDO LA DIRECTIVA "ORG 0x2000".
 	  POR ESTO MISMO, EL EIP SE PONE POR DEFECTO EN 0X2000*/
 	mapear_pagina(directorio, 0x2000, (uint32) eip_fisico, PRESENT | WRITE | USUARIO);
 	/****************************************************************************************************/
-	
+
 	mapear_pagina(directorio, (uint32) pila, (uint32) pila, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (uint32) pila0, (uint32) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
@@ -141,6 +141,8 @@ void cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 	// 5to: crear entrada de BCP e inicializarla
 	crear_entradaBCP(pid, ACTIVO, directorio, video, name);
+
+	return pid;
 }
 
 
@@ -153,22 +155,22 @@ void matarTarea(uint8 id){
 
 
 void mapeo_paginas_default(uint32* directorio){
-	
+
 	//pagina en donde empieza el codigo del kernel
 	uint32 kernel_init = ((uint32) &make_descriptor) & 0xFFFFF000;
-	
+
 	//pagina siguiente a la pagina donde termina el kernel
 	uint32 kernel_end = ( ((uint32) &command[99]) & 0xFFFFF000) + TAM_PAG;
-	
+
 	//mapeo la pagina en donde esta la estructura de la GDT
 	mapear_pagina(directorio, (uint32) gdt_vector, (uint32) gdt_vector, PRESENT | READ_PAGINACION | USUARIO);
-	
+
 	//mapeo todas las paginas en donde se encuentra el kernel
 	while(kernel_init != kernel_end){
 		mapear_pagina(directorio, kernel_init, kernel_init, PRESENT | READ_PAGINACION | USUARIO);
 		kernel_init += TAM_PAG;
 	}
-		
+
 }
 
 
@@ -179,7 +181,7 @@ uint8 buscar_entradaBCP_matar(){
 	while( (res < CANT_TAREAS) && (BCP[res].estado != MATAR) ){
 		res++;
 	}
-	
+
 	return res; //NOTA: devuelve la posicion de la tarea en la BCP
 }
 
@@ -197,21 +199,21 @@ void info_BCP(uint8 index){
 
 
 void kill_app(uint16 bcpPos){
-	
+
 	uint8 running = FALSE;
-	
+
 	//solo mato a las tareas que estan corriendo o activas
 	if( (BCP[bcpPos].estado == CORRIENDO) || (BCP[bcpPos].estado == ACTIVO)){
-		
+
 		if(BCP[bcpPos].estado == CORRIENDO){
 			running = TRUE;
 		}
 		matarTarea(bcpPos);
 		desaparecerTarea(bcpPos);
-		
+
 		info_BCP(bcpPos);
 		breakpoint();
-		
+
 		if(running){
 			switch_task();
 		}
@@ -240,7 +242,7 @@ void desaparecerTarea(uint8 bcpPos){
 	//pongo en 0 y libero pagina de la pila
 	setmem(task_pila,0x00,TAM_PAG);
 	liberoPagina((uint32*) task_pila);
-	
+
 	//recupero la pila0 de la tarea
 	uint8* task_pila0 = (uint8*) (task_tss->esp0 & 0xFFFFF000);
 
