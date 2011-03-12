@@ -144,7 +144,6 @@ void help(){
 	printf("h: help(*)\n",AZUL_L);
 	printf("l: muestra todas las tareas disponibles(*)\n",AZUL_L);
 	printf("p: muestra todas las tareas en ejecucion(*)\n",AZUL_L);
-	printf("s: muestra las tareas que no se estan ejecutando(*)\n",AZUL_L);
 	printf("v x: carga y muestra la tarea x\n",AZUL_L);
 	printf("d x: mostrar la tarea x\n",AZUL_L);
 	printf("z x: inicia la tarea x\n",AZUL_L);
@@ -157,9 +156,9 @@ void help(){
 void cargar_tarea(int32 id){
 	clear_info_line();
 	mover_puntero(0,0);
- 	
+
  	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
-		
+
 		printf("No existe tal tarea 0 (es el kernel, pero ya esta corriendo)", COLOR_INFO);
 	}
 	else{
@@ -200,7 +199,7 @@ void show_running_tasks(){
 	mover_puntero(2,0);
 	printf("Tareas actualmente corriendo(TSS entry en GDT): \n",COLOR_INFO);
 	printf("\tNombre\t|\tPID\n",COLOR_INFO);
-	
+
 	uint16 i = 6;
 	uint8 bcpPos;
 	while( i < (6+CANT_TAREAS) ){
@@ -214,17 +213,9 @@ void show_running_tasks(){
 	}
 }
 
-void show_sleeping_tasks(){
-	//paso a la pantalla del kernel
-	mostrar_pantalla_entera(0);
-
-	printf("s: show_sleeping_tasks ",COLOR_INFO);
-}
-
-
 void display_task(int32 id){
 	//recordar que "id" es el indice en la gdt del segmento tss de una tarea
-	
+
 	clear_screen();
 
 	//si no está presente la tarea
