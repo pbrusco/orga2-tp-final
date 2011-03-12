@@ -87,7 +87,7 @@ void remove_last_char_from_command(){
 }
 
 
-void run (){
+void run(){
 	cambiar_pantalla(5);
   int8 first_word = extract_code(command);
   int32 second_param = extract_number(command);
@@ -150,34 +150,26 @@ void help(){
 }
 
 void cargar_tarea(int32 id){
-
-	clear_info_line();
-	mover_puntero(0,0);
-
- 	if(id == 0 || id >= TAREAS_EN_MEMORIA ){
-		printf("No existe tal tarea", COLOR_INFO);
-  	show_all();
-	}
-	else{
-		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
-   	 	printf("Se ha cargado con exito la tarea, PID: ", COLOR_INFO);
-		printdword(pid, COLOR_INFO);
-	}
+	cargar_mostrando(id,'n');
 }
 
 void cargar_tarea_y_mostrar(int32 id){
+  cargar_mostrando(id,'y');
+}
 
- if(id == 0 || id >= TAREAS_EN_MEMORIA ){
+void cargar_mostrando(int32 id,char mostrar){
+
+   if(id == 0 || id >= TAREAS_EN_MEMORIA ){
 		mover_puntero(0,0);
 		printf("No existe tal tarea", COLOR_INFO);
 		show_all();
 	}
 	else{
 
-
 		uint16 pid = cargarTarea(tareas_en_memoria[id].eip, tareas_en_memoria[id].tam, tareas_en_memoria[id].nombre);
-    	display_task(pid);
-
+		  if (mostrar == 'y'){
+    	  display_task(pid);
+      }
 	}
 }
 
