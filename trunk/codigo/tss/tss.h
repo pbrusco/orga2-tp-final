@@ -3,7 +3,7 @@
 
 // Task State Segment - Definicion de las TSSs.
 
-// Definicion de una TSS 
+// Definicion de una TSS
 typedef struct str_tss {
 	uint16 ptl;
 	uint16  unused0;
@@ -47,9 +47,10 @@ typedef struct str_tss {
 
 
 /* Funciones */
-
+void info_TSS();
 void crear_TSS(uint8 entrada, uint32 CR3, uint32 EIP, uint32 EFLAGS, uint32 pila, uint32);
 uint8 buscar_TSS_vacia();
 void vaciar_TSS(Tss*);
 
-#endif //__TSS_H__ 
+#endif //__TSS_H__
+

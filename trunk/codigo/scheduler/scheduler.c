@@ -10,14 +10,30 @@ extern uint8 tarea_actual;
 switch_reg salto;
 
 
+void info_SCHEDULER(){
 
+  mover_puntero(10,10);
+  int x = 1;
+  info_BCP(0);
+  if (BCP[0].sig != 0){
+    while(x != 0){
+     info_BCP(x);
+      x = BCP[x].sig;
+    }
+  }
+
+
+
+}
 void switch_task(){
 //recordar que las interrupciones en el contexto de esta tarea estan deshabilitadas
 
+  //info_SCHEDULER();
+  //info_GDT();
+  //info_TSS();
+
 	//1ro: me fijo que haya mas de una tarea, sino termino
 	if(tarea_actual != BCP[tarea_actual].sig){
-
-
 
 		//2do: cambio el estado de la tarea actual de CORRIENDO a ACTIVO
 		//(o lo dejo en MATAR si es que estaba asi), paso la tarea actual

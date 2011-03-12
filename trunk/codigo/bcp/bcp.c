@@ -189,14 +189,13 @@ uint8 buscar_entradaBCP_matar(){
 
 
 void info_BCP(uint8 index){
-	mover_puntero(10,0);
-	printf("Entrada BCP: ", CELESTE_L); printdword(index, CELESTE_L); printf("\n",0);
-	printf("pid: ", GRIS_L | BRILLANTE); printdword(BCP[index].pid, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("estado: ", GRIS_L | BRILLANTE); printdword(BCP[index].estado, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("directorio: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].entrada_directorio, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
-	printf("siguiente: ", GRIS_L | BRILLANTE); printdword(BCP[index].sig, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("anterior: ", GRIS_L | BRILLANTE); printdword(BCP[index].ant, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].pantalla, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
+	printf("\n",AZUL_L);
+	printf("  pid: ", GRIS_L | BRILLANTE); printdword(BCP[index].pid, GRIS_L | BRILLANTE);
+	//printf("  estado: ", GRIS_L | BRILLANTE); printdword(BCP[index].estado, GRIS_L | BRILLANTE);
+	//printf("directorio: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].entrada_directorio, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
+	//printf("  siguiente: ", GRIS_L | BRILLANTE); printdword(BCP[index].sig, GRIS_L | BRILLANTE);
+	//printf("anterior: ", GRIS_L | BRILLANTE); printdword(BCP[index].ant, GRIS_L | BRILLANTE); printf("\n",0);
+	//printf("pantalla: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].pantalla, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
 }
 
 

@@ -1,5 +1,6 @@
 #include "../tipos/tipos_basicos.h"
 #include "gdt.h"
+#include "../pantalla/pantalla.h"
 
 extern gdt_entry gdt_vector[];
 
@@ -27,6 +28,18 @@ uint16 buscar_entradaGDT_vacia(){
 		i++;
 	}
 	return 0;
+}
+
+void info_GDT(){
+int32 i = 1;
+mover_puntero(15,0);
+	while(i < GDT_COUNT){
+		printdword(gdt_vector[i].base1,AZUL_L|BASE16);
+		printf(",",AZUL_L);
+		i++;
+	}
+
+
 }
 
 void borrar_gdt_entry(uint16 i){
