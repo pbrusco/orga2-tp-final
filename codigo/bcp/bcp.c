@@ -35,6 +35,7 @@ void iniciar_BCP(){
 	BCP[0].entrada_directorio = (uint32 *) DIR_DIRECTORIO;
 	BCP[0].sig = BCP[0].ant = 0;
 	BCP[0].pantalla = (uint16 *) 0xB9000;//TODO: agregar al mapa de memoria
+	BCP[0].nombre = "kernel";
 }
 
 void iniciar_tss_kernel(){
@@ -45,12 +46,14 @@ void iniciar_tss_kernel(){
 
 
 // LLAMAR SIEMPRE Y CUANDO YA SE HAYA EJECUTADO "iniciar_BCP"
-void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* video){
+void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* video, int8* name){
 	uint16 entrada = buscar_entradaBCP_vacia();
 	BCP[entrada].pid = id;
 	BCP[entrada].estado = ACTIVO;
 	BCP[entrada].pantalla = video;
 	BCP[entrada].entrada_directorio = ent_directorio;
+	BCP[entrada].nombre = name;
+	
 	BCP[entrada].ant = BCP[tarea_actual].ant;
 	BCP[entrada].sig = tarea_actual;
 	BCP[BCP[tarea_actual].ant].sig = entrada;
@@ -92,11 +95,14 @@ void cambiar_estado(uint16 bpcPos, uint8 estado_nuevo){
 }
 
 
-void cargarTarea(uint32 eip){
+void cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
-	// 1ro: averiguar direccion de la tarea y tamaño (en bytes). Por ahora OBSOLETO
+	
 
-
+	// 1ro: copiar codigo de la tarea a una pagina nueva
+	uint32* eip_fisico = pidoPagina();
+	cpmem((uint8*) dir_tarea, (uint8*) eip_fisico, tam);
+	
 	// 2do: crear un directorio y las tablas de paginas necesarias y mapearlas segun corresponda, una pagina para la pila
 	// y otra para el video
 	uint32 *directorio = pidoPagina();
@@ -106,28 +112,40 @@ void cargarTarea(uint32 eip){
 
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
-	mapear_pagina(directorio, eip, eip, PRESENT | WRITE | USUARIO);
+	
+	/*ESTO LO HACEMOS ASI ARBITRARIAMENTE. TODAS LAS TAREAS SE COMPILAN PONIENDO LA DIRECTIVA "ORG 0x2000".
+	  POR ESTO MISMO, EL EIP SE PONE POR DEFECTO EN 0X2000*/
+	mapear_pagina(directorio, 0x2000, (uint32) eip_fisico, PRESENT | WRITE | USUARIO);
+	/****************************************************************************************************/
+	
 	mapear_pagina(directorio, (uint32) pila, (uint32) pila, PRESENT | WRITE | USUARIO);
 	mapear_pagina(directorio, (uint32) pila0, (uint32) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
 	mapear_pagina(directorio, (uint32) 0xB8000, (uint32) video, PRESENT | WRITE | USUARIO);
 
+
+/*	mover_puntero(5,0);*/
+/*	printdword(obtener_mapeo(directorio, 0x2000), BASE16 | ROJO_L);*/
+/*	breakpoint();*/
+
 	// 3ro: crear una entrada de TSS e inicializarla
 	uint8 pos_TSS = buscar_TSS_vacia();
-	crear_TSS(pos_TSS, (uint32) directorio, (uint32) eip, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
+	crear_TSS(pos_TSS, (uint32) directorio, 0x2000, USER_EFLAGS, ((uint32)pila) + TAM_PAG, ((uint32)pila0) + TAM_PAG);
 
 
 	// 4to: crear una entrada en la GDT para la TSS creada antes y mapearla
 	uint16 pid = buscar_entradaGDT_vacia();
 	gdt_vector[pid] = make_descriptor((uint32) &TSS[pos_TSS], TAM_TSS, TSS_AVAILABLE | PRESENTE | DPL_3 | TSS_0_OBLIGATORIO, TSS_GRANULARIDAD);
 
+
 	// 5to: crear entrada de BCP e inicializarla
-	crear_entradaBCP(pid, ACTIVO, directorio, video);
+	crear_entradaBCP(pid, ACTIVO, directorio, video, name);
 }
 
 
 
-void matarTarea(uint8 bcpPos){
+void matarTarea(uint8 id){
+	uint8 bcpPos = buscar_entradaBCP(id);
 	cambiar_estado(bcpPos, MATAR);
 }
 
@@ -170,10 +188,10 @@ void info_BCP(uint8 index){
 	printf("Entrada BCP: ", CELESTE_L); printdword(index, CELESTE_L); printf("\n",0);
 	printf("pid: ", GRIS_L | BRILLANTE); printdword(BCP[index].pid, GRIS_L | BRILLANTE); printf("\n",0);
 	printf("estado: ", GRIS_L | BRILLANTE); printdword(BCP[index].estado, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("directorio: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].entrada_directorio, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("directorio: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].entrada_directorio, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
 	printf("siguiente: ", GRIS_L | BRILLANTE); printdword(BCP[index].sig, GRIS_L | BRILLANTE); printf("\n",0);
 	printf("anterior: ", GRIS_L | BRILLANTE); printdword(BCP[index].ant, GRIS_L | BRILLANTE); printf("\n",0);
-	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].pantalla, GRIS_L | BRILLANTE); printf("\n",0);
+	printf("pantalla: ", GRIS_L | BRILLANTE); printdword((uint32) BCP[index].pantalla, BASE16 | GRIS_L | BRILLANTE); printf("\n",0);
 }
 
 
@@ -199,8 +217,10 @@ void kill_app(uint16 bcpPos){
 	}
 }
 
+
 void exit(){
-	matarTarea(tarea_actual);
+	breakpoint();
+	matarTarea(BCP[tarea_actual].pid);
 	switch_task();
 }
 

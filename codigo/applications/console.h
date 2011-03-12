@@ -30,9 +30,9 @@ void kill_task(int32 id); //recibe la posicion de la tarea a matar dentro de "ta
 
 
 typedef struct Info_Tareas_s{
-	uint16 eip;
-	uint8 bcp_pos;
-	uint8 gdt_pos;
+	uint32 eip;
+	uint32 tam;
+	int8* nombre;
 } __attribute__((__packed__, aligned (8))) Info_Tareas;
 
 

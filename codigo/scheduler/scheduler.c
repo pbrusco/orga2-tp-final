@@ -10,6 +10,7 @@ extern uint8 tarea_actual;
 switch_reg salto;
 
 
+
 void switch_task(){
 //recordar que las interrupciones en el contexto de esta tarea estan deshabilitadas
 	
