@@ -108,9 +108,6 @@ void run (){
     case 'p':
       show_running_tasks();
       break;
-    case 's':
-      show_sleeping_tasks();
-      break;
     case 'd':
       display_task(second_param);
       break;
