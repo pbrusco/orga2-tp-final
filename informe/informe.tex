@@ -69,7 +69,7 @@ En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir c
 
 \section{Instrucciones de uso}
 \paragraph{}
-Para ejecutar el kernel basta con !!!!!!!!!!!!!!!!!.... Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
+Para ejecutar el kernel basta con compilar el kernel utilizando el MakeFile. Luego utilizando Bochs 2.4 se iniciara el proceso. Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
 \begin{itemize}
 \item "h" : ayuda (lista los comandos).
 \item "l" : muestra todas las tareas disponibles.
@@ -94,9 +94,7 @@ El código fuente que implementa el kernel se entrega junto con este informe en 
 \item Consola
 \item Pantalla
 \item TSS - Task State
-\item Macros
 \item BCP - Block Control Process
-\item Almacenamiento
 \item Interrupciones							
 \item Kernel
 \end{shortitemize}
@@ -169,10 +167,10 @@ Finalmente, nuestra GDT queda organizada de la siguiente manera:
 	\item datos kernel
 	\item codigo usuario
 	\item datos usuario
-	\item entrada\_tss1
-	\item entrada\_tss2
+	\item descriptor\_tss1
+	\item descriptor\_tss2
 	\item ...	
-	\item entrada\_tssx
+	\item descriptor\_tssx
 
 \end{itemize}
 
@@ -209,7 +207,22 @@ Por otra parte, está la función \textit{iniciar\_paginacion\_kernel}, que simp
 La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
 
 \subsubsection{TSS}
+\paragraph{}
+La TSS (Task State Segment) es una estructura de datos que contiene informaci\'on acerca de una tarea. 
 
+\paragraph{}
+Para setear la TSS se necesita una entrada en la GDT especificando la base, limite y atributos.
+
+\paragraph{}
+Luego, para acceder al c\'odigo de la tarea, deberemos, entre otras cosas, hacer un jump al descriptor de TSS en la gdt.
+
+\paragraph{}
+En nuestro kernel, las funciones que poseemos en este modulo son:
+\begin{itemize}
+\item \textbf{crear\_TSS}: Crea una TSS (y su descriptor en la GDT) utilizando como parametros: dirección, CR3, EIP, EFLAGS, pila y el ESP0.
+\item \textbf{buscar\_TSS\_vacia}: Busca una entrada de TSS vacia (toma como TSS vacia aquella cuyo cr3 sea igual a 0, devuelve un número igual o mayor que CANT\_TAREAS si no hay ningun lugar disponible)
+\item \textbf{vaciar\_TSS} Setea el cr3 de una tss en 0 para ser reutilizada por otras tareas.
+\end{itemize}
 \subsubsection{Process Control Block (BCP) }
 
 \paragraph{}
@@ -227,40 +240,22 @@ En nuestro caso, esta estructura contiene la siguiente información:
 \end{itemize}
 
 \paragraph{}
-Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso esta situada en !!!!!!!!!(para quien lo haya escrito: la protección que tiene es la misma que la de todo el kernel. El usuario tiene permisos de lectura, pero no de escritura.)
+Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso la protección que tiene es la misma que la de todo el kernel. El usuario tiene permisos de lectura, pero no de escritura.
 
 \paragraph{}
 Las principales funciones del modulo BCP son las siguientes:
 
 \begin{itemize}
-
-
 \item \textbf{iniciar\_BCP}: llena el BPC[0] con los datos del kernel, y inicializa variables globales
-
-
 \item \textbf{buscar\_entradaBCP\_vacia }: busca entrada libre en el BCP (libre significa estado muerto)
-
 \item \textbf{crear\_entradaBCP }: llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
-
 \item \textbf{cambiar\_estado}: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
-
 \item \textbf{buscar\_entradaBCP}: devuelve la posicion en la BCP de una tarea pasada como parametro.
-
 \item \textbf{buscar\_entradaBCP\_matar}: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT\_TAREAS
-
-
 \item \textbf{cargarTarea}: carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
-
-
 \item \textbf{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. 
-
 \item \textbf{exit}:  esta es llamada cuando la tarea actual quiere terminar y llama a la interrupcion 80
-
-
 \item \textbf{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
-
-
-
 \end{itemize}
 \subsubsection{Interrupciones}
 
@@ -314,8 +309,42 @@ A continuación se listan las principales funciones necesarias para hacer posibl
 
 
 \subsubsection{Pantalla}
-\subsubsection{Macros}
-\subsubsection{Almacenamiento}
+
+
+\paragraph{}
+El modulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
+\paragraph{}
+Está planeado de la siguiente manera:
+\begin{itemize}
+\item 23 filas centrales que podras usar las tareas y el kernel para escribir
+\item En la última fila se vera la linea de comandos (manejada por console.c) 
+
+\end{itemize}
+
+
+ 
+\paragraph{}
+Las funciones que provee son:
+\begin{itemize} 
+\item \textbf{avanzar\_puntero}: Avanza el puntero de la pantalla un caracter. 
+\item \textbf{retroceder\_puntero}: Retrocede el puntero de la pantalla un caracter. 
+\item \textbf{mover\_puntero}: Mueve el puntero de la pantalla hasta una fila y columna indicadas. 
+\item \textbf{salto\_de\_linea}: Avanza el puntero de la pantalla una fila. 
+\item \textbf{printf}: Es utilizadad para imprimir caracteres.
+\item \textbf{printdword}: Se usa para ver valores de variables. Recibe como parámetros la dword a imprimir y los atributos de escritura.
+\item \textbf{putc}: Escribe un caracter en la pantalla 
+\item \textbf{borrarc}: Borra el ultimo caracter de la pantalla 
+\item \textbf{num2char}: Deja en buffer un string que representa al numero pasado escrito en una base indicada. 
+\item \textbf{clear\_screen}: Limpia la pantalla. 
+\item \textbf{mostrar\_pantalla\_entera}: La idea es copiar 23 renglones enteros de la tarea 'pid'. (Recordar que la pantalla es de 80*23, de manera de dejarle el ultimo 'renglon' para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
+\item \textbf{cambiar\_pantalla}: Setea la pantalla a mostrar y llama a mostrar pantalla entera.
+\item \textbf{clear\_command\_line}: limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado 
+\item \textbf{clear\_info\_line}: Limpia la linea de informacion (fila 0 de la pantalla) y deja el puntero a dicha linea inicializado 
+\item \textbf{removerc}: Borra el ultimo caracter de la linea de comandos 
+\item \textbf{agregarc}: Escribe un caracter en la linea de comandos
+\end{itemize}
+
+
 \subsection{Ensamblando el Kernel}
 \label{kernel}	
 \begin{itemize}
