@@ -73,10 +73,10 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 \begin{itemize}
     \item "h" : ayuda (lista los comandos).
  	\item "l" : muestra todas las tareas disponibles.
- 	\item "p" : muestra todas las tareas en ejecuci\'on.
+ 	\item "p" : muestra todas las tareas en ejecuci\'on junto con su pid.
  	\item "v \{x\}" : ejecuta y muestra la tarea \{x\}.
- 	\item "d \{x\}" : muestra la tarea \{x\}.
- 	\item "k \{x\}" : termina la tarea \{x\}.
+ 	\item "d \{pid\}" : muestra la tarea con pid \{pid\}.
+ 	\item "k \{pid\}" : termina la tarea con pid \{pid\}.
 
 \end{itemize}
 
@@ -92,7 +92,8 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			\item GDT - Global Descriptor Table
 			\item Periféricos
 			\item Paginación				
-			\item Shell
+			\item Consola
+			\item Pantalla
 			\item TSS - Task State
 			\item Macros
 			\item BCP - Block Control Process
@@ -217,7 +218,26 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 		\subsubsection{Interrupciones}
 		\subsubsection{Scheduller}
 		\subsubsection{Periféricos}
-		\subsubsection{Shell}
+		\subsubsection{Consola}
+			\paragraph{}
+				La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
+			\paragraph{}
+				A continuación se listan las principales funciones necesarias para hacer posibles la linea de comandos:
+				\begin{itemize}
+
+                    \item \textbf{ cargar\_tarea}: recibe la posicion de la tarea a cargar dentro de "tareas\_en\_memoria"
+
+                    \item \textbf{console}: Es la función llamada cada vez que se preciona una tecla en la linea de comandos. En caso que esta tecla sea un 'enter' se llama a la función 'run' del comando almacenado, en caso contrario se van almacenando las teclas.
+                    \item \textbf{run}: Es la encargada de obtener y decodificar el comando enviado por console de manera de llamar a la función correcta.
+			
+				
+				
+				\end{itemize}				
+	
+
+
+		
+     	\subsubsection{Pantalla}
 		\subsubsection{Macros}
 		\subsubsection{Almacenamiento}
 	\subsection{Ensamblando el Kernel}
