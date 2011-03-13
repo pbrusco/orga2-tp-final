@@ -69,7 +69,7 @@ En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir c
 
 \section{Instrucciones de uso}
 \paragraph{}
-Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
+Para ejecutar el kernel basta con !!!!!!!!!!!!!!!!!.... Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
 \begin{itemize}
 \item "h" : ayuda (lista los comandos).
 \item "l" : muestra todas las tareas disponibles.
@@ -157,9 +157,33 @@ En líneas generales la interfaz de este módulo puede ser caracterizada de la s
 El módulo de \textbf{GDT} es aquel mediante el cual se introduce la estrutura de datos \textit{GDT} que modela la estructura \textit{Global Descriptor Table} de la arquitectura IA-32 de Intel\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 2.1.1, página 61}. Asímismo, implementa también las funcionalidades necesarias para que el kernel pueda operar y hacer uso de esta estructura.
 
 \paragraph{}
-Concretamente, la implementación de la estructura \textit{GDT} no es más que un arreglo de otra estructura más pequeña definida en este mismo módulo: la \textit{GDT\_entry}. Dicha estructura constituye un bloque de memoria de 4 bytes que modela las entradas en la \textit{GDT}, las cuales reciben el nombre de descriptores. Los descriptores pueden ser de varios tipos (descriptor de segmento, descriptor de TSS, etc) y se separan en diversos campos \footnote{Más información sobre descriptores de}. Por tal motivo, la estructura \textit{GDT\_entry} también está subdividida en idénticos campos los cuales, segun los valores que se le fijen, indican entre otras cosas a qué tipo de descriptor corresponde cada entrada.
+Concretamente, la implementación de la estructura \textit{GDT} no es más que un arreglo de otra estructura más pequeña definida en este mismo módulo: la \textit{GDT\_entry}. Dicha estructura constituye un bloque de memoria de 4 bytes que modela las entradas en la \textit{GDT}, las cuales reciben el nombre de descriptores. Los descriptores pueden ser de varios tipos (descriptor de segmento, descriptor de TSS, etc) y se separan en diversos campos. Por tal motivo, la estructura \textit{GDT\_entry} también está subdividida en idénticos campos los cuales, segun los valores que se le fijen, indican entre otras cosas a qué tipo de descriptor corresponde cada entrada.
+
+\paragraph{}
+Finalmente, nuestra GDT queda organizada de la siguiente manera:
 
 
+\begin{itemize}
+	\item entrada nula
+	\item codigo kernel
+	\item datos kernel
+	\item codigo usuario
+	\item datos usuario
+	\item entrada\_tss1
+	\item entrada\_tss2
+	\item ...	
+	\item entrada\_tssx
+
+\end{itemize}
+
+\paragraph{}
+En el modulo implementado podemos encontrar las siguientes funciones:
+
+\begin{itemize}
+\item \textbf{make\_descriptor}: función que crea una entrada para la gdt tomando como parametros la base, el limite y los atributos.
+\item \textbf{buscar\_entradaGDT\_vacia}: Devuelve una posicion de la gdt que este vacia.
+\item \textbf{borrar\_gdt\_entry}: Crea un descriptor vacio en la posición a borrar.
+\end{itemize}
 
 \subsubsection{Paginación}
 \paragraph{}
@@ -239,6 +263,10 @@ Las principales funciones del modulo BCP son las siguientes:
 
 \end{itemize}
 \subsubsection{Interrupciones}
+
+
+
+
 \subsubsection{Scheduler}
 \paragraph{}
 El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
@@ -270,6 +298,7 @@ En nuestro kernel, el scheduller esta compuesto por la funci\'on switch\_task, c
 \end{enumerate}
 
 \subsubsection{Consola}
+
 \paragraph{}
 La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
 \paragraph{}
@@ -280,11 +309,7 @@ A continuación se listan las principales funciones necesarias para hacer posibl
 
 \item \textbf{console}: Es la función llamada cada vez que se preciona una tecla en la linea de comandos. En caso que esta tecla sea un 'enter' se llama a la función 'run' del comando almacenado, en caso contrario se van almacenando las teclas.
 \item \textbf{run}: Es la encargada de obtener y decodificar el comando enviado por console de manera de llamar a la función correcta.
-
-
-
 \end{itemize}				
-
 
 
 
