@@ -63,7 +63,7 @@
 El presente trabajo final surge como una continuación del tercer trabájo práctico de la materia en el segundo cuatrimestre de 2009. Aquél trabajo consistía en implementar un sistema minimal que permitiese correr concurrentemente dos tareas. Concretamente, dicho sistema consitía en un bootloader que se encargaba de cargar a memoria un kernel simplificado que incluía los binarios de las tareas en cuestión, junto con todas las estructuras necesarias para que dichas tareas pudieran ser ejecutadas (GDT, Directorio de Tablas de Páginas, una Tabla de Páginas para cada tarea, etc.). Luego, el kernel simplemente debía encargarse de activar el \textit{Gate A20}, pasar el procesador a modo protegido, activar el sistema de paginación, y poner a correr las tareas llamadas ``Pintor'' y ``Traductor'', las cuales alternaba mediante una interrupción del timer.
 
 \paragraph{}
-Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. El principal aspecto que lo diferencia es el hecho de que las tareas no se encuentran ya cargadas en memoria de manera estática, sino deben ser cargadas de manera dinámica y puestas en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas van siendo lanzadas.\\
+Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. A pesar que las tareas de usuario se encuentran cargadas en memoria de manera estática, el principal aspecto que diferencia al presente trabajo, es que estas se van inicializando a medida que el usuario así lo desee, a través del manejo de una consola diseñada para dicho fin. A la hora de inicializar una tarea, esta es puesta en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas van siendo lanzadas.\\
 En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir capaz de ejecutar varias tareas alternadamente dando la ilusión de simultaneidad) que puede lanzar procesos de forma dinámica con tan solo cargar tareas de memoria y creando las estructuras necesarias para que estas puedan ejecutarse en un procesador de arquitectura Intel-x86.
 
 		
@@ -90,7 +90,7 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			\item Memoria
 			\item Scheduler
 			\item GDT - Global Descriptor Table
-			\item Periféricos
+			\item Periféricos?????????????
 			\item Paginación				
 			\item Consola
 			\item Pantalla
@@ -104,7 +104,7 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 	\end{center}		
 
 	\paragraph{}
-	Esta distribución no es arbitraria, sino que responde a la modularización con la cual se encaró el diseño y desarrollo del kernel aquí presentado. Así, cada directorio contiene el código fuente uno o más de los módulos que integran al kernel, cada uno de los cuales fue desarrollado de forma incremental y testeado individualmente.
+	Esta distribución no es arbitraria, sino que responde a la modularización con la cual se encaró el diseño y desarrollo del kernel aquí presentado. Así, cada directorio contiene el código fuente de uno o más de los módulos que integran al kernel, cada uno de los cuales fue desarrollado de forma incremental y testeado individualmente.
 	
 	\paragraph{}
 	En la sección \ref{modulos}, se procederá a explicar en detalle cada uno de estos módulos a fin de poder comprender con claridad todas las partes que componen al kernel elaborado. Una vez concluída esa explicación, en la sección siguiente (\ref{kernel}), se detallará de qué forma el kernel agrupa y hace uso de todos estos módulos a fin de dar como resultado un sistema \textit{multitasking} con un \textit{scheduler} dinámico capaz de levantar tareas de memoria y alternarlas por medio de una política de reemplazo \textit{Round Robin}.
@@ -163,6 +163,23 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			
 				
 		\subsubsection{Paginación}
+			\paragraph{}
+			En este módulo, podemos encontrar todas las funcionalidades necesarias para el manejo de la paginación, las cuales son:
+			\begin{itemize}
+				\item mapear_tabla
+				\item mapear_pagina
+				\item obtener_mapeo
+				\item iniciar_paginacion_kernel
+			\end{itemize}
+			
+			\paragraph{}
+			Cuando se hizo necesario implementar el módulo, nos dimos a la tarea de imaginar qué necesidades íbamos a tener respecto a la paginación. En un comienzo, las rutinas \textit{mapear_tabla} y \textit{mapear_página} eran precarias. Necesitaban recibir como parámetro la dirección de la entrada de directorio y la de tabla de páginas respectivamente. Esto resultaba molesto, ya que primero habia que hacer un cálculo para conocer el offset dentro de cada tabla antes de poder realizar el mapeo. Además, en el caso del mapeo de una página, también habia que verificar que la tabla de páginas asociada a la página que se intentaba mapear estuviera presente.
+			
+			\paragraph{}
+			Teniendo en cuenta estas desventajas, concluímos que era necesario que todos estos cálculos y verificaciones se hicieran dentro de las mismas funciones. Seguidamente, se modificó el código de \textit{mapear_página} para que sólo reciba la dirección fisica del directorio de páginas, además de las necesarias como dirección virtual (o lógica), dirección física a la cual se debía mapear y los atributos de ::::
+
+//funcion que dada la direccion de un directorio pone en cero (o NO presente) todas las tablas y paginas mapeadas y libera las paginas utilizadas para contenerlas
+void liberar_directorio(uint32* dir_entry);
 		\subsubsection{TSS}
 		\subsubsection{Process Control Block (BCP) }
 		
@@ -177,10 +194,11 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 \item \textbf{ant}: anterior tarea para el round robin scheduler
 \item \textbf{pantalla}: puntero a la pagina destinada al video de la tarea
 \item \textbf{nombre}
+\item \textbf{dir_fisica}: puntero a la/s página/s a donde fue copiada la tarea para ejecutarse
 \end{itemize}
 
 			\paragraph{}
-				Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso esta situada en !!!!!!!!!
+				Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso esta situada en !!!!!!!!!(para quien lo haya escrito: la protección que tiene es la misma que la de todo el kernel. El usuario tiene permisos de lectura, pero no de escritura.)
 		
 			\paragraph{}
 				Las principales funciones del modulo BCP son las siguientes:
