@@ -166,21 +166,27 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			\paragraph{}
 			En este módulo, podemos encontrar todas las funcionalidades necesarias para el manejo de la paginación, las cuales son:
 			\begin{itemize}
-				\item mapear_tabla
-				\item mapear_pagina
-				\item obtener_mapeo
-				\item iniciar_paginacion_kernel
+				\item mapear\_tabla
+				\item mapear\_pagina
+				\item obtener\_mapeo
+				\item iniciar\_paginacion\_kernel
+				\item liberar\_directorio
 			\end{itemize}
 			
 			\paragraph{}
-			Cuando se hizo necesario implementar el módulo, nos dimos a la tarea de imaginar qué necesidades íbamos a tener respecto a la paginación. En un comienzo, las rutinas \textit{mapear_tabla} y \textit{mapear_página} eran precarias. Necesitaban recibir como parámetro la dirección de la entrada de directorio y la de tabla de páginas respectivamente. Esto resultaba molesto, ya que primero habia que hacer un cálculo para conocer el offset dentro de cada tabla antes de poder realizar el mapeo. Además, en el caso del mapeo de una página, también habia que verificar que la tabla de páginas asociada a la página que se intentaba mapear estuviera presente.
+			Cuando se hizo necesario implementar el módulo, nos dimos a la tarea de imaginar qué necesidades íbamos a tener respecto a la paginación. En un comienzo, las rutinas \textit{mapear\_tabla} y \textit{mapear\_página} eran precarias. Necesitaban recibir como parámetro la dirección de la entrada de directorio y la de tabla de páginas respectivamente. Esto resultaba molesto, ya que primero habia que hacer un cálculo para conocer el offset dentro de cada tabla antes de poder realizar el mapeo. Además, en el caso del mapeo de una página, también habia que verificar que la tabla de páginas asociada a la página que se intentaba mapear estuviera presente.
 			
 			\paragraph{}
-			Teniendo en cuenta estas desventajas, concluímos que era necesario que todos estos cálculos y verificaciones se hicieran dentro de las mismas funciones. Seguidamente, se modificó el código de \textit{mapear_página} para que sólo reciba la dirección fisica del directorio de páginas, además de las necesarias como dirección virtual (o lógica), dirección física a la cual se debía mapear y los atributos de ::::
+			Teniendo en cuenta estas desventajas, se concluyó que era necesario que todos estos cálculos y verificaciones se hicieran dentro de las mismas funciones. Seguidamente, se modificó el código de \textit{mapear\_página} para que sólo reciba la dirección fisica del directorio de páginas, además de las necesarias como dirección virtual (o lógica), dirección física a la cual se debía mapear la dirección virtual y los atributos de dicha página (escritura/lectura, supervisor/usuario, presente/no presente). Una de las principales características de la función es que allí se hace la verificación de si está o no presente la tabla de páginas que corresponde, y en caso de no estarlo, se pide una página para su estructura, se la inicia usando \textit{mapear\_tabla} y luego se continúa con el mapeo deseado. Estas características hicieron mucho más simple su uso y nos facilitó la tarea a la hora de programar otras rutinas que dependían de esta implementación.
+			
+			\paragraph{}
+			Por otra parte, está la función \textit{iniciar\_paginacion\_kernel}, que simplemente inicializa el Directorio de Tablas de Páginas (DTP) y todas las Tablas de Páginas (TP) asociadas. Para ello, se reservó una dirección dentro del mapa de memoria (la dirección es 0x100000), en la cuál se alojan todas estas estructuras.
+			
+			\paragraph{}
+			La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
 
-//funcion que dada la direccion de un directorio pone en cero (o NO presente) todas las tablas y paginas mapeadas y libera las paginas utilizadas para contenerlas
-void liberar_directorio(uint32* dir_entry);
 		\subsubsection{TSS}
+			
 		\subsubsection{Process Control Block (BCP) }
 		
 			\paragraph{}
@@ -194,7 +200,7 @@ void liberar_directorio(uint32* dir_entry);
 \item \textbf{ant}: anterior tarea para el round robin scheduler
 \item \textbf{pantalla}: puntero a la pagina destinada al video de la tarea
 \item \textbf{nombre}
-\item \textbf{dir_fisica}: puntero a la/s página/s a donde fue copiada la tarea para ejecutarse
+\item \textbf{dir\_fisica}: puntero a la/s página/s a donde fue copiada la tarea para ejecutarse
 \end{itemize}
 
 			\paragraph{}
