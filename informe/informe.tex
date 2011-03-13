@@ -241,17 +241,33 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 		\subsubsection{Interrupciones}
 		\subsubsection{Scheduller}
 			\paragraph{}
-			El Scheduller es el encargado de realizar el cambio de tareas siguiendo algun algoritmo de schedulling, en este caso Round Robin.
+				El algoritmo de schedulling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
+\begin{itemize}
+	\item todas las tareas deben poseer tiempo en la CPU.
+	\item si se usan priordades, una tarea con menor prioridad no debería trabar a una de mayor prioridad.
+	\item el scheduller debe escalar bien a medida que se agregan tareas en el kernel.
+\end{itemize}
+
+
+\paragraph{}
+Para este trabajo elegimos el algoritmo de Round Robin.
+
+			\paragraph{}
+
+Este algorimo es simple ya que se utiliza una única cola de procesos. Cuando el tiempo de cada uno de estos pasa, se efectua un cambio hacia la ejecución del siguiente y el anterior es puesto nuevamente en la cola. 
+\paragraph{}
+Cada proceso posee un quantum (cierto numero de ticks del reloj) que es el tiempo en el que se estara ejecutando. En nuestro caso, cada quantum equivale a 1 tick de reloj.
+
+
 			\paragraph{}
 			En nuestro kernel, el scheduller esta compuesto por la funci\'on switch\_task, cuyo funcionamiento es el siguiente
-			\paragraph{}
-			(Las interrupciones en el contexto de esta tarea estan deshabilitadas)
-			\begin{itemize}
+
+			\begin{enumerate}
 				\item comprueba que haya mas de una tarea, sino no hace nada.
 				\item cambia el estado de la tarea actual de CORRIENDO a ACTIVO (o lo deja en MATAR si es que estaba asi)
-				\item cambia el selector de 'salto' a donde se marco el 'pid' de la tarea\_actual, teniendo en cuenta de qué RPL elegir dependiendo de qué tarea se va a pasar a ejecutar
+				\item cambia el selector de 'salto' a donde se marco el 'pid' de la tarea\_actual, teniendo en cuenta qué RPL (Requested Privileged Level) elegir dependiendo de qué tarea se va a pasar a ejecutar
 				\item se hace el cambio de tarea
-			\end{itemize}
+			\end{enumerate}
 
 		\subsubsection{Consola}
 			\paragraph{}
