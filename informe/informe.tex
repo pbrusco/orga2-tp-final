@@ -90,7 +90,6 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			\item Memoria
 			\item Scheduler
 			\item GDT - Global Descriptor Table
-			\item Periféricos?????????????
 			\item Paginación				
 			\item Consola
 			\item Pantalla
@@ -241,7 +240,19 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 				\end{itemize}
 		\subsubsection{Interrupciones}
 		\subsubsection{Scheduller}
-		\subsubsection{Periféricos}
+			\paragraph{}
+			El Scheduller es el encargado de realizar el cambio de tareas siguiendo algun algoritmo de schedulling, en este caso Round Robin.
+			\paragraph{}
+			En nuestro kernel, el scheduller esta compuesto por la funci\'on switch\_task, cuyo funcionamiento es el siguiente
+			\paragraph{}
+			(Las interrupciones en el contexto de esta tarea estan deshabilitadas)
+			\begin{itemize}
+				\item comprueba que haya mas de una tarea, sino no hace nada.
+				\item cambia el estado de la tarea actual de CORRIENDO a ACTIVO (o lo deja en MATAR si es que estaba asi)
+				\item cambia el selector de 'salto' a donde se marco el 'pid' de la tarea\_actual, teniendo en cuenta de qué RPL elegir dependiendo de qué tarea se va a pasar a ejecutar
+				\item se hace el cambio de tarea
+			\end{itemize}
+
 		\subsubsection{Consola}
 			\paragraph{}
 				La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
