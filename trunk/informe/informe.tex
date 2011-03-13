@@ -185,6 +185,17 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 			La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
 
 		\subsubsection{TSS}
+			\paragraph{}
+			En este módulo, las funciones implementadas son:
+			\begin{itemize}
+				\item crear_TSS
+				\item buscar_TSS_vacia
+				\item vaciar_TSS
+				\item info_TSS
+			\end{itemize}
+
+			\paragraph{}
+			Además, aquí se implementa una estructuda llamada TSS_Entry, la cual contiene todos los datos necesarios para manejar el cambio de contexto en el switch de tareas. Para lograr este fin, se declara una variable goblal que es un arreglo de TSS_Entry la cual se inicia vacía. A medida que se van cargando tareas al scheduling, se utilizan las funciones buscar_TSS_vacia y crear_TSS para ir ocupando e inicializando estas entradas.
 			
 		\subsubsection{Process Control Block (BCP) }
 		
