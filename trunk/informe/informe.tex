@@ -190,40 +190,28 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
                   \item \textbf{iniciar\_BCP}: llena el BPC[0] con los datos del kernel, y inicializa variables globales
 
           
-                  \item \textbf{buscar\_entradaBCP\_vacia        }: busca entrada libre en el BCP (libre significa estado muerto)
-
+                  \item \textbf{buscar\_entradaBCP\_vacia }: busca entrada libre en el BCP (libre significa estado muerto)
                  
                   \item \textbf{crear\_entradaBCP }: llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
-
    
-                  \item \textbf{cambiar\_estado               }: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
-
+                  \item \textbf{cambiar\_estado}: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
    
-                  \item \textbf{buscar\_entradaBCP}: devuelve la posicion en la BCP de la tarea "id". Recordar que "id" es la posicion de la entrada tss de la tarea en la gdt
-
-                  
+                  \item \textbf{buscar\_entradaBCP}: devuelve la posicion en la BCP de una tarea pasada como parametro.
+     
                   \item \textbf{buscar\_entradaBCP\_matar}: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT\_TAREAS
 
-                  
                   
                   \item \textbf{cargarTarea}: carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
 
                   
-                  \item \textbf{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. El param "id" es la posicion en la GDT del segmento TSS de la tarea que se quiere eliminar.
-
-
-                  \item \textbf{kill\_app}
-
-                  
-                  \item \textbf{exit}:  esta tarea se la llama cuando la tarea actual quiere terminar y llama a la interrupcion 80
+                  \item \textbf{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. 
+                                   
+                  \item \textbf{exit}:  esta es llamada cuando la tarea actual quiere terminar y llama a la interrupcion 80
 
                   
                   \item \textbf{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
 
-                  
-                  \item \textbf{mapeo\_paginas\_default}: mapea las paginas por default para una tarea (paginas de la gdt,idt,tss,y demas estructuras)
-
-		
+                  	
 		
 				\end{itemize}
 		\subsubsection{Interrupciones}
