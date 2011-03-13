@@ -75,9 +75,7 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
  	\item "l" : muestra todas las tareas disponibles.
  	\item "p" : muestra todas las tareas en ejecuci\'on.
  	\item "v \{x\}" : ejecuta y muestra la tarea \{x\}.
- 	\item "z \{x\}" : ejecuta la tarea \{x\}.
  	\item "d \{x\}" : muestra la tarea \{x\}.
- 	\item "h \{x\}" : esconde la tarea \{x\}.
  	\item "k \{x\}" : termina la tarea \{x\}.
 
 \end{itemize}
@@ -165,7 +163,69 @@ Para ejecutar el kernel basta con bla bla bla.... Una vez cargado, el kernel mos
 				
 		\subsubsection{Paginación}
 		\subsubsection{TSS}
-		\subsubsection{Process Contro Block (BCP) }
+		\subsubsection{Process Control Block (BCP) }
+		
+			\paragraph{}
+			El Process Control Block, es una estructructura de datos en el Kernel que contiene la información necesaria para manejar cada uno de los procesos.
+			En nuestro caso, esta estructura contiene la siguiente información:
+\begin{itemize}
+\item \textbf{pid}: indice de la tarea en el gdt\_vector
+\item \textbf{estado}: indica el estado de la tarea
+\item \textbf{entrada\_directorio}: direccion del directorio de la tarea
+\item \textbf{sig}: siguiente tarea para el round robin scheduler
+\item \textbf{ant}: anterior tarea para el round robin scheduler
+\item \textbf{pantalla}: puntero a la pagina destinada al video de la tarea
+\item \textbf{nombre}
+\end{itemize}
+
+			\paragraph{}
+				Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso esta situada en !!!!!!!!!
+		
+			\paragraph{}
+				Las principales funciones del modulo BCP son las siguientes:
+				
+				\begin{itemize}
+	
+                  
+                  \item \textbf{iniciar\_BCP}: llena el BPC[0] con los datos del kernel, y inicializa variables globales
+
+          
+                  \item \textbf{buscar\_entradaBCP\_vacia        }: busca entrada libre en el BCP (libre significa estado muerto)
+
+                 
+                  \item \textbf{crear\_entradaBCP }: llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
+
+   
+                  \item \textbf{cambiar\_estado               }: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
+
+   
+                  \item \textbf{buscar\_entradaBCP}: devuelve la posicion en la BCP de la tarea "id". Recordar que "id" es la posicion de la entrada tss de la tarea en la gdt
+
+                  
+                  \item \textbf{buscar\_entradaBCP\_matar}: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT\_TAREAS
+
+                  
+                  
+                  \item \textbf{cargarTarea}: carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
+
+                  
+                  \item \textbf{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. El param "id" es la posicion en la GDT del segmento TSS de la tarea que se quiere eliminar.
+
+
+                  \item \textbf{kill\_app}
+
+                  
+                  \item \textbf{exit}:  esta tarea se la llama cuando la tarea actual quiere terminar y llama a la interrupcion 80
+
+                  
+                  \item \textbf{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
+
+                  
+                  \item \textbf{mapeo\_paginas\_default}: mapea las paginas por default para una tarea (paginas de la gdt,idt,tss,y demas estructuras)
+
+		
+		
+				\end{itemize}
 		\subsubsection{Interrupciones}
 		\subsubsection{Scheduller}
 		\subsubsection{Periféricos}
