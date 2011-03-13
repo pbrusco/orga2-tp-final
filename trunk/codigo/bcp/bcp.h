@@ -10,6 +10,7 @@ typedef struct BCP_Entry_s{
 	uint8 ant;			//anterior tarea para el round robin scheduler
 	uint16 *pantalla;			//puntero a la pagina destinada al video de la tarea
 	int8* nombre;
+	uint32* dir_fisica;
 } __attribute__((__packed__, aligned (8))) BCP_Entry;
 
 
@@ -22,7 +23,7 @@ void iniciar_BCP();
 uint16 buscar_entradaBCP_vacia();
 
 // llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
-void crear_entradaBCP(uint32 pid, uint8 estado, uint32* entrada_directorio, uint16 *pantalla, int8* name);
+void crear_entradaBCP(uint32 pid, uint8 estado, uint32* entrada_directorio, uint16 *pantalla, int8* name, uint32* dir_fisica);
 
 // cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
 void cambiar_estado(uint16 bcpPos, uint8 estado_nuevo);

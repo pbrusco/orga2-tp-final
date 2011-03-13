@@ -47,13 +47,14 @@ void iniciar_tss_kernel(){
 
 
 // LLAMAR SIEMPRE Y CUANDO YA SE HAYA EJECUTADO "iniciar_BCP"
-void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* video, int8* name){
+void crear_entradaBCP(uint32 id, uint8 estado, uint32* ent_directorio, uint16* video, int8* name, uint32* dir_fisica){
 	uint16 entrada = buscar_entradaBCP_vacia();
 	BCP[entrada].pid = id;
 	BCP[entrada].estado = ACTIVO;
 	BCP[entrada].pantalla = video;
 	BCP[entrada].entrada_directorio = ent_directorio;
 	BCP[entrada].nombre = name;
+	BCP[entrada].dir_fisica = dir_fisica;
 
 	BCP[entrada].ant = BCP[tarea_actual].ant;
 	BCP[entrada].sig = tarea_actual;
@@ -115,8 +116,8 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 	//mapeo las paginas que quiero con identity mapping
 	mapeo_paginas_default(directorio);
 
-	/*ESTO LO HACEMOS ASI ARBITRARIAMENTE. TODAS LAS TAREAS SE COMPILAN PONIENDO LA DIRECTIVA "ORG 0x2000".
-	  POR ESTO MISMO, EL EIP SE PONE POR DEFECTO EN 0X2000*/
+	/*ESTO LO HACEMOS ASI ARBITRARIAMENTE. TODAS LAS TAREAS SE COMPILAN PONIENDO LA DIRECTIVA "ORG 0x0".
+	  POR ESTO MISMO, EL EIP SE PONE POR DEFECTO EN 0X0*/
 	mapear_pagina(directorio, 0x0, (uint32) eip_fisico, PRESENT | WRITE | USUARIO);
 	/****************************************************************************************************/
 
@@ -124,11 +125,6 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 	mapear_pagina(directorio, (uint32) pila0, (uint32) pila0, PRESENT | WRITE | SUPERVISOR);
 	//mapeo la pagina de video a la pagina de video de la tarea
 	mapear_pagina(directorio, (uint32) 0xB8000, (uint32) video, PRESENT | WRITE | USUARIO);
-
-
-/*	mover_puntero(5,0);*/
-/*	printdword(obtener_mapeo(directorio, 0x2000), BASE16 | ROJO_L);*/
-/*	breakpoint();*/
 
 	// 3ro: crear una entrada de TSS e inicializarla
 	uint8 pos_TSS = buscar_TSS_vacia();
@@ -142,7 +138,7 @@ uint16 cargarTarea(uint32 dir_tarea, uint32 tam, int8* name){
 
 
 	// 5to: crear entrada de BCP e inicializarla
-	crear_entradaBCP(pid, ACTIVO, directorio, video, name);
+	crear_entradaBCP(pid, ACTIVO, directorio, video, name, eip_fisico);
 
 	return pid;
 }
@@ -257,6 +253,10 @@ void desaparecerTarea(uint8 bcpPos){
 	//pongo en 0 y libero pagina del video
 	setmem((uint8*) BCP[bcpPos].pantalla,0x00,80*24*2);
 	liberoPagina((uint32*) BCP[bcpPos].pantalla);
+	
+	//pongo en 0 y libero la pagina donde fue copiado el codigo de la tarea
+	setmem((uint8*) BCP[bcpPos].dir_fisica, 0, TAM_PAG);
+	liberoPagina(BCP[bcpPos].dir_fisica);
 
 	//libero la tss (OJO: solo pone en 0 el cr3, pero por ahora es suficiente)
 	vaciar_TSS(task_tss);
