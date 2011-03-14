@@ -426,7 +426,7 @@
 
 	\subsection{Escenario}
 	\paragraph{}
-	Describiremos entonces qué ocurre en el kernel cuando un usuario pone a correr dos tareas (que eventualmente pueden ser la misma) y luego decide finalizar una. Para ello, explicaremos paso por paso los eventos y acciones que tienen lugar en el sistema en el marco de la situación presentada:
+	Describiremos entonces qué ocurre en el kernel cuando un usuario pone a correr una tarea (es decir, el kernel y otra más) y luego decide finalizarla. Para ello, explicaremos paso por paso los eventos y acciones que tienen lugar en el sistema en el marco de la situación presentada:
 	\begin{enumerate}
 		\item Se inicia el sistema. Se ejecuta la inicilización del kernel tal como fue descripta en la sección  \ref{kernel}. Una vez terminada, la ejecución queda atrapada en el loop infinito de la función \texttt{kernel\_infinito}. No obstante, como las interrupciones están activas, el \textit{timertick} interrumpe al procesador cada \textbf{?? ms}.\\
 		Una vez producida una interrupción del timer, se detiene la ejecución del loop y se pasa a ejecutar la rutina de atención de la interrupcion del timer (\#32) sin que se produzca ningún cambio de contexto; es decir, se guarda el \textit{instruction pointer (IP)} actual en la pila de la tarea que se esta ejecutando (que casualmente es el kernel) y se actualiza el valor del \textit{IP} a la dirección de memoria en donde está el código de la rutina \texttt{\_INT32}. Dicha rutina efectua un llamado a la función \texttt{switch\_task} del módulo \textbf{Scheduler}. Sin embargo, como no hay otras tareas en el sistema, la misma no realiza cambio alguno por lo que la interrupcion finaliza y el loop infinito de \texttt{kernel\_infinito} continúa su ejecución.\\
@@ -449,8 +449,6 @@
 		Una vez terminada la función \texttt{cargarTarea} se vuelve a la ejecución de la función \texttt{console}, la cual invoca luego a la funcioń \texttt{cambiar\_pantalla} del módulo \textbf{Pantalla} pasándole como parámetro el \textit{pid} de la tarea \textit{X} que el usuario pidió cargar.\\
 		La función \texttt{cambiar\_pantalla}, copia el contenido del buffer de video de la tarea a la memoria de video y luego termina. Seguidamente, tambien terminan \texttt{console} e \texttt{\_INT33} y se devuelve el procesador a la ejecución del loop infinito en \texttt{kernel\_inifinito}.
 		\item Una vez cargada la tarea pedida por el usuario, en el sistema están presentes dos tareas: el kernel y la tarea 1. Luego, en la próxima interrupción del timer nuevamente la \texttt{\_INT32} llamará a \texttt{switch\_task}, solo que esta vez al haber más de una tarea en el sistema, dicha función marcará como \textit{``ACTIVA''} a la tarea actual en su \textit{entrada de BCP}, y marcará como \textit{``CORRIENDO''} en su \textit{entrada de BCP} a la tarea siguiente a la actual. Finalmente, ejecutará la instrucción \texttt{ljump selector:offset}, donde el \textit{offset} el es índice de la entrada en la \textit{GDT} en donde está el \textit{descriptor de TSS} de la tarea que se va a pasar a ejecutar.
-		\item El usuario ingres un comando para cargar una segunda tarea.
-		\item Se carga la tarea 2.
 		\item El usuario ingresa un comando para finalizar la primera tarea.
 		\item Se elimina la tarea 1.
 	\end{enumerate}
