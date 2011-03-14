@@ -448,10 +448,12 @@
 		\end{itemize}
 		Una vez terminada la función \texttt{cargarTarea} se vuelve a la ejecución de la función \texttt{console}, la cual invoca luego a la funcioń \texttt{cambiar\_pantalla} del módulo \textbf{Pantalla} pasándole como parámetro el \textit{pid} de la tarea \textit{X} que el usuario pidió cargar.\\
 		La función \texttt{cambiar\_pantalla}, copia el contenido del buffer de video de la tarea a la memoria de video y luego termina. Seguidamente, tambien terminan \texttt{console} e \texttt{\_INT33} y se devuelve el procesador a la ejecución del loop infinito en \texttt{kernel\_inifinito}.
-		\item Una vez cargada la tarea pedida por el usuario, en el sistema están presentes dos tareas: el kernel y la tarea 1. Luego, en la próxima interrupción del timer nuevamente la \texttt{\_INT32} llamará a \texttt{switch\_task}, solo que esta vez al haber más de una tarea en el sistema, dicha función marcará como \textit{``ACTIVA''} a la tarea actual en su \textit{entrada de BCP}, y marcará como \textit{``CORRIENDO''} en su \textit{entrada de BCP} a la tarea siguiente a la actual. Finalmente, ejecutará la instrucción \texttt{ljump selector:offset}, donde el \textit{offset} el es índice de la entrada en la \textit{GDT} en donde está el \textit{descriptor de TSS} de la tarea que se va a pasar a ejecutar.
-		\item El usuario ingresa un comando para finalizar la primera tarea.
-		\item Se elimina la tarea 1.
-	\end{enumerate}
+		\item Una vez cargada la tarea pedida por el usuario, en el sistema están presentes dos tareas: el kernel y la tarea 1. Luego, en la próxima interrupción del timer nuevamente la \texttt{\_INT32} llamará a \texttt{switch\_task}, solo que esta vez al haber más de una tarea en el sistema, dicha función marcará como \textit{``ACTIVA''} a la tarea actual en su \textit{entrada de BCP}, y marcará como \textit{``CORRIENDO''} en su \textit{entrada de BCP} a la tarea siguiente a la actual. Finalmente, ejecutará la instrucción \texttt{ljump selector:offset}, donde el \textit{selector} el es índice de la entrada en la \textit{GDT} en donde está el \textit{descriptor de TSS} de la tarea que se va a pasar a ejecutar.
+		\item Luego, de forma alternada y ``siguiendo la ronda'', las tareas van tomando el control del procesador tras cada interrupción del timer. En este punto, el usuario podría ingresa un comando para cargar nuevas tareas y se volvería a producir lo descripto desde el punto 2 en adelante.
+		\item  Supongomos ahora que el usuario ingresa el comando \textit{``k(X)''} para terminar la tareas que inició anteriormente tarea. Como señalamos en el paso 2, la \texttt{\_INT33} va guardando los caracteres pulsados por medio del llamado a la función \texttt{console}, y ejecuta el comando una vez que el usuario presiona \textit{``enter''} también por medio de esa misma función; la cual en ese caso se encarga de llamar a la función \texttt{matarTarea} del módulo \textbf{BCP}, pasandole como parámetro el \textit{pid} de la tarea en cuestión.\\
+		La función \texttt{matarTarea} únicamente se encarga de cambiar el estado dentro del \textit{BCP} de la tarea a finalizar de \textit{``CORRIENDO''} o \textit{``ACTIVA''} a \textit{``MATAR''} y termina, tras lo cual también termina la función \texttt{console} y interrupción que llamó a esta última.
+		\item
+.	\end{enumerate}
 
 
 \section{Nosotros también nos equivocamos}
