@@ -273,11 +273,11 @@
 	\paragraph{}
 	A continuación presentamos la interfaz de este módulo explicando cada una de las funciones que brinda al kernel para el manejo de las estructuras antes explicadas:
 	\begin{itemize}
-		\item \texttt{set\_interrupt:}
-		\item \texttt{set\_trap:}
-		\item \texttt{set\_task\_gate:}
-		\item \texttt{idtFill:}
-		\item \texttt{void handler\_de\_interrupciones:}
+		\item \texttt{set\_interrupt:} Setea una \textit{IDT\_entry} con los valores necesarios para que sea un descriptor de interrupción.
+		\item \texttt{set\_trap:} Setea una \textit{IDT\_entry} con los valores necesarios para que sea una trap gate.
+		\item \texttt{set\_task\_gate:}  Setea una \textit{IDT\_entry} con los valores necesarios para que sea una puerta de tarea.
+		\item \texttt{idtFill:} Setea las primeras 20 entradas de la \textit{IDT} como descriptores de interrupciones apuntando cada uno a su correpondiente rutina de atención, cada una de las cuales llama a su vez a la función \textit{handler\_de\_interrupciones}.	Luego, setea la entrada 32 y 33 de la \textit{IDT} como descriptores de interrupciones para el timertick y teclado respectivamente. Finalmente, setea la entrada 80 de la \textit{IDT} como un descriptor de interrupción que implementa la syscall \textit{exit} para matar al proceso que se encuentra en ejecución.
+		\item \texttt{void handler\_de\_interrupciones:} Esta función es llamada por las primeras 20 rutinas de atención de interrupciones para imprimir por pantalla el número de interrupción producido y colgar la ejecución del sistema.
 	\end{itemize}
 	
 	\paragraph{}
