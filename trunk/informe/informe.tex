@@ -397,11 +397,18 @@
 		\item Luego se ejecuta la instrucción \texttt{Jmp 0x08:modo\_protegido} a fin de efectivizar le pasaje al \textit{modo protegido} del procesador. Segudiamente, se actualiza el valor de los selectores para que apunten al descriptor de segemento de datos en la \textit{GDT}.
 		\item A continuación, se inicializar la pila en la posición de memoria 0x200000 (2 MB). Se asume que el sistema cuenta con esa mínima cantidad de memoria, ya que es requisito por el tamaño del kernel.
 		\item Una vez hecho esto se realiza un llamado a la función \texttt{contarMemoria} del módulo \textbf{Memoria} a fin de poder inicializar las variables \texttt{memoria\_tota, paginas\_libres} con valores acordes a la memoria del sistema sobre el cual se está ejecutando el kernel.
-		\item Luego, se hace una invocación a la función \texttt{iniciar\_paginacion\_kernel} del módulo \textbf{Paginación} (sección \ref{pag}) para setear e inicializar las estructuras necesarias (directorios, tablas de páginas, páginas)a fin de que el sistema pueda trabajar con este método de direccionamiento a memoria.
+		\item Luego, se hace una invocación a la función \texttt{iniciar\_paginacion\_kernel} del módulo \textbf{Paginación} para setear e inicializar las estructuras necesarias (directorios, tablas de páginas, páginas)a fin de que el sistema pueda trabajar con este método de direccionamiento a memoria.
 		\item Inmediatamente después se procede a cargar el registro \textit{CR3} del procesador con la direccion del Directorio de Tablas de Páginas a fin de que el procesador pueda ubicar esta estructura en memoria.
 		\item Seguidamente, se habilita la unidad de paginación en el procesador. Para ello, se setea el bit \textit{PG} del registro \textit{CR0}.
 		\item Luego, una vez habilitada la paginación, se invoca a la función \texttt{llenarBitmap} del módulo \textbf{Memoria} para marcar como ocupadas a todas las páginas utilizadas por el kernel y como libres a las restantes.
-		\item 
+		\item A continuación se llama al a función \texttt{iniciar\_BCP} del módulo \textbf{BCP}. De esta forma, se inicializan las variables globales referidas a procesos y se marca al kernel como el proceso 0 llenando la primera entrada la \textit{BCP} con los datos del mismo. Esto posibilitará que cuando el kernel esté corriendo su loop infinito y haya más tareas en el sistema sea ``scheduleado'' como una tarea más, pudiendo retomar el control del procesador únicamente cuando el scheduler le de su turno.
+		\item Sabiendo que las tareas se alternarán el control procesador, es preciso conservar el entorno de ejecución del kernel para cuando éste retome el control del mismo. Para ello, durante esta inicializacion se llama a la función \texttt{iniciar\_tss\_kernel} del módulo \textbf{BCP} que se encarga de buscar una \textit{TSS} en el arreglos de \textit{TSS's}, guarda el contexto de ejecución en la misma y colocar el corespondiente descritor de \textit{TSS} en la \textit{GDT}.
+		\item Cargo el registro de tareas (TR)
+		\item inicializo los descriptores de la IDT: call idtFill
+		\item remapeamos las interrupciones del vector de interrupciones
+		\item cargo en el registro IDTR la direccion base y el limite de la IDT que armamos en idt.c: lidt[IDT\_DESC]
+		\item Habilito las interrupciones: sti
+		\item call kernel\_infinito
 	\end{enumerate}
 
 \section{Cómo funciona todo}
