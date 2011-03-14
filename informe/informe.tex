@@ -151,6 +151,7 @@ En líneas generales la interfaz de este módulo puede ser caracterizada de la s
 \end{itemize}
 
 \subsubsection{Global Descriptor Table (GDT)}
+\label{gdt}
 \paragraph{}
 El módulo de \textbf{GDT} es aquel mediante el cual se introduce la estrutura de datos \textit{GDT} que modela la estructura \textit{Global Descriptor Table} de la arquitectura IA-32 de Intel\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 2.1.1, página 61}. Asímismo, implementa también las funcionalidades necesarias para que el kernel pueda operar y hacer uso de esta estructura.
 
@@ -257,9 +258,19 @@ Las principales funciones del modulo BCP son las siguientes:
 \item \textbf{exit}:  esta es llamada cuando la tarea actual quiere terminar y llama a la interrupcion 80
 \item \textbf{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
 \end{itemize}
+
 \subsubsection{Interrupciones}
-
-
+	\paragraph{}
+	Las estructuras y funciones necesarias para el manejo de interrupciones en el kernel aquí presentado se encuentran implmentadas en dos módulos: 
+	\begin{itemize}
+		\item El primero se encarga de la creación y el manejo de las estructuras necesarias para el funcionamiento de las interrupciones: \textit{IDT, descritores de IDT, registro de IDT, etc}.
+		\item El segundo se encarga de definir cada una de las funciones que constituyen las rutinas de atencion de interrupciones.
+	\end{itemize}
+	
+	El primero módulo está compuesto por los archivos \textit{idt.c} e \textit{idt.h}. Allí se especifica la estructura \textit{IDT} que modela la \textit{Interruption Descriptor Table (IDT)} de la arquitectura IA-32 de Intel. Al igual que la estructura \textit{GDT} descripta en la sección \ref{gdt}, la \textit{IDT} es un arreglo de otra estructura menor que es la \textit{IDT\_entry}, la cual a su vez modela los \textit{descriptores de IDT} que son las entradas que componen la \textit{IDT}.
+	
+	
+	%mientras que el segundo está compuesto por los archivos \textit{isr.asm} e  \textit{isr.h} y. 
 
 
 \subsubsection{Scheduler}
