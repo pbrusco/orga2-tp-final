@@ -59,205 +59,204 @@
 
 % Cuerpo del informe
 \section{Introducción}
-\paragraph{}
-El presente trabajo final surge como una continuación del tercer trabájo práctico de la materia en el segundo cuatrimestre de 2009. Aquél trabajo consistía en implementar un sistema minimal que permitiese correr concurrentemente dos tareas. Concretamente, dicho sistema consitía en un bootloader que se encargaba de cargar a memoria un kernel simplificado que incluía los binarios de las tareas en cuestión, junto con todas las estructuras necesarias para que dichas tareas pudieran ser ejecutadas (GDT, Directorio de Tablas de Páginas, una Tabla de Páginas para cada tarea, etc.). Luego, el kernel simplemente debía encargarse de activar el \textit{Gate A20}, pasar el procesador a modo protegido, activar el sistema de paginación, y poner a correr las tareas llamadas ``Pintor'' y ``Traductor'', las cuales alternaba mediante una interrupción del timer.
+	\paragraph{}
+	El presente trabajo final surge como una continuación del tercer trabájo práctico de la materia en el segundo cuatrimestre de 2009. Aquél trabajo consistía en implementar un sistema minimal que permitiese correr concurrentemente dos tareas. Concretamente, dicho sistema consitía en un bootloader que se encargaba de cargar a memoria un kernel simplificado que incluía los binarios de las tareas en cuestión, junto con todas las estructuras necesarias para que dichas tareas pudieran ser ejecutadas (GDT, Directorio de Tablas de Páginas, una Tabla de Páginas para cada tarea, etc.). Luego, el kernel simplemente debía encargarse de activar el \textit{Gate A20}, pasar el procesador a modo protegido, activar el sistema de paginación, y poner a correr las tareas llamadas ``Pintor'' y ``Traductor'', las cuales alternaba mediante una interrupción del timer.
 
-\paragraph{}
-Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. A pesar que las tareas de usuario se encuentran cargadas en memoria de manera estática, el principal aspecto que diferencia al presente trabajo, es que estas se van inicializando a medida que el usuario así lo desee, a través del manejo de una consola diseñada para dicho fin. A la hora de inicializar una tarea, esta es puesta en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas van siendo lanzadas.\\
-En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir capaz de ejecutar varias tareas alternadamente dando la ilusión de simultaneidad) que puede lanzar procesos de forma dinámica con tan solo cargar tareas de memoria y creando las estructuras necesarias para que estas puedan ejecutarse en un procesador de arquitectura Intel-x86.
+	\paragraph{}
+	Por el contrario, el trabajo aquí presentado, si bien se basa en el anterior, posee algunas diferencias. A pesar que las tareas de usuario se encuentran cargadas en memoria de manera estática, el principal aspecto que diferencia al presente trabajo, es que estas se van inicializando a medida que el usuario así lo desee, a través del manejo de una consola diseñada para dicho fin. A la hora de inicializar una tarea, esta es puesta en ejecución a través de un scheduler que va asignando tiempos de CPU a cada uno de los procesos que se ejecutan de forma concurrente en el sistema. Naturalmente, esta diferencia en cuanto al otro kernel conlleva un cambio en lo que respecta a la administracíón de memoria, ya que estructuras como entradas de la GDT o TSS's deberán ser creados e inicializados para cada nueva tarea conforme estas van siendo lanzadas.\\
+	En consecuencia, el resultado final es un \textit{kernel multitarea} (es decir capaz de ejecutar varias tareas alternadamente dando la ilusión de simultaneidad) que puede lanzar procesos de forma dinámica con tan solo cargar tareas de memoria y creando las estructuras necesarias para que estas puedan ejecutarse en un procesador de arquitectura Intel-x86.
 
 
 \section{Instrucciones de uso}
-\paragraph{}
-Para ejecutar el kernel basta con compilar el kernel utilizando el MakeFile. Luego utilizando Bochs 2.4 se iniciara el proceso. Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
-\begin{itemize}
-\item "h" : ayuda (lista los comandos).
-\item "l" : muestra todas las tareas disponibles.
-\item "p" : muestra todas las tareas en ejecuci\'on junto con su pid.
-\item "v \{x\}" : ejecuta y muestra la tarea \{x\}.
-\item "d \{pid\}" : muestra la tarea con pid \{pid\}.
-\item "k \{pid\}" : termina la tarea con pid \{pid\}.
-
-\end{itemize}
+	\paragraph{}
+	Para ejecutar el kernel basta con compilar el kernel utilizando el MakeFile. Luego utilizando Bochs 2.4 se iniciara el proceso. Una vez cargado, el kernel mostrará en pantalla una consola mediante la cual se podrá cargar y poner a ejecutar cada una de las tareas. A continuación se detallan la lista de comandos que pueden ser interpretados por la consola:
+	\begin{itemize}
+		\item "h" : ayuda (lista los comandos).
+		\item "l" : muestra todas las tareas disponibles.
+		\item "p" : muestra todas las tareas en ejecuci\'on junto con su pid.
+		\item "v \{x\}" : ejecuta y muestra la tarea \{x\}.
+		\item "d \{pid\}" : muestra la tarea con pid \{pid\}.
+		\item "k \{pid\}" : termina la tarea con pid \{pid\}.
+	\end{itemize}
 
 
 \section{Implementación}
 \subsection{Descripción General}
-El código fuente que implementa el kernel se entrega junto con este informe en un sorpote digital y se ubica en la carpeta \texttt{codigo}. Dentro de la misma los archivos se organizan de la siguiente manera:
-\begin{center}
-\begin{shortitemize}
-\setlength{\shortitemwidth}{200pt}
-\item Memoria
-\item Scheduler
-\item GDT - Global Descriptor Table
-\item Paginación				
-\item Consola
-\item Pantalla
-\item TSS - Task State
-\item BCP - Block Control Process
-\item Interrupciones							
-\item Kernel
-\end{shortitemize}
-\end{center}		
+	\paragraph{}
+	El código fuente que implementa el kernel se entrega junto con este informe en un sorpote digital y se ubica en la carpeta \texttt{codigo}. Dentro de la misma los archivos se organizan de la siguiente manera:
+	\begin{center}
+		\begin{shortitemize}
+		\setlength{\shortitemwidth}{200pt}
+		\item Memoria
+		\item Scheduler
+		\item GDT - Global Descriptor Table
+		\item Paginación				
+		\item Consola
+		\item Pantalla
+		\item TSS - Task State
+		\item BCP - Block Control Process
+		\item Interrupciones							
+		\item Kernel
+		\end{shortitemize}
+	\end{center}		
 
-\paragraph{}
-Esta distribución no es arbitraria, sino que responde a la modularización con la cual se encaró el diseño y desarrollo del kernel aquí presentado. Así, cada directorio contiene el código fuente de uno o más de los módulos que integran al kernel, cada uno de los cuales fue desarrollado de forma incremental y testeado individualmente.
+	\paragraph{}
+	Esta distribución no es arbitraria, sino que responde a la modularización con la cual se encaró el diseño y desarrollo del kernel aquí presentado. Así, cada directorio contiene el código fuente de uno o más de los módulos que integran al kernel, cada uno de los cuales fue desarrollado de forma incremental y testeado individualmente.
 
-\paragraph{}
-En la sección \ref{modulos}, se procederá a explicar en detalle cada uno de estos módulos a fin de poder comprender con claridad todas las partes que componen al kernel elaborado. Una vez concluída esa explicación, en la sección siguiente (\ref{kernel}), se detallará de qué forma el kernel agrupa y hace uso de todos estos módulos a fin de dar como resultado un sistema \textit{multitasking} con un \textit{scheduler} dinámico capaz de levantar tareas de memoria y alternarlas por medio de una política de reemplazo \textit{Round Robin}.
+	\paragraph{}
+	En la sección \ref{modulos}, se procederá a explicar en detalle cada uno de estos módulos a fin de poder comprender con claridad todas las partes que componen al kernel elaborado. Una vez concluída esa explicación, en la sección siguiente (\ref{kernel}), se detallará de qué forma el kernel agrupa y hace uso de todos estos módulos a fin de dar como resultado un sistema \textit{multitasking} con un \textit{scheduler} dinámico capaz de levantar tareas de memoria y alternarlas por medio de una política de reemplazo \textit{Round Robin}.
 
-\paragraph{}
-Seguidamente, se expone cómo está constituído el \textit{Mapa de memoria} del sistema, así como también el porqué de su elección.
+	\paragraph{}
+	Seguidamente, se expone cómo está constituído el \textit{Mapa de memoria} del sistema, así como también el porqué de su elección.
+
 
 \subsection{Mapa de Memoria}
-\paragraph{}
-Previo a la escritura del código de los módulos mencionados en la sección anterior, a sabiendas de que el sistema utilizaría la paginación como forma de direccionar a memoria, se procedió a establecer un mapa de memoria que permitiese ubicar las estructuras críticas e indispensables del sistema de manera inequívoca. La opción elegida fue realizar un \textit{identity mapping} de las páginas (todas ellas de 4 KB) a los frames de memoria, fijando algunos de ellos para uso exclusivo del kernel o de otras estructuras como la \textit{GDT}, las \textit{TSS} o el \textit{Bitmap}.
+	\paragraph{}
+	Previo a la escritura del código de los módulos mencionados en la sección anterior, a sabiendas de que el sistema utilizaría la paginación como forma de direccionar a memoria, se procedió a establecer un mapa de memoria que permitiese ubicar las estructuras críticas e indispensables del sistema de manera inequívoca. La opción elegida fue realizar un \textit{identity mapping} de las páginas (todas ellas de 4 KB) a los frames de memoria, fijando algunos de ellos para uso exclusivo del kernel o de otras estructuras como la \textit{GDT}, las \textit{TSS} o el \textit{Bitmap}.
 
-\paragraph{}
-La imagen que sigue muestrá como estan mapeadas y ocupadas las páginas de memoria en el sistema:
-\begin{center}
-\includegraphics[scale=0.80]{./otros/mapa_memoria.pdf}
-\end{center}
+	\paragraph{}
+	La imagen que sigue muestrá como estan mapeadas y ocupadas las páginas de memoria en el sistema:
+	\begin{center}
+		\includegraphics[scale=0.80]{./otros/mapa_memoria.pdf}
+	\end{center}
 
 \subsection{Módulos}
 \label{modulos}
 \subsubsection{Memoria}
-\paragraph{}
-El módulo de \textbf{Memoria} es el encargado de brindarle al kernel las herramientas para contabilizar y administrar la memoria del sistema.
+	\paragraph{}
+	El módulo de \textbf{Memoria} es el encargado de brindarle al kernel las herramientas para contabilizar y administrar la memoria del sistema.
 
-\paragraph{}
-Básicamente, la idea empleada para administrar consiste en contabilizar la cantidad de bytes con los que cuenta la memoria, luego determinar cuántas páginas de 4 KB hay en la memoria del sistema y luego plasmar esta información en un \textit{Bitmap}. El \textit{Bitmap} no es más que una porción de memoria en donde hay tantos bits como páginas haya en el sistema. Luego, cada página ocupada se representa en el \textit{Bitmap} poniendo un ``1'' en el bit asociado a dicha página, mientras que las páginas libres se representan con un ``0''.
+	\paragraph{}
+	Básicamente, la idea empleada para administrar consiste en contabilizar la cantidad de bytes con los que cuenta la memoria, luego determinar cuántas páginas de 4 KB hay en la memoria del sistema y luego plasmar esta información en un \textit{Bitmap}. El \textit{Bitmap} no es más que una porción de memoria en donde hay tantos bits como páginas haya en el sistema. Luego, cada página ocupada se representa en el \textit{Bitmap} poniendo un ``1'' en el bit asociado a dicha página, mientras que las páginas libres se representan con un ``0''.
 
-\paragraph{}
-En líneas generales la interfaz de este módulo puede ser caracterizada de la siguiente manera:
-\begin{itemize}
-\item Variables Globales:
-\begin{itemize}
-\item \texttt{memoria\_total:} Variable global en la cual se almacena la cantidad de Megabytes de memoria con la que cuenta el sistema.
-\item \texttt{paginas\_libres:} Variable global que contabiliza el número de páginas libres de memoria en el sistema.
-\item \texttt{dir\_init\_bitmap:} Puntero a la dirección 0x???, que es la posición donde se inicia el \textit{Bitmap} para administrar las páginas de memoria.
-\item \texttt{dir\_end\_bitmap:} Puntero a la dirección 0x??, que es la última dirección válida del \textit{Bitmap}.
-\end{itemize}
-
-\item Funciones:
-\begin{itemize}
-\item \texttt{contarMemoria:} Función que se encarga de contar cuántos MB de memoria hay en el sistema guardando dicho valor en la variable \texttt{memoria\_total}. Asímismo, determina el número de frames de 4 KB que puede haber en la memoria del sistema y almacena dicho valor en la variable \texttt{paginas\_libres}.
-\item \texttt{llenarBitmap:} Función que a partir de la posición apuntada por \texttt{dir\_init\_bitmap} marca poniendo en ``1'' todos los bits correspondientes a las páginas de memoria utilizadas por el kernel y luego pone en ``0'' a las restantes.
-\item \texttt{pidoPagina:} Función que devuelve un puntero a la primer posición de memoria de una pagina libre, y previo a ello, la marca como ocupada en el Bitmap poniendo en ``1'' el bit correspondiente a dicha página.
-\item \texttt{liberoPagina:} Función que dado un puntero a una posicion de memoria, determina en qué página de memoria se alberga dicha posición y luego pone en ``0'' el bit correspondiente a esa página para así marcarla como libre.
-\item \texttt{setmem:} Función que dado un puntero a una posición de memoria y dos valores enteros \textit{set} y \textit{cant}, pone el valor de \textit{set} en \textit{cant} bytes desde la posición de memoria apuntada por el puntero en adelante.
-\item \texttt{cpmem:} Función que dados dos punteros a posiciones de memoria y un valor entero \textit{cant}, copia el valor de \textit{cant} bytes desde la posición de memoria apuntada por el primer puntero en adelante, hacia los \textit{cant} bytes de memoria desde la posición de memoria apuntada por el por el segundo puntero en adelante.
-\end{itemize}
-\end{itemize}
+	\paragraph{}
+	En líneas generales la interfaz de este módulo puede ser caracterizada de la siguiente manera:
+	\begin{itemize}
+		\item Variables Globales:
+		\begin{itemize}
+			\item \texttt{memoria\_total:} Variable global en la cual se almacena la cantidad de Megabytes de memoria con la que cuenta el sistema.
+			\item \texttt{paginas\_libres:} Variable global que contabiliza el número de páginas libres de memoria en el sistema.
+			\item \texttt{dir\_init\_bitmap:} Puntero a la dirección 0x???, que es la posición donde se inicia el \textit{Bitmap} para administrar las páginas de memoria.
+			\item \texttt{dir\_end\_bitmap:} Puntero a la dirección 0x??, que es la última dirección válida del \textit{Bitmap}.
+		\end{itemize}
+		\item Funciones:
+		\begin{itemize}
+			\item \texttt{contarMemoria:} Función que se encarga de contar cuántos MB de memoria hay en el sistema guardando dicho valor en la variable \texttt{memoria\_total}. Asímismo, determina el número de frames de 4 KB que puede haber en la memoria del sistema y almacena dicho valor en la variable \texttt{paginas\_libres}.
+			\item \texttt{llenarBitmap:} Función que a partir de la posición apuntada por \texttt{dir\_init\_bitmap} marca poniendo en ``1'' todos los bits correspondientes a las páginas de memoria utilizadas por el kernel y luego pone en ``0'' a las restantes.
+			\item \texttt{pidoPagina:} Función que devuelve un puntero a la primer posición de memoria de una pagina libre, y previo a ello, la marca como ocupada en el Bitmap poniendo en ``1'' el bit correspondiente a dicha página.
+			\item \texttt{liberoPagina:} Función que dado un puntero a una posicion de memoria, determina en qué página de memoria se alberga dicha posición y luego pone en ``0'' el bit correspondiente a esa página para así marcarla como libre.
+			\item \texttt{setmem:} Función que dado un puntero a una posición de memoria y dos valores enteros \textit{set} y \textit{cant}, pone el valor de \textit{set} en \textit{cant} bytes desde la posición de memoria apuntada por el puntero en adelante.
+			\item \texttt{cpmem:} Función que dados dos punteros a posiciones de memoria y un valor entero \textit{cant}, copia el valor de \textit{cant} bytes desde la posición de memoria apuntada por el primer puntero en adelante, hacia los \textit{cant} bytes de memoria desde la posición de memoria apuntada por el por el segundo puntero en adelante.
+		\end{itemize}
+	\end{itemize}
 
 \subsubsection{Global Descriptor Table (GDT)}
 \label{gdt}
-\paragraph{}
-El módulo de \textbf{GDT} es aquel mediante el cual se introduce la estrutura de datos \textit{GDT} que modela la estructura \textit{Global Descriptor Table} de la arquitectura IA-32 de Intel\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 2.1.1, página 61}. Asímismo, implementa también las funcionalidades necesarias para que el kernel pueda operar y hacer uso de esta estructura.
+	\paragraph{}
+	El módulo de \textbf{GDT} es aquel mediante el cual se introduce la estrutura de datos \textit{GDT} que modela la estructura \textit{Global Descriptor Table} de la arquitectura IA-32 de Intel\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 2.1.1, página 61}. Asímismo, implementa también las funcionalidades necesarias para que el kernel pueda operar y hacer uso de esta estructura.
 
-\paragraph{}
-Concretamente, la implementación de la estructura \textit{GDT} no es más que un arreglo de otra estructura más pequeña definida en este mismo módulo: la \textit{GDT\_entry}. Dicha estructura constituye un bloque de memoria de 4 bytes que modela las entradas en la \textit{GDT}, las cuales reciben el nombre de descriptores. Los descriptores pueden ser de varios tipos (descriptor de segmento, descriptor de TSS, etc) y se separan en diversos campos. Por tal motivo, la estructura \textit{GDT\_entry} también está subdividida en idénticos campos los cuales, segun los valores que se le fijen, indican entre otras cosas a qué tipo de descriptor corresponde cada entrada.
+	\paragraph{}
+	Concretamente, la implementación de la estructura \textit{GDT} no es más que un arreglo de otra estructura más pequeña definida en este mismo módulo: la \textit{GDT\_entry}. Dicha estructura constituye un bloque de memoria de 4 bytes que modela las entradas en la \textit{GDT}, las cuales reciben el nombre de descriptores. Los descriptores pueden ser de varios tipos (descriptor de segmento, descriptor de TSS, etc) y se separan en diversos campos. Por tal motivo, la estructura \textit{GDT\_entry} también está subdividida en idénticos campos los cuales, segun los valores que se le fijen, indican entre otras cosas a qué tipo de descriptor corresponde cada entrada.
 
-\paragraph{}
-Finalmente, nuestra GDT queda organizada de la siguiente manera:
+	\paragraph{}
+	Finalmente, nuestra GDT queda organizada de la siguiente manera:
 
+	\begin{itemize}
+		\item entrada nula
+		\item codigo kernel
+		\item datos kernel
+		\item codigo usuario
+		\item datos usuario
+		\item descriptor\_tss1
+		\item descriptor\_tss2
+		\item ...	
+		\item descriptor\_tssx
+	\end{itemize}
 
-\begin{itemize}
-	\item entrada nula
-	\item codigo kernel
-	\item datos kernel
-	\item codigo usuario
-	\item datos usuario
-	\item descriptor\_tss1
-	\item descriptor\_tss2
-	\item ...	
-	\item descriptor\_tssx
+	\paragraph{}
+	En el módulo implementado podemos encontrar las siguientes funciones:
 
-\end{itemize}
-
-\paragraph{}
-En el modulo implementado podemos encontrar las siguientes funciones:
-
-\begin{itemize}
-\item \textbf{make\_descriptor}: función que crea una entrada para la gdt tomando como parametros la base, el limite y los atributos.
-\item \textbf{buscar\_entradaGDT\_vacia}: Devuelve una posicion de la gdt que este vacia.
-\item \textbf{borrar\_gdt\_entry}: Crea un descriptor vacio en la posición a borrar.
-\end{itemize}
+	\begin{itemize}
+		\item \texttt{make\_descriptor}: función que crea una entrada para la gdt tomando como parametros la base, el limite y los atributos.
+		\item \texttt{buscar\_entradaGDT\_vacia}: Devuelve una posicion de la gdt que este vacia.
+		\item \texttt{borrar\_gdt\_entry}: Crea un descriptor vacio en la posición a borrar.
+	\end{itemize}
 
 \subsubsection{Paginación}
-\paragraph{}
-En este módulo, podemos encontrar todas las funcionalidades necesarias para el manejo de la paginación, las cuales son:
-\begin{itemize}
-\item mapear\_tabla
-\item mapear\_pagina
-\item obtener\_mapeo
-\item iniciar\_paginacion\_kernel
-\item liberar\_directorio
-\end{itemize}
+	\paragraph{}
+	En este módulo, podemos encontrar todas las funcionalidades necesarias para el manejo de la paginación, las cuales son:
+	
+	\begin{itemize}
+		\item mapear\_tabla
+		\item mapear\_pagina
+		\item obtener\_mapeo
+		\item iniciar\_paginacion\_kernel
+		\item liberar\_directorio
+	\end{itemize}
 
-\paragraph{}
-Cuando se hizo necesario implementar el módulo, nos dimos a la tarea de imaginar qué necesidades íbamos a tener respecto a la paginación. En un comienzo, las rutinas \textit{mapear\_tabla} y \textit{mapear\_página} eran precarias. Necesitaban recibir como parámetro la dirección de la entrada de directorio y la de tabla de páginas respectivamente. Esto resultaba molesto, ya que primero habia que hacer un cálculo para conocer el offset dentro de cada tabla antes de poder realizar el mapeo. Además, en el caso del mapeo de una página, también habia que verificar que la tabla de páginas asociada a la página que se intentaba mapear estuviera presente.
+	\paragraph{}
+	Cuando se hizo necesario implementar el módulo, nos dimos a la tarea de imaginar qué necesidades íbamos a tener respecto a la paginación. En un comienzo, las rutinas \textit{mapear\_tabla} y \textit{mapear\_página} eran precarias. Necesitaban recibir como parámetro la dirección de la entrada de directorio y la de tabla de páginas respectivamente. Esto resultaba molesto, ya que primero habia que hacer un cálculo para conocer el offset dentro de cada tabla antes de poder realizar el mapeo. Además, en el caso del mapeo de una página, también habia que verificar que la tabla de páginas asociada a la página que se intentaba mapear estuviera presente.
 
-\paragraph{}
-Teniendo en cuenta estas desventajas, se concluyó que era necesario que todos estos cálculos y verificaciones se hicieran dentro de las mismas funciones. Seguidamente, se modificó el código de \textit{mapear\_página} para que sólo reciba la dirección fisica del directorio de páginas, además de las necesarias como dirección virtual (o lógica), dirección física a la cual se debía mapear la dirección virtual y los atributos de dicha página (escritura/lectura, supervisor/usuario, presente/no presente). Una de las principales características de la función es que allí se hace la verificación de si está o no presente la tabla de páginas que corresponde, y en caso de no estarlo, se pide una página para su estructura, se la inicia usando \textit{mapear\_tabla} y luego se continúa con el mapeo deseado. Estas características hicieron mucho más simple su uso y nos facilitó la tarea a la hora de programar otras rutinas que dependían de esta implementación.
+	\paragraph{}
+	Teniendo en cuenta estas desventajas, se concluyó que era necesario que todos estos cálculos y verificaciones se hicieran dentro de las mismas funciones. Seguidamente, se modificó el código de \textit{mapear\_página} para que sólo reciba la dirección fisica del directorio de páginas, además de las necesarias como dirección virtual (o lógica), dirección física a la cual se debía mapear la dirección virtual y los atributos de dicha página (escritura/lectura, supervisor/usuario, presente/no presente). Una de las principales características de la función es que allí se hace la verificación de si está o no presente la tabla de páginas que corresponde, y en caso de no estarlo, se pide una página para su estructura, se la inicia usando \textit{mapear\_tabla} y luego se continúa con el mapeo deseado. Estas características hicieron mucho más simple su uso y nos facilitó la tarea a la hora de programar otras rutinas que dependían de esta implementación.
 
-\paragraph{}
-Por otra parte, está la función \textit{iniciar\_paginacion\_kernel}, que simplemente inicializa el Directorio de Tablas de Páginas (DTP) y todas las Tablas de Páginas (TP) asociadas. Para ello, se reservó una dirección dentro del mapa de memoria (la dirección es 0x100000), en la cuál se alojan todas estas estructuras.
+	\paragraph{}
+	Por otra parte, está la función \textit{iniciar\_paginacion\_kernel}, que simplemente inicializa el Directorio de Tablas de Páginas (DTP) y todas las Tablas de Páginas (TP) asociadas. Para ello, se reservó una dirección dentro del mapa de memoria (la dirección es 0x100000), en la cuál se alojan todas estas estructuras.
 
-\paragraph{}
-La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
+	\paragraph{}
+	La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
 
 \subsubsection{TSS}
-\paragraph{}
-La TSS (Task State Segment) es una estructura de datos que contiene informaci\'on acerca de una tarea. 
+	\paragraph{}
+	La TSS (Task State Segment) es una estructura de datos que contiene informaci\'on acerca de una tarea. 
 
-\paragraph{}
-Para setear la TSS se necesita una entrada en la GDT especificando la base, limite y atributos.
+	\paragraph{}
+	Para setear la TSS se necesita una entrada en la GDT especificando la base, limite y atributos.
 
-\paragraph{}
-Luego, para acceder al c\'odigo de la tarea, deberemos, entre otras cosas, hacer un jump al descriptor de TSS en la gdt.
+	\paragraph{}
+	Luego, para acceder al c\'odigo de la tarea, deberemos, entre otras cosas, hacer un jump al descriptor de TSS en la gdt.
 
-\paragraph{}
-En nuestro kernel, las funciones que poseemos en este modulo son:
-\begin{itemize}
-\item \textbf{crear\_TSS}: Crea una TSS (y su descriptor en la GDT) utilizando como parametros: dirección, CR3, EIP, EFLAGS, pila y el ESP0.
-\item \textbf{buscar\_TSS\_vacia}: Busca una entrada de TSS vacia (toma como TSS vacia aquella cuyo cr3 sea igual a 0, devuelve un número igual o mayor que CANT\_TAREAS si no hay ningun lugar disponible)
-\item \textbf{vaciar\_TSS} Setea el cr3 de una tss en 0 para ser reutilizada por otras tareas.
-\end{itemize}
+	\paragraph{}
+	En nuestro kernel, las funciones que poseemos en este módulo son:
+	\begin{itemize}
+		\item \texttt{crear\_TSS}: Crea una TSS (y su descriptor en la GDT) utilizando como parametros: dirección, CR3, EIP, EFLAGS, pila y el ESP0.
+		\item \texttt{buscar\_TSS\_vacia}: Busca una entrada de TSS vacia (toma como TSS vacia aquella cuyo cr3 sea igual a 0, devuelve un número igual o mayor que CANT\_TAREAS si no hay ningun lugar disponible)
+		\item \texttt{vaciar\_TSS} Setea el cr3 de una tss en 0 para ser reutilizada por otras tareas.
+	\end{itemize}
+
 \subsubsection{Process Control Block (BCP) }
+	\paragraph{}
+	El Process Control Block, es una estructructura de datos en el Kernel que contiene la información necesaria para manejar cada uno de los procesos.
+	En nuestro caso, esta estructura contiene la siguiente información:
+	\begin{itemize}
+		\item \textbf{pid}: indice de la tarea en el gdt\_vector
+		\item \textbf{estado}: indica el estado de la tarea
+		\item \textbf{entrada\_directorio}: direccion del directorio de la tarea
+		\item \textbf{sig}: siguiente tarea para el round robin scheduler
+		\item \textbf{ant}: anterior tarea para el round robin scheduler
+		\item \textbf{pantalla}: puntero a la pagina destinada al video de la tarea
+		\item \textbf{nombre}
+		\item \textbf{dir\_fisica}: puntero a la/s página/s a donde fue copiada la tarea para ejecutarse
+	\end{itemize}
 
-\paragraph{}
-El Process Control Block, es una estructructura de datos en el Kernel que contiene la información necesaria para manejar cada uno de los procesos.
-En nuestro caso, esta estructura contiene la siguiente información:
-\begin{itemize}
-\item \textbf{pid}: indice de la tarea en el gdt\_vector
-\item \textbf{estado}: indica el estado de la tarea
-\item \textbf{entrada\_directorio}: direccion del directorio de la tarea
-\item \textbf{sig}: siguiente tarea para el round robin scheduler
-\item \textbf{ant}: anterior tarea para el round robin scheduler
-\item \textbf{pantalla}: puntero a la pagina destinada al video de la tarea
-\item \textbf{nombre}
-\item \textbf{dir\_fisica}: puntero a la/s página/s a donde fue copiada la tarea para ejecutarse
-\end{itemize}
+	\paragraph{}
+	Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso la protección que tiene es la misma que la de todo el kernel. El usuario tiene permisos de lectura, pero no de escritura.
 
-\paragraph{}
-Ya que el BCP contiene informacion critica de los procesos, esta almacenada en un area protegida de los usuarios. En nuestro caso la protección que tiene es la misma que la de todo el kernel. El usuario tiene permisos de lectura, pero no de escritura.
+	\paragraph{}
+	Las principales funciones del módulo BCP son las siguientes:
 
-\paragraph{}
-Las principales funciones del modulo BCP son las siguientes:
-
-\begin{itemize}
-\item \textbf{iniciar\_BCP}: llena el BPC[0] con los datos del kernel, y inicializa variables globales
-\item \textbf{buscar\_entradaBCP\_vacia }: busca entrada libre en el BCP (libre significa estado muerto)
-\item \textbf{crear\_entradaBCP }: llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
-\item \textbf{cambiar\_estado}: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
-\item \textbf{buscar\_entradaBCP}: devuelve la posicion en la BCP de una tarea pasada como parametro.
-\item \textbf{buscar\_entradaBCP\_matar}: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT\_TAREAS
-\item \textbf{cargarTarea}: carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
-\item \textbf{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. 
-\item \textbf{exit}:  esta es llamada cuando la tarea actual quiere terminar y llama a la interrupcion 80
-\item \textbf{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
-\end{itemize}
+	\begin{itemize}
+		\item \texttt{iniciar\_BCP}: llena el BPC[0] con los datos del kernel, y inicializa variables globales
+		\item \texttt{buscar\_entradaBCP\_vacia }: busca entrada libre en el BCP (libre significa estado muerto)
+		\item \texttt{crear\_entradaBCP }: llena la entrada con los datos de la tarea y la agrega al final de la cola de tareas activas
+		\item \texttt{cambiar\_estado}: cambia el estado de una tarea, y si el estado es MUERTO la quita de la cola de tareas activas
+		\item \texttt{buscar\_entradaBCP}: devuelve la posicion en la BCP de una tarea pasada como parametro.
+		\item \texttt{buscar\_entradaBCP\_matar}: devuelve la posicion en la BCP de alguna tarea con estado "MUERTA". Si no hay ninguna, devuelve CANT\_TAREAS
+		\item \texttt{cargarTarea}: carga una tarea y todo sus datos y contexto en memoria y la agrega en la BCP para incluirla en el scheduling
+		\item \texttt{matarTarea}: Marcar tarea como "MATAR" para que luego el KERNEL se encargue de eliminarla. 
+		\item \texttt{exit}:  esta es llamada cuando la tarea actual quiere terminar y llama a la interrupcion 80
+		\item \texttt{desaparecerTarea}: Esta funcion se va a llamar cada vez que se ejecute el kernel. La idea es que si hay alguna tarea en la BCP marcada como "MATAR" (ya va a estar fuera del scheduler), esta funcion se encargue de eliminar y liberar todas las estructuras utilizadas por la tarea (BCP, TSS, directorio y tablas de páginas, paginas de video y de pila y gdt).
+	\end{itemize}
 
 \subsubsection{Interrupciones}
 	\paragraph{}
@@ -267,10 +266,22 @@ Las principales funciones del modulo BCP son las siguientes:
 		\item El segundo se encarga de definir cada una de las funciones que constituyen las rutinas de atencion de interrupciones.
 	\end{itemize}
 	
-	El primero módulo está compuesto por los archivos \textit{idt.c} e \textit{idt.h}. Allí se especifica la estructura \textit{IDT} que modela la \textit{Interruption Descriptor Table (IDT)} de la arquitectura IA-32 de Intel. Al igual que la estructura \textit{GDT} descripta en la sección \ref{gdt}, la \textit{IDT} es un arreglo de otra estructura menor que es la \textit{IDT\_entry}, la cual a su vez modela los \textit{descriptores de IDT} que son las entradas que componen la \textit{IDT}.
+	\paragraph{}
+	El primer módulo está compuesto por los archivos \textit{idt.c} e \textit{idt.h}. Allí se especifican las estructuras \textit{IDT} e \textit{IDT\_Descriptor} que modelan respectivamente la \textit{Interruption Descriptor Table (IDT)} y el \textit{registro de GDT (GDTR)} de la arquitectura IA-32 de Intel\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 6.10, página 226}.\\
+	Al igual que la estructura \textit{GDT} descripta en la sección \ref{gdt}, la \textit{IDT} es un arreglo de otra estructura menor que es la \textit{IDT\_entry}, la cual a su vez modela las entradas de la \textit{IDT} que reciben el nombre  de \textit{descriptores de IDT}\footnote{Intel 64 and IA-32 Architectures Software Developer’s Manual, Volume 3A: System Programming Guide, Part 1 - Sección 6.11, página 228}.
 	
+	\paragraph{}
+	A continuación presentamos la interfaz de este módulo explicando cada una de las funciones que brinda al kernel para el manejo de las estructuras antes explicadas:
+	\begin{itemize}
+		\item \texttt{set\_interrupt:}
+		\item \texttt{set\_trap:}
+		\item \texttt{set\_task\_gate:}
+		\item \texttt{idtFill:}
+		\item \texttt{void handler\_de\_interrupciones:}
+	\end{itemize}
 	
-	%mientras que el segundo está compuesto por los archivos \textit{isr.asm} e  \textit{isr.h} y. 
+	\paragraph{}
+	El segundo módulo...
 
 
 \subsubsection{Scheduler}
@@ -323,7 +334,7 @@ A continuación se listan las principales funciones necesarias para hacer posibl
 
 
 \paragraph{}
-El modulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
+El módulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
 \paragraph{}
 Está planeado de la siguiente manera:
 \begin{itemize}
