@@ -277,113 +277,114 @@
 		\item \texttt{set\_trap:} Setea una \textit{IDT\_entry} con los valores necesarios para que sea una trap gate.
 		\item \texttt{set\_task\_gate:}  Setea una \textit{IDT\_entry} con los valores necesarios para que sea una puerta de tarea.
 		\item \texttt{idtFill:} Setea las primeras 20 entradas de la \textit{IDT} como descriptores de interrupciones apuntando cada uno a su correpondiente rutina de atención, cada una de las cuales llama a su vez a la función \textit{handler\_de\_interrupciones}.	Luego, setea la entrada 32 y 33 de la \textit{IDT} como descriptores de interrupciones para el timertick y teclado respectivamente. Finalmente, setea la entrada 80 de la \textit{IDT} como un descriptor de interrupción que implementa la syscall \textit{exit} para matar al proceso que se encuentra en ejecución.
-		\item \texttt{void handler\_de\_interrupciones:} Esta función es llamada por las primeras 20 rutinas de atención de interrupciones para imprimir por pantalla el número de interrupción producido y colgar la ejecución del sistema.
+		\item \texttt{handler\_de\_interrupciones:} Esta función es llamada por las primeras 20 rutinas de atención de interrupciones para imprimir por pantalla el número de interrupción producido y colgar la ejecución del sistema.
 	\end{itemize}
 	
 	\paragraph{}
-	El segundo módulo...
-
+	El segundo módulo es aque en el que se implementan las funciones \textit{\_INT\texttt{X}}, donde \texttt{X} el número de la interrupcion que al producirse invoca a su correspondiente función \textit{\_INT\texttt{X}}.
+	
+	\paragraph{}
+	Seguidamente se expone la lista de rutinas de interrupción implementadas junto con una breve descripión de su funcionamiento:
+	\begin{itemize}
+		\item \texttt{\_INT0 a \_INT19:} Llama a la función \texttt{handler\_de\_interrupciones} pasándole como parámetro el número de la interrupción producida para que ésta imprima por pantalla un mensaje asociado a dicha interrupción y luego ejecute un loop infinito a fin de colgar la ejecución del sistema.
+		\item \texttt{\_INT32:} Llama a la función \texttt{switch\_task} del módulo \textbf{Scheduler} para que se produzca el cambio de la tarea que se esta ejecutando por la tarea elegida por el \textit{scheduler} segun su politica de reemplazo.
+		\item \texttt{\_INT33:} Copia el valor de la tecla pulsada en el registro \textit{AX} y llama a la función \texttt{console} (implementada en el módulo \textbf{Consola}) pasandole el valor de ese registro como parámetro.
+		\item \texttt{\_INT80:} Llama a la función \texttt{exit} del módulo \textbf{BCP} que se encarga de imprimir en pantalla el mensaje \textit{``TERMINE!!''}, matar a la tarea que se está ejecutando y llamar a la función \texttt{switch\_task} para pasar a la proxima tarea segun la política de scheduling. 
+	\end{itemize}
 
 \subsubsection{Scheduler}
-\paragraph{}
-El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
-\begin{itemize}
-\item todas las tareas deben poseer tiempo en la CPU.
-\item si se usan priordades, una tarea con menor prioridad no debería trabar a una de mayor prioridad.
-\item el scheduller debe escalar bien a medida que se agregan tareas en el kernel.
-\end{itemize}
+	\paragraph{}
+	El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
+	\begin{itemize}
+		\item todas las tareas deben poseer tiempo en la CPU.
+		\item si se usan priordades, una tarea con menor prioridad no debería trabar a una de mayor prioridad.
+		\item el scheduller debe escalar bien a medida que se agregan tareas en el kernel.
+	\end{itemize}
 
+	\paragraph{}
+	Para este trabajo elegimos el algoritmo de Round Robin.
 
-\paragraph{}
-Para este trabajo elegimos el algoritmo de Round Robin.
+	\paragraph{}
+	Este algorimo es simple ya que se utiliza una única cola de procesos. Cuando el tiempo de cada uno de estos pasa, se efectua un cambio hacia la ejecución del siguiente y el anterior es puesto nuevamente en la cola. 
 
-\paragraph{}
+	\paragraph{}
+	Cada proceso posee un quantum (cierto numero de ticks del reloj) que es el tiempo en el que se estara ejecutando. En nuestro caso, cada quantum equivale a 1 tick de reloj.
 
-Este algorimo es simple ya que se utiliza una única cola de procesos. Cuando el tiempo de cada uno de estos pasa, se efectua un cambio hacia la ejecución del siguiente y el anterior es puesto nuevamente en la cola. 
-\paragraph{}
-Cada proceso posee un quantum (cierto numero de ticks del reloj) que es el tiempo en el que se estara ejecutando. En nuestro caso, cada quantum equivale a 1 tick de reloj.
+	\paragraph{}
+	En nuestro kernel, el scheduller esta compuesto por la funci\'on switch\_task, cuyo funcionamiento es el siguiente
 
+	\begin{enumerate}
+		\item comprueba que haya mas de una tarea, sino no hace nada.
+		\item cambia el estado de la tarea actual de CORRIENDO a ACTIVO (o lo deja en MATAR si es que estaba asi)
+		\item cambia el selector de 'salto' a donde se marco el 'pid' de la tarea\_actual, teniendo en cuenta qué RPL (Requested Privileged Level) elegir dependiendo de qué tarea se va a pasar a ejecutar
+		\item se hace el cambio de tarea
+	\end{enumerate}
 
-\paragraph{}
-En nuestro kernel, el scheduller esta compuesto por la funci\'on switch\_task, cuyo funcionamiento es el siguiente
-
-\begin{enumerate}
-\item comprueba que haya mas de una tarea, sino no hace nada.
-\item cambia el estado de la tarea actual de CORRIENDO a ACTIVO (o lo deja en MATAR si es que estaba asi)
-\item cambia el selector de 'salto' a donde se marco el 'pid' de la tarea\_actual, teniendo en cuenta qué RPL (Requested Privileged Level) elegir dependiendo de qué tarea se va a pasar a ejecutar
-\item se hace el cambio de tarea
-\end{enumerate}
 
 \subsubsection{Consola}
+	\paragraph{}
+	La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
 
-\paragraph{}
-La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
-\paragraph{}
-A continuación se listan las principales funciones necesarias para hacer posibles la linea de comandos:
-\begin{itemize}
-
-\item \textbf{ cargar\_tarea}: recibe la posicion de la tarea a cargar dentro de "tareas\_en\_memoria"
-
-\item \textbf{console}: Es la función llamada cada vez que se preciona una tecla en la linea de comandos. En caso que esta tecla sea un 'enter' se llama a la función 'run' del comando almacenado, en caso contrario se van almacenando las teclas.
-\item \textbf{run}: Es la encargada de obtener y decodificar el comando enviado por console de manera de llamar a la función correcta.
-\end{itemize}				
-
+	\paragraph{}
+	A continuación se listan las principales funciones necesarias para hacer posibles la linea de comandos:
+	\begin{itemize}
+		\item \texttt{ cargar\_tarea}: recibe la posicion de la tarea a cargar dentro de "tareas\_en\_memoria"
+		\item \texttt{console}: Es la función llamada cada vez que se preciona una tecla en la linea de comandos. En caso que esta tecla sea un 'enter' se llama a la función 'run' del comando almacenado, en caso contrario se van almacenando las teclas.
+		\item \texttt{run}: Es la encargada de obtener y decodificar el comando enviado por console de manera de llamar a la función correcta.
+	\end{itemize}				
 
 
 \subsubsection{Pantalla}
+	\paragraph{}
+	El módulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
 
-
-\paragraph{}
-El módulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
-\paragraph{}
-Está planeado de la siguiente manera:
-\begin{itemize}
-\item 23 filas centrales que podras usar las tareas y el kernel para escribir
-\item En la última fila se vera la linea de comandos (manejada por console.c) 
-
-\end{itemize}
-
-
- 
-\paragraph{}
-Las funciones que provee son:
-\begin{itemize} 
-\item \textbf{avanzar\_puntero}: Avanza el puntero de la pantalla un caracter. 
-\item \textbf{retroceder\_puntero}: Retrocede el puntero de la pantalla un caracter. 
-\item \textbf{mover\_puntero}: Mueve el puntero de la pantalla hasta una fila y columna indicadas. 
-\item \textbf{salto\_de\_linea}: Avanza el puntero de la pantalla una fila. 
-\item \textbf{printf}: Es utilizadad para imprimir caracteres.
-\item \textbf{printdword}: Se usa para ver valores de variables. Recibe como parámetros la dword a imprimir y los atributos de escritura.
-\item \textbf{putc}: Escribe un caracter en la pantalla 
-\item \textbf{borrarc}: Borra el ultimo caracter de la pantalla 
-\item \textbf{num2char}: Deja en buffer un string que representa al numero pasado escrito en una base indicada. 
-\item \textbf{clear\_screen}: Limpia la pantalla. 
-\item \textbf{mostrar\_pantalla\_entera}: La idea es copiar 23 renglones enteros de la tarea 'pid'. (Recordar que la pantalla es de 80*23, de manera de dejarle el ultimo 'renglon' para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
-\item \textbf{cambiar\_pantalla}: Setea la pantalla a mostrar y llama a mostrar pantalla entera.
-\item \textbf{clear\_command\_line}: limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado 
-\item \textbf{clear\_info\_line}: Limpia la linea de informacion (fila 0 de la pantalla) y deja el puntero a dicha linea inicializado 
-\item \textbf{removerc}: Borra el ultimo caracter de la linea de comandos 
-\item \textbf{agregarc}: Escribe un caracter en la linea de comandos
-\end{itemize}
+	\paragraph{}
+	Está planeado de la siguiente manera:
+	\begin{itemize}
+		\item 23 filas centrales que podras usar las tareas y el kernel para escribir
+		\item En la última fila se vera la linea de comandos (manejada por console.c) 
+	\end{itemize}
+	 
+	\paragraph{}
+	Las funciones que provee son:
+	\begin{itemize} 
+		\item \textbf{avanzar\_puntero}: Avanza el puntero de la pantalla un caracter. 
+		\item \textbf{retroceder\_puntero}: Retrocede el puntero de la pantalla un caracter. 
+		\item \textbf{mover\_puntero}: Mueve el puntero de la pantalla hasta una fila y columna indicadas. 
+		\item \textbf{salto\_de\_linea}: Avanza el puntero de la pantalla una fila. 
+		\item \textbf{printf}: Es utilizadad para imprimir caracteres.
+		\item \textbf{printdword}: Se usa para ver valores de variables. Recibe como parámetros la dword a imprimir y los atributos de escritura.
+		\item \textbf{putc}: Escribe un caracter en la pantalla 
+		\item \textbf{borrarc}: Borra el ultimo caracter de la pantalla 
+		\item \textbf{num2char}: Deja en buffer un string que representa al numero pasado escrito en una base indicada. 
+		\item \textbf{clear\_screen}: Limpia la pantalla. 
+		\item \textbf{mostrar\_pantalla\_entera}: La idea es copiar 23 renglones enteros de la tarea 'pid'. (Recordar que la pantalla es de 80*23, de manera de dejarle el ultimo 'renglon' para el kernel y la consola y el primer renglón para saber qué estamos visualizando.
+		\item \textbf{cambiar\_pantalla}: Setea la pantalla a mostrar y llama a mostrar pantalla entera.
+		\item \textbf{clear\_command\_line}: limpia la linea de comandos (fila 24 de la pantalla) y deja el prompt y el puntero a dicha linea inicializado 
+		\item \textbf{clear\_info\_line}: Limpia la linea de informacion (fila 0 de la pantalla) y deja el puntero a dicha linea inicializado 
+		\item \textbf{removerc}: Borra el ultimo caracter de la linea de comandos 
+		\item \textbf{agregarc}: Escribe un caracter en la linea de comandos
+	\end{itemize}
 
 
 \subsection{Ensamblando el Kernel}
 \label{kernel}	
-\begin{itemize}
-\item Habilitar Gate A20
-\item Inicializar la GDT y el GDT\_desc
-\item Copiar GDT\_desc a lgdt
-\item Habilitar bit PE de CR0
-\item Jmp 0x08:modo\_protegido
-\item Pasaje a modo protegido
-\item Actualizar selectores
-\item Inicializar la pila
-\item Contar memoria disponible
-\item Crear estructuras de paginación
-\item Cargar en CR3 la direccion del Directorio de Tablas de Páginas
-\item Habilitar bit PG de CR0
-\item Inicializar Bitmap
-\item Pasaje a paginación
-\end{itemize}
+	\paragraph{}
+	\begin{itemize}
+		\item Habilitar Gate A20
+		\item Inicializar la GDT y el GDT\_desc
+		\item Copiar GDT\_desc a lgdt
+		\item Habilitar bit PE de CR0
+		\item Jmp 0x08:modo\_protegido
+		\item Pasaje a modo protegido
+		\item Actualizar selectores
+		\item Inicializar la pila
+		\item Contar memoria disponible
+		\item Crear estructuras de paginación
+		\item Cargar en CR3 la direccion del Directorio de Tablas de Páginas
+		\item Habilitar bit PG de CR0
+		\item Inicializar Bitmap
+		\item Pasaje a paginación
+	\end{itemize}
 
 \end{document}
