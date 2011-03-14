@@ -300,7 +300,7 @@
 \subsubsection{Scheduler}
 \label{sched}	
 	\paragraph{}
-	El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
+	El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso cumpliendo con ciertos criterios
 	\begin{itemize}
 		\item todas las tareas deben poseer tiempo en la CPU.
 		\item si se usan priordades, una tarea con menor prioridad no debería trabar a una de mayor prioridad.
@@ -373,6 +373,17 @@
 		\item \textbf{removerc}: Borra el ultimo caracter de la linea de comandos 
 		\item \textbf{agregarc}: Escribe un caracter en la linea de comandos
 	\end{itemize}
+
+\subsection{Tareas}
+
+\paragraph{}
+Para una mejor comprensión de cómo es el manejo de las tareas, se va a explicar cómo fue que se implementó esto. Cuando se decidió empezar a correr tareas, nos encontramos en la disyuntiva de cómo hacer para correrlas. En un principio, se hacía algo similar a lo que se había hecho en el tercer trabajo práctico de la materia. Las tareas se compilaban poniendo en la directiva ORG para nasm que su origen era X y luego se incluían los binarios de las mismas en el código \textit{kernel.asm}, teniendo el cuidado de que se incluyan en la misma dirección X con la que fueron compilados para correr.
+
+\paragraph{}
+Esto acarreaba varios problemas, pero el principal era que una tarea iba a poder utilizarse una única vez en simultaneo, es decir, una vez que el usuario decidiera cargar la tarea T, no se podía volver a correr dicha tarea, sin antes matarla claro está. Además, como cada tarea ocupaba menos de una página, los códigos estaban incluidos en la misma página, por lo que cada tarea podía ver (e incluso ejecutar) el código de la otra tarea. Por todo esto se decidió que era una buena idea no ejecutar las tareas en la misma posición en donde había sido incluido su código, sino que convenía copiar el código a alguna posición de memoria aparte y ejecutarlo desde allí. Esta copia de código fue realizada en la función que se encarga de cargar una tarea en el sistema: \textbf{cargarTarea} que se encuentra en el módulo \textbf{BCP}.
+
+\paragraph{}
+Aquí hubo un inconveniente cuando se traducían las interrupciones de las tareas, ya que el mapeo de la página a donde apuntaba el EIP de la tarea no estaba realizado con identity mapping. Para solucionar estos inconvenientes se optó porque todas las tareas que se hicieran, se compilaran con la directiva ORG 0x0 al comienzo. Esto, junto con un correcto mapeo de páginas a la hora de cargar una tarea en el sistema, hicieron posible poder ejecutar varias veces en simultaneo una misma tarea, reparando así problemas tanto de funcionalidad como de seguridad.
 
 
 \subsection{El Kernel}
@@ -508,3 +519,11 @@
 
 
 \end{document}
+
+
+
+
+
+
+
+
