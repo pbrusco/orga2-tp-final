@@ -123,6 +123,7 @@
 \subsection{Módulos}
 \label{modulos}
 \subsubsection{Memoria}
+\label{mem}
 	\paragraph{}
 	El módulo de \textbf{Memoria} es el encargado de brindarle al kernel las herramientas para contabilizar y administrar la memoria del sistema.
 
@@ -183,6 +184,7 @@
 	\end{itemize}
 
 \subsubsection{Paginación}
+\label{pag}
 	\paragraph{}
 	En este módulo, podemos encontrar todas las funcionalidades necesarias para el manejo de la paginación, las cuales son:
 	
@@ -207,6 +209,7 @@
 	La última función crucial de este módulo es \textit{liberar\_directorio}. Esta función se encarga de, dada la dirección de un directorio de tablas de páginas, borrar todas las entradas del directorio y de las tablas de páginas y limpiar y liberar todas aquellas páginas que hayan sido utilizadas para contener estas estructuras, las páginas de las pilas de la tarea y del buffer de video. Esta función es utilizada a la hora de eliminar una tarea de memoria.
 
 \subsubsection{TSS}
+\label{tss}
 	\paragraph{}
 	La TSS (Task State Segment) es una estructura de datos que contiene informaci\'on acerca de una tarea. 
 
@@ -225,6 +228,7 @@
 	\end{itemize}
 
 \subsubsection{Process Control Block (BCP) }
+\label{bcp}
 	\paragraph{}
 	El Process Control Block, es una estructructura de datos en el Kernel que contiene la información necesaria para manejar cada uno de los procesos.
 	En nuestro caso, esta estructura contiene la siguiente información:
@@ -259,6 +263,7 @@
 	\end{itemize}
 
 \subsubsection{Interrupciones}
+\label{int}
 	\paragraph{}
 	Las estructuras y funciones necesarias para el manejo de interrupciones en el kernel aquí presentado se encuentran implmentadas en dos módulos: 
 	\begin{itemize}
@@ -293,6 +298,7 @@
 	\end{itemize}
 
 \subsubsection{Scheduler}
+\label{sched}	
 	\paragraph{}
 	El algoritmo de scheduling es el que determina cuanto tiempo de CPU sera dedicado a cada proceso dependiendo cumpliendo con ciertos criterios
 	\begin{itemize}
@@ -322,6 +328,7 @@
 
 
 \subsubsection{Consola}
+\label{cons}
 	\paragraph{}
 	La consola es una función del kernel que permite una interfaz hacia los usuarios, en este caso es una linea de comandos que permite listar, correr, matar, etc. una lista de tareas disponibles en el sistema. 
 
@@ -335,6 +342,7 @@
 
 
 \subsubsection{Pantalla}
+\label{screen}
 	\paragraph{}
 	El módulo pantalla se ocupa de lo necesario para poder imprimir información en la pantalla para el uso del kernel y las tareas.
 
@@ -367,25 +375,34 @@
 	\end{itemize}
 
 
-\subsection{Ensamblando el Kernel}
+\subsection{EL Kernel}
 \label{kernel}	
 	\paragraph{}
+	Hasta aquí se explico el funcionamiento de todos los módulos que componen el kernel. En esta sección, se explicará cómo se integran todos estos componentes para conformar el kernel propiamente dicho. Veamos entonces cómo se conforma el módulo \textbf{Kernel}.
+	
+	\paragraph{} 
+	Los archivos del módulo \textbf{Kernel} son tres: \textit{kernel.c}, \textit{kernel.h} y \textit{kernel.asm}. Los dos primeros, son archivos que contienen la declaración e implementación de funciones que serán utilizadas por el kernel durante su ejecución. Estas son:
 	\begin{itemize}
-		\item Habilitar Gate A20
-		\item Inicializar la GDT y el GDT\_desc
-		\item Copiar GDT\_desc a lgdt
-		\item Habilitar bit PE de CR0
-		\item Jmp 0x08:modo\_protegido
-		\item Pasaje a modo protegido
-		\item Actualizar selectores
-		\item Inicializar la pila
-		\item Contar memoria disponible
-		\item Crear estructuras de paginación
-		\item Cargar en CR3 la direccion del Directorio de Tablas de Páginas
-		\item Habilitar bit PG de CR0
-		\item Inicializar Bitmap
-		\item Pasaje a paginación
+		\item \texttt{kernel\_infinito:} Esta función consistuye el loop infinito sobre el cual se basa todo kernel. Durante este ciclo, la única acción del kernel consiste en la búsqueda de algún proceso al que se le haya marcado en su entrada de \textit{BCP} como listo para matar y se procede a la liberación de todos los recursos asociados a ese procesos (páginas de memoria, TSS, pila, entrada en la \textit{BCP}, entrada en la \textit{GDT}).
+		\item \texttt{update\_cursor:} Esta función únicamente se encarga de mover el cursor que está en la pantalla.
 	\end{itemize}
+	
+	\paragraph{}
+	Finalmente, el archivo \textit{kernel.asm} contiene el código de inicialización del kernel, que es en donde finalmente se hace uso de todas las estructuras y funcionalidades aportadas por los módulos vistos anteriormente. A continuación, se detallará todos los pasos que realiza el kernel a fin de preparar el sistema para que sea capaz de ejecutar tareas de modo concurrente, para luego dar paso a la ejecución de las mismas por medio de la invocación a la función \texttt{kernel\_infinito}:
+	
+	\begin{enumerate}
+		\item Como primer paso, se habilita el Gate A20 para que se pueda direcciónar a memoria más alla de la dirección 0x100000; es decir, más allá de 1 Megabyte.
+		\item Luego, se carga la estructura \textit{GDT\_desc} del módulo \textbf{GDT} en el registro \textit{gdtr} del procesador, el cual describe la direción base y el límite de la \textit{GDT}. A su vez, la \textit{GDT}, que tal como se explicó oportunamente en la sección \ref{gdt} es un arreglo de descriptores, también es inicializada seteando la memoria contigua al código del kernel (hacia el final del archivo \textit{kernel.asm}) de forma tal que allí queden alojados los 128 descriptores detallados en la sección \ref{gdt}. 
+		\item Seguidamente se setea el bit \textit{PE} de registro \textit{CR0} del procesador a fin de poder realizar el pasaje a \textit{modo protegido}.
+		\item Luego se ejecuta la instrucción \texttt{Jmp 0x08:modo\_protegido} a fin de efectivizar le pasaje al \textit{modo protegido} del procesador. Segudiamente, se actualiza el valor de los selectores para que apunten al descriptor de segemento de datos en la \textit{GDT}.
+		\item A continuación, se inicializar la pila en la posición de memoria 0x200000 (2 MB). Se asume que el sistema cuenta con esa mínima cantidad de memoria, ya que es requisito por el tamaño del kernel.
+		\item Una vez hecho esto se realiza un llamado a la función \texttt{contarMemoria} del módulo \textbf{Memoria} a fin de poder inicializar las variables \texttt{memoria\_tota, paginas\_libres} con valores acordes a la memoria del sistema sobre el cual se está ejecutando el kernel.
+		\item Luego, se hace una invocación a la función \texttt{iniciar\_paginacion\_kernel} del módulo \textbf{Paginación} (sección \ref{pag}) para setear e inicializar las estructuras necesarias (directorios, tablas de páginas, páginas)a fin de que el sistema pueda trabajar con este método de direccionamiento a memoria.
+		\item Inmediatamente después se procede a cargar el registro \textit{CR3} del procesador con la direccion del Directorio de Tablas de Páginas a fin de que el procesador pueda ubicar esta estructura en memoria.
+		\item Seguidamente, se habilita la unidad de paginación en el procesador. Para ello, se setea el bit \textit{PG} del registro \textit{CR0}.
+		\item Luego, una vez habilitada la paginación, se invoca a la función \texttt{llenarBitmap} del módulo \textbf{Memoria} para marcar como ocupadas a todas las páginas utilizadas por el kernel y como libres a las restantes.
+		\item 
+	\end{enumerate}
 
 \section{Cómo funciona todo}
 
