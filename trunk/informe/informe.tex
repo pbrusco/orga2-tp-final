@@ -387,4 +387,78 @@
 		\item Pasaje a paginación
 	\end{itemize}
 
+\section{Cómo funciona todo}
+
+\subsection{Introducción}
+\paragraph{}
+En las secciones anteriores de este informe se realizó una explicación a grandes rasgos de todas las estructuras y métodos utilizados para el funcionamiento del kernel y de las tareas. No obstante, para lograr entender mejor cómo es que fue implementado todo y cómo es que funcionan las cosas, creemos que sería de mucha ayuda hacer una descripción paso a paso de algún posible escenario. En esta sección entonces, trataremos de clarificar el funcionamiento global del trabajo práctico.
+
+\subsection{Escenario}
+\paragraph{}
+El escenario a describir es el siguiente:
+\begin{itemize}
+	\item Se inicia el kernel
+	\item Se carga la tarea 1
+	\item Se elimina la tarea 1
+\end{itemize}
+
+\paragraph{Se inicia el kernel}
+\paragraph{Se carga la tarea 1}
+\paragraph{Se elimina la tarea 1}
+
+
+\section{Nosotros también nos equivocamos}
+
+\paragraph{}
+A lo largo de la realización del trabajo práctico fuimos encontrándonos con infinidad de problemas. Muchos fueron fáciles de descubrir y resolver, pero con otros no se contó con la misma suerte. Muchas veces estuvimos trabados mucho tiempo hasta poder continuar programando ya que había errores que no nos dejaban seguir adelante. Por esta razón es que creemos que en este informe no podía faltar una sección comentando alguno de los errores que nos causaron mayores dolores de cabeza.
+
+\paragraph{}
+Lo primero que se hizo a la hora de comenzar este trabajo práctico, fue limpiar el trabajo hecho en clase y sólo tomar las cosas básicas y primordiales, como la activación del GATE A20, la estructura de la GDT para el kernel, el paso a modo protegido y la actualización de los registros de segmento para que utilizaran los segmentos de la GDT correspondientes. Luego, comenzamos a trabajar en el resto de las funcionalidades, como la paginación, el manejo de memoria, etc. La idea era utilizar la menor cantidad de código assembler posible, para que el código resulte más legible y amigable, por lo tanto todas estas rutinas fueron implementadas en lenguaje C. Gracias a esta decisión, nos topamos con el primer problema. Intentando probar un código de C, durante el llamado a la función ocurría una excepción y la maquina virtual Bochs se colgaba. Intentando buscar donde estaba el error, fuimos comentando lineas de código de la función, hasta que finalmente se había comentado todo el código y sin embargo seguía ocurriendo la misma excepción. Lo que restaba entonces era que había un problema cuando se realizaba el llamado a dicha función. En ese momento, fue cuando caímos en la cuenta que nunca se había inicializado la pila del kernel. Asombrosamente, este error fue arrastrado desde el trabajo práctico realizado durante el cuatrimestre, pero en ese momento no había surgido este problema. La solución entonces fue cargar los registros \textit{EBP} y \textit{ESP} con la dirección destinada a la pila del kernel.
+
+\paragraph{}
+Más adelante, una vez que la cantidad de código había aumentado, nos topamos con otro error. Pero este error era distinto por una simple razón: el error se daba al compilar el kernel. En un comienzo no se entendía el por qué del problema. Luego de insistir un poco, pudimos entender a qué se debía. Dentro del código de error que nos daba al compilar, logramos ver que había algún problema con una variable llamada \textit{GDT\_DESC}. Esta variable pertenecía al código C de la GDT, y era la que contenía el tamaño y la dirección de la GDT. Notamos que este error dejaba de ocurrir si borrabamos o comentabamos líneas de código o eliminabamos alguna estructura de datos grande. Hecho esto, pudimos compilar y correr el código para poder debuggear. Lo primero que chequeamos fue la dirección en la que se alojaba dicha variable, la cuál rondaba por 0xFFxx (no registramos exactamente el valor para este apartado, pero estaba muy cerca de 0xFFFF). Revisando en qué parte del código se utilizaba esta variable, se notó que la misma sólo se usaba en las primeras líneas de código para cargar la GDT y poder así pasar luego a modo protegido. En este momento, recordamos que esas líneas de código utilizan el procesador en modo real, por lo que el código era procesado en 16 bits. Lo que ocurría entonces es que la dirección de la variable \textit{GDT\_DESC}, había superado la 0xFFFF y dicha dirección no era alcanzable por el código de 16 bits. Como no logramos encontrar la forma de indicarle al compilador GCC dónde queríamos que compilara cierto código, la solución que adoptamos fue implementar el arreglo de la GDT en assembler, dentro del archivo \textit{kernel.asm}. De esta manera nos aseguramos que el mismo quede en posiciones bajas de la memoria para que este error no volviera a ocurrir.
+
+\paragraph{}
+Una vez adentrados en la construcción del kernel, se optó por probar si se podía correr alguna tarea junto con el kernel utilizando todo lo que se había implementado hasta el momento, que si bien había sido probado por separado nunca se había puesto a prueba en una situación un poco más real. Lo primero que se intentó fue correr una tarea que se ejecutara en modo kernel es decir, igual a lo que se había realizado durante la cursada. En este caso no hubo inconveniente. Sin embargo, sí lo hubo al intentar correr una tarea en modo usuario. En este caso, cuando se intentaba realizar el switch de tareas, se producía una excepción de protección general (\#GP). Luego de ahondar un poco en el tema y de realizar algunas consultas a Alejandro Furfaro y a Federico Raimondo, pudimos resolver el problema modificando el RPL del selector con el cuál se hacían los cambios de contexto, es decir cuando se ejecutaba la instrucción \textit{jmp selector:offset}.
+
+\paragraph{}
+Sin embargo, este problema no terminó allí. Al momento de pasar a ejecutarse una tarea, sucedió que se producía un \textit{page fault}. Luego de hacer algunos debuggeos, notamos que este error se producía cuando la tarea intentaba escribir un dato en la pantalla. Estabamos seguros que el problema era de permisos, pero no lográbamos encontrar en dónde estaba. Luego de una nueva consulta, caímos en la cuenta que el error estaba en el permiso de la tabla de páginas. Cuando se había implementado la función mapear página, una de las verificaciones que se realizaba era para ver si la tabla de páginas estaba presente o no. Si no estaba, se alojaba una nueva página para la misma y se la mapeaba dentro del directorio de páginas en la entrada correspondiente, utilizando los mismos atributos/permisos que se usaban para la página que se estaba mapeando. El problema fue que el primer mapeo que se realizaba tenía permisos de lectura únicamente. Por lo que para la tabla de páginas que se utilizaba, sólo podían realizarse lecturas. Para corregir este error entonces, se procedió a modificar levemente el código de la función \textit{mapear\_pagina} verificando si el permiso de la página es de escritura y el de la tabla no, en cuyo caso se modificaban los permisos de la tabla de páginas. De esta manera, siempre prevalece el permiso más alto.
+
+\paragraph{}
+Uno de los problemas graves que nos surgieron a la hora del manejo de tareas fue cuando intentamos eliminar una tarea del scheduling. La idea principal era poder hacerlo a través de una llamada al sistema, pero sin embargo el primer objetivo fue lograr hacerlo desde alguna función que se pudiese llamar utilizando la consola. Algo así como el ``kill'' del sistema GNU/Linux (un poco más humilde en realidad). El primer problema que surgió fue que en algunas ocasiones funcionaba bien y en otras mal. La excepción que se producía era un \textit{page fault}. Luego de varios debuggeos, observamos que este error se producía cuando se estaba ejecutando la tarea a matar. Claramente, esto sucedía porque dentro de todas las acciones a realizar para eliminar a la tarea, una de ellas era vaciar (dejar en 0) el directorio de tablas de páginas. Claramente, estas posiciones de memoria no estaban dentro del mapeo de la tarea, por cuestiones de seguridad, además de no ser necesario en absoluto. Había varias soluciones distintas posibles de implementar, pero elegimos una que a los fines prácticos era más sencilla y que al igual que las otras, cumplía con los requisitos necesarios. Lo que se hizo entonces fue que el ``matar'' de una tarea fuese simplemente quitar a la tarea del scheduling modificando los punteros de las tareas que estaban alrededor de la tarea a matar y marcarla dentro de la BCP como tarea a matar. Luego, se agregó dentro del código del kernel que se buscara a las tareas a matar y que en caso de haberlas, ejecute ahora sí el código que se encargaba de limpiar y desocupar todas las estructuras utilizadas para dicha tarea (pilas, directorio y tablas, BCP, TSS, GDT, etc). Como esto se ejecutaba en el contexto del kernel, al tener el kernel toda la memoria mapeada en el directorio, quitamos el problema de los permisos a la hora de la limpieza. 
+
+\paragraph{}
+Luego de esta modificación, pudimos encontrar un problema que estábamos acarreando en una rutina de atención de interrupciones. Cuando corriamos el kernel, luego de un tiempo de inactividad, recibíamos una excepción \#GP. Luego de mucho debuggear, notamos que lo que ocurría es que se estaba realizando una llamada a la función que realizaba la limpieza de una tarea a pesar que en ningún momento se le había indicado. Más aún, ni siquiera se había cargado una tarea. Lo que ocurría es lo siguiente: en la ejecución del kernel, se realizaban 2 pasos:
+
+\begin{itemize}
+	\item Se llama a una función que busca una tarea marcada como ``a matar'' dentro de la BCP
+	\item Si el resultado de esta búsqueda es positivo (es decir, si hay alguna tarea así marcada), se llama a la función que limpia el contexto de una tarea.
+\end{itemize}
+
+\paragraph{}
+El problema fue que al parecer, esta función estaba retornando un valor erróneo. Sin necesidad de realizar un debbugeo, se descartó esta posibilidad porque el código de la esta función era muy simple y fácil de revisar y no se encontraron errores. Luego de analizarlo un tiempo, supimos que el único código que se ejecutaba para poder reproducir el error era el código del kernel (el loop infinito que realiza los 2 pasos antes mencionado) y el handler de atención de interrupción del timertick (incluído el scheduler). Fue entonces cuando observamos que en la atención de la rutina, no se estaban guardando los registros de interés general. El problema era entonces que justo luego de ejecutarse todo el código de la función que buscaba la tarea a matar y antes que devolviera el resultado, se producía una interrupción del timertick que pisaba entre otras cosas, el valor del registro eax, registro en el que se devuelve el resultado de una función en C, es decir, se estaba pisando el resultado de la función que buscaba una tarea a matar. Esto hacía que se ejecutara la ``función de limpieza'' en un momento equivocado y que se produzca el error ya mencionado. Este problema se solucionó simplemente pusheando los registros generales ni bien se entraba al handler del timertick y popeandolos justo antes de salir.
+
+\paragraph{}
+Todos los errores antes mencionados fueron los que más dolores de cabeza e insomnio nos produjeron. Sin embargo, los errores que tuvimos en la realización de este TP son incontables y los problemas acarreados por los mismos, muchos más. Nombrarlos y explicarlos todos nos llevaría mucho tiempo y sería poco práctico. Creemos que con esta compilación de errores podemos dar una idea de qué tan complicado puede ser encarar un proyecto de este tipo y de cómo a veces el código más insignificante puede hacer que las cosas cambien drásticamente.
+
+
+\section{Algunas conclusiones}
+
+\paragraph{}
+Nuestra decisión de hacer un trabajo práctico sobre scheduling dinámico fue entre muchas cosas, por el hecho de poder entender un poco mejor cómo funcionan por detrás muchas cosas de un sistema operativo. En este sentido, creemos que nuestro objetivo fue cumplido. Gracias a este proyecto, no sólo aplicamos conocimientos adquiridos durante la cursada, sino que también pudimos reforzarlos y aprender muchas cosas más sobre el tema de system programming. 
+
+\paragraph{}
+Creemos que hay muchas cosas más que se podrían agregar a nuestro kernel, para hacerlo más robusto y completo, pero las mismas exceden los fines de la cursada, además de estirar por más tiempo la finalización de este trabajo práctico. Sin embargo, esto no significa el fin de este viaje, sino que al contrario, nos abre otras puertas. El haber recorrido este camino, nos sirvió para conocer un poco el mundo de la programación de sistemas operativos, despertando en alguno de nuestros integrantes ganas por continuar creciendo dentro de esta rama.
+
+
+
+
+
+\Huge{PONER COMO BIBLIOGRAFIA CONSULTADA LOS MANUALES DE INTEL DE SYSTEM PROGRAMMING Y DEL SET DE INSTRUCCIONES, LA PAGINA OSDEV.ORG, EL TRABAJO PRACTICO QUE HICIMOS DURANTE EL CUATRIMESTRE, LAS TEORICAS VISTAS EN CLASE Y LAS SLIDES DE LAS CLASES PRACTICAS DE SYSTEM PROGRAMMING. SE PUEDE PONER ALGUNA ``CONCLUSION'' CHAMUYANDO UN POCO DE POR QUE ELEGIMOS EL TEMA}
+
+
+
+
+
+
 \end{document}
