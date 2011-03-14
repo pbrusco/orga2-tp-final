@@ -437,14 +437,18 @@
 		\begin{itemize}
 			\item Pedir páginas para el código, la \textit{Directorio de Páginas}, la pila de nivel 0 y la pila de nivel 3, y el buffer de video necesarios para la tarea por medio de la función \texttt{pedirPagina} del módulo \textbf{Paginación}.
 			\item Copiar el código de la tarea a partir de la dirección recibida como parámetro a la pagina pedida a tal efecto mediante la instrucción \texttt{cpmem} del módulo \textbf{Memoria}.
-			\item Llenar las entradas de la \textit{Directorio de Páginas} con las páginas pedidas por la tarea mediante la función \texttt{mapear\_pagina} del módulo \textbf{Paginación}.
-			\item Mapear directorio \textbf{...??} mediante la función \texttt{mapear\_pagina\_default} del módulo \textbf{???}.
+			\item Llenar las entradas del \textit{Directorio de Páginas} con las páginas pedidas por la tarea mediante la función \texttt{mapear\_pagina} del módulo \textbf{Paginación}.
+			\item Llenar las entradas del \textit{Directorio de Páginas} con las páginas de código del kernel (necesario para ejecutar código del kernel) mediante la función \texttt{mapear\_pagina\_default} del módulo \textbf{BCP}.
 			\item Buscar una \textit{TSS} libre dentro del arreglo de \textit{TSS's} en memoria mediante la función \texttt{buscar\_TSS\_vacia} del módulo \textbf{TSS}.
 			\item Llenar los campos de la TSS con los valores de la dirección del \textit{Directorio de Páginas}, las direcciónes de ambas pilas, el offset en la página de código de la tarea (0 para que empiece desde el primer byte) y los flags para indicar que es una tarea a nivel de usuario, por medio de mediante la función \texttt{crear\_TSS} del módulo \textbf{TSS}.
 			\item Buscar una entrada libre en la \textit{GDT} para crear un \textit{descriptor de TSS} mediante la función \texttt{buscar\_entrada\_GDT\_vacia} del módulo \textbf{GDT}.
 			\item Setear, por medio de la función \texttt{make\_descriptor} del módulo \textbf{GDT}, la entrada encontrada en la \textit{GDT} para que sea un \textit{descriptor de TSS} que apunte a la \textit{TSS} creada anteriormente para esta tarea.
+			\item Crea una entrada en la \textit{BCP} que tenga por \textit{pid} el número que tiene en la \textit{GDT} el \textit{descriptor de TSS} de la tareas y marque a la tarea como ``ACTIVA'', mediante la función \texttt{crear\_entradaBCP} del módulo \textbf{BCP}.
+			\item Devolver finalmente el \textit{pid} de la tarea cargada.
 		\end{itemize}
-		\item Se carga la tarea 1.
+		Una vez terminada la función \texttt{cargarTarea} se vuelve a la ejecución de la función \texttt{console}, la cual invoca luego a la funcioń \texttt{cambiar\_pantalla} del módulo \textbf{Pantalla} pasándole como parámetro el \textit{pid} de la tarea \textit{X} que el usuario pidió cargar.\\
+		La función \texttt{cambiar\_pantalla}, copia el contenido del buffer de video de la tarea a la memoria de video y luego termina. Seguidamente, tambien terminan \texttt{console} e \texttt{\_INT33} y se devuelve el procesador a la ejecución del loop infinito en \texttt{kernel\_inifinito}.
+		\item Una vez cargada la tarea pedida por el usuario, en el sistema están presentes dos tareas: el kernel y la tarea 1. Luego, en la próxima interrupción del timer nuevamente la \texttt{\_INT32} llamará a \texttt{switch\_task}, solo que esta vez al haber más de una tarea en el sistema, dicha función marcará como \textit{``ACTIVA''} a la tarea actual en su \textit{entrada de BCP}, y marcará como \textit{``CORRIENDO''} en su \textit{entrada de BCP} a la tarea siguiente a la actual. Finalmente, ejecutará la instrucción \texttt{ljump selector:offset}, donde el \textit{offset} el es índice de la entrada en la \textit{GDT} en donde está el \textit{descriptor de TSS} de la tarea que se va a pasar a ejecutar.
 		\item El usuario ingres un comando para cargar una segunda tarea.
 		\item Se carga la tarea 2.
 		\item El usuario ingresa un comando para finalizar la primera tarea.
