@@ -1,0 +1,1 @@
+Kernel con scheduler dinamico
